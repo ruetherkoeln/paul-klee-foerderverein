@@ -1,0 +1,45 @@
+---
+import { SITE } from '../data/site.ts';
+---
+<footer class="bg-navy-900 text-white/80 mt-24">
+  <div class="container-c py-14 grid md:grid-cols-3 gap-10">
+    <div>
+      <div class="font-display font-bold text-lg text-white mb-3">Paul-Klee-Schule</div>
+      <p class="text-sm leading-relaxed">
+        Städtisch Katholische Grundschule Gerresheimerstraße<br/>
+        {SITE.address.street}<br/>
+        {SITE.address.zip} {SITE.address.city}
+      </p>
+      <p class="text-sm mt-3">
+        Tel.: {SITE.phone}<br/>
+        E-Mail: <a href={`mailto:${SITE.emailSchool}`} class="hover:text-gold-500">{SITE.emailSchool}</a>
+      </p>
+    </div>
+    <div>
+      <div class="font-display font-bold text-lg text-white mb-3">Förderverein</div>
+      <p class="text-sm leading-relaxed">
+        Förderverein der Paul-Klee-Schule Düsseldorf e. V.<br/>
+        Gerresheimer Straße 34/36<br/>
+        40211 Düsseldorf
+      </p>
+      <p class="text-sm mt-3">
+        E-Mail: <a href={`mailto:${SITE.emailVerein}`} class="hover:text-gold-500">{SITE.emailVerein}</a>
+      </p>
+      <a href="/foerderverein/#spenden" class="btn-gold mt-4 !py-2 !px-4 text-xs">Jetzt spenden</a>
+    </div>
+    <div>
+      <div class="font-display font-bold text-lg text-white mb-3">Rechtliches</div>
+      <ul class="text-sm space-y-2">
+        <li><a href="/impressum/" class="hover:text-gold-500">Impressum</a></li>
+        <li><a href="/datenschutz/" class="hover:text-gold-500">Datenschutz</a></li>
+        <li><a href="/foerderverein/satzung/" class="hover:text-gold-500">Vereinssatzung</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="container-c py-4 text-xs flex flex-col md:flex-row justify-between gap-2">
+      <span>© {new Date().getFullYear()} Paul-Klee-Schule Düsseldorf · Förderverein e. V.</span>
+      <span>Eine Initiative von Schulgemeinschaft und Förderverein.</span>
+    </div>
+  </div>
+</footer>

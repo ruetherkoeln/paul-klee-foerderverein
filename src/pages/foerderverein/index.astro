@@ -1,0 +1,285 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../data/site.ts';
+
+const stats = [
+  { number: '~220', label: 'Kinder an unserer Schule' },
+  { number: '30+', label: 'Herkunftsländer unter den Familien' },
+  { number: '100%', label: 'Ihrer Spende kommt direkt bei den Kindern an' }
+];
+
+const brennpunkt = [
+  { kicker: '> 30', title: 'Herkunftsländer', body: 'unter den Schülerfamilien — Diversität als Chance und Aufgabe zugleich.' },
+  { kicker: 'Täglich', title: 'Bedarf', body: 'Kommen Kinder ohne Frühstück, ohne Schulmaterial, manchmal ohne Wohnsicherheit.' },
+  { kicker: 'Fehlend', title: 'Mittel', body: 'Ausflüge, Musikunterricht, Sportgeräte, digitale Ausstattung — nicht im Regelbudget NRW.' }
+];
+
+const werte = [
+  { title: 'Gemeinnützig & transparent', body: 'Eingetragener Verein, steuerlich anerkannt — Spendenquittungen auf Anfrage.' },
+  { title: '100% direkt an die Kinder', body: 'Keine Verwaltungskosten — jeder Cent kommt bei den Schülerinnen und Schülern an.' },
+  { title: 'Ehrenamtlich geführt', body: 'Alle Vorstandsmitglieder arbeiten ohne Vergütung.' },
+  { title: 'Mitgliedschaft offen für alle', body: 'Ab 12 € / Jahr — Mitsprache ausdrücklich erwünscht.' }
+];
+
+const projekte = [
+  { num: '01', title: 'Lernmittel & Ausstattung', body: 'Schulhefte, Stifte, Taschenrechner — für Kinder, deren Familien sich das Nötigste nicht leisten können.' },
+  { num: '02', title: 'Klassenfahrten & Ausflüge', body: 'Gemeinsame Erlebnisse formen Gemeinschaft. Wir bezuschussen Fahrten für Familien ohne die nötigen Mittel.' },
+  { num: '03', title: 'Musik, Kunst & Sport', body: 'Instrumente, Sporttrikots, Theaterworkshops — Kreativität jenseits des Lehrplans, die das Budget nicht vorsieht.' },
+  { num: '04', title: 'Digitale Teilhabe', body: 'Tablets, Lernsoftware, Druckerpatronen, WLAN-Hotspots — damit kein Kind beim digitalen Lernen abgehängt wird.' },
+  { num: '05', title: 'Frühstück & Grundversorgung', body: 'Kein Kind lernt mit leerem Magen. Wir kofinanzieren Frühstücksangebote und Grundversorgung.' },
+  { num: '06', title: 'Schulverschönerung', body: 'Wände, Pausenhof, Garten — Räume, in denen Kinder gern sind, sind Räume, in denen sie gern lernen.' }
+];
+
+const zukunft = [
+  { title: 'Mentoring-Programm', body: 'Ehrenamtliche begleiten Schülerinnen und Schüler über mehrere Jahre — individuell, verlässlich, nachhaltig.' },
+  { title: 'Bibliothek & Leseförderung', body: 'Aufbau einer Schulbibliothek mit mehrsprachigen Beständen — Lesen als Schlüssel zu allem Weiteren.' },
+  { title: 'Schüler-Werkstatt', body: 'Ein Raum zum Bauen, Reparieren, Gestalten — praktische Fähigkeiten und Selbstwirksamkeit vermitteln.' },
+  { title: 'Eltern-Café', body: 'Niedrigschwelliger Treffpunkt für Familien — Sprachkurse, Beratung, Vernetzung, Ankommen in der Stadt.' }
+];
+
+const spendenStufen = [10, 25, 50, 100];
+---
+<Base title="Förderverein" description="Der Förderverein der Paul-Klee-Schule Düsseldorf e. V. — Bildung ist kein Privileg." variant="verein">
+
+  {/* HERO */}
+  <section class="bg-navy-900 text-white">
+    <div class="container-c pt-16 pb-24 grid md:grid-cols-2 gap-14 items-center">
+      <div>
+        <div class="eyebrow text-gold-500 mb-6">Förderverein Düsseldorf · seit 2025</div>
+        <h1 class="text-5xl md:text-6xl leading-[1.05] font-display font-extrabold">
+          Bildung ist kein <span class="accent">Privileg.</span>
+        </h1>
+        <p class="mt-6 text-white/75 text-lg max-w-xl leading-relaxed">
+          Wir sind der Förderverein der Paul-Klee-Schule — Gerresheimer Straße, Düsseldorf.
+          Wir füllen die Lücken, die das System hinterlässt, und bauen Zukunft, Schritt für Schritt.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="#spenden" class="btn-gold">♥ Jetzt spenden</a>
+          <a href="#projekte" class="btn border-2 border-white/30 text-white hover:bg-white hover:text-navy-900">Unsere Projekte</a>
+        </div>
+      </div>
+      <div class="space-y-8 md:pl-10 md:border-l md:border-white/10">
+        {stats.map(s => (
+          <div>
+            <div class="text-5xl md:text-6xl font-display font-extrabold text-gold-500 leading-none">{s.number}</div>
+            <div class="text-white/70 mt-2 max-w-xs">{s.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* BRENNPUNKT */}
+  <section id="brennpunkt" class="bg-brick-600 text-white">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14">
+      <div>
+        <div class="eyebrow text-cream-50 mb-6">Was bedeutet das?</div>
+        <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          „Brennpunktschule"<br/>— ein Wort mit Gewicht.
+        </h2>
+        <p class="mt-6 text-white/85 leading-relaxed">
+          Der Begriff bezeichnet Schulen in sozial benachteiligten Stadtteilen, in denen ein überdurchschnittlich hoher Anteil
+          der Schülerinnen und Schüler aus einkommensschwachen Familien stammt, mehrsprachig aufwächst oder besondere
+          Förderbedarfe mitbringt.
+        </p>
+        <p class="mt-4 text-white/85 leading-relaxed">
+          Das bedeutet: mehr Bedarf an Unterstützung — und ein Landesbudget, das diese Realität nicht vollständig abdeckt.
+          Was das System nicht finanziert, finanzieren Menschen wie Sie.
+        </p>
+      </div>
+      <div class="space-y-5">
+        {brennpunkt.map(b => (
+          <div class="bg-brick-700/50 border-l-4 border-gold-500 p-6">
+            <div class="text-3xl font-display font-extrabold text-gold-500">{b.kicker}</div>
+            <div class="mt-2 font-semibold text-lg">{b.title}</div>
+            <p class="text-white/80 mt-1 text-sm leading-relaxed">{b.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* WERTE */}
+  <section id="ueber-uns" class="bg-cream-50 text-navy-900">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14">
+      <div>
+        <div class="eyebrow mb-6">Wer wir sind</div>
+        <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          Ein Verein.<br/>Eine Mission. Eine Schule.
+        </h2>
+        <p class="mt-6 leading-relaxed">
+          Gegründet von Eltern, Lehrern und Engagierten, die erkannt haben: Zwischen dem, was Kinder brauchen,
+          und dem, was das Land bereitstellt, klafft eine Lücke.
+        </p>
+        <p class="mt-4 leading-relaxed">
+          Der Förderverein der Paul-Klee-Schule e. V. ist ein gemeinnütziger Verein, der ausschließlich zur
+          Unterstützung des Schullebens, der pädagogischen Arbeit und der sozialen Teilhabe tätig ist.
+        </p>
+        <p class="mt-4 leading-relaxed">
+          Wir sind keine Bürokratie. Wir sind Eltern, Lehrkräfte, Nachbarinnen, Menschen aus Düsseldorf,
+          denen diese Kinder am Herzen liegen. Jeder gespendete Euro verbleibt zu 100% an der Schule —
+          kein Overhead, keine Verwaltungsebene dazwischen.
+        </p>
+      </div>
+      <div class="space-y-4">
+        {werte.map(w => (
+          <div class="card flex gap-4 items-start">
+            <div class="w-10 h-10 bg-gold-500/20 text-gold-600 grid place-items-center font-bold flex-shrink-0">✦</div>
+            <div>
+              <div class="font-semibold text-base">{w.title}</div>
+              <p class="text-sm text-navy-900/70 mt-1 leading-relaxed">{w.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* PROJEKTE */}
+  <section id="projekte" class="bg-cream-100 text-navy-900">
+    <div class="container-c py-20">
+      <div class="eyebrow mb-4">Was wir tun</div>
+      <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight max-w-3xl">
+        Konkrete Hilfe.<br/>Messbare Wirkung.
+      </h2>
+      <p class="mt-6 max-w-2xl leading-relaxed">
+        Was das Land NRW nicht finanziert, finanzieren wir — mit Ihrer Hilfe.
+        Diese Projekte existieren nur dank Ihrer Spenden.
+      </p>
+      <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {projekte.map(p => (
+          <div class="card relative pl-8 pt-8">
+            <div class="absolute top-3 left-4 text-5xl font-display font-extrabold text-gold-500/30">{p.num}</div>
+            <div class="font-display font-bold text-xl">{p.title}</div>
+            <p class="mt-3 text-sm text-navy-900/70 leading-relaxed">{p.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* ZUKUNFT */}
+  <section id="zukunft" class="bg-navy-900 text-white">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14">
+      <div>
+        <div class="eyebrow text-gold-500 mb-6">Zukunft bauen</div>
+        <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          Was wir aufbauen wollen.
+        </h2>
+        <p class="mt-6 text-white/75 leading-relaxed">
+          Einmalige Projekte sind gut. Strukturen, die bleiben, sind besser. Das sind unsere mittel- und langfristigen Ziele.
+        </p>
+      </div>
+      <div class="divide-y divide-white/10">
+        {zukunft.map(z => (
+          <div class="py-5 border-l-4 border-gold-500 pl-5">
+            <div class="font-semibold text-lg">{z.title}</div>
+            <p class="text-white/70 text-sm mt-1 leading-relaxed">{z.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* SPENDEN */}
+  <section id="spenden" class="bg-cream-50 text-navy-900">
+    <div class="container-c py-20 text-center">
+      <div class="eyebrow mb-4">Jetzt helfen</div>
+      <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+        Ihre Spende.<br/>Echte Wirkung.
+      </h2>
+      <p class="mt-6 max-w-2xl mx-auto leading-relaxed">
+        10 € kaufen Hefte und Stifte für einen Monat. 25 € ermöglichen einen Ausflug.
+        50 € finanzieren eine Woche Frühstück für fünf Kinder.
+      </p>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        {spendenStufen.map(s => (
+          <button class="px-6 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-gold-500 hover:text-navy-900 font-display font-bold text-xl transition-all rounded-sm bg-white">
+            {s} €
+          </button>
+        ))}
+        <button class="px-6 py-4 border-2 border-navy-900/15 hover:border-gold-500 font-display font-bold text-xl bg-white">
+          Frei
+        </button>
+      </div>
+
+      <div class="mt-10 max-w-2xl mx-auto bg-white card text-left">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="bg-[#003087] text-white px-3 py-1 font-bold text-sm rounded-sm">PayPal</div>
+          <span class="text-sm text-navy-900/70">Sicher · Schnell · Ohne Konto möglich</span>
+        </div>
+        <h3 class="text-2xl font-display font-bold">Schenken Sie einem Kind eine bessere Chance.</h3>
+        <p class="mt-3 text-sm leading-relaxed">
+          Ihre Spende geht direkt an den Förderverein der Paul-Klee-Schule Düsseldorf e. V. —
+          gemeinnützig anerkannt. Spendenquittung auf Anfrage.
+        </p>
+        <a href="https://www.paypal.com/donate" class="btn-gold mt-5 w-full justify-center">
+          ♥ jetzt spenden
+        </a>
+        <p class="mt-4 text-xs text-navy-900/60">
+          Alternativ: Überweisung an Förderverein der Paul-Klee-Schule e. V. — IBAN folgt nach Vereinsregistereintrag.
+        </p>
+      </div>
+
+      <div class="mt-12 max-w-xl mx-auto border-t border-navy-900/10 pt-8">
+        <div class="eyebrow mb-3">Mitglied werden</div>
+        <h3 class="text-2xl font-display font-bold">Schon ab 12 € im Jahr.</h3>
+        <p class="mt-3 text-sm leading-relaxed">
+          Mit einer Mitgliedschaft unterstützen Sie verlässlich und langfristig — und stimmen
+          mit darüber ab, welche Projekte gefördert werden.
+        </p>
+        <a href="/foerderverein/mitglied-werden/" class="btn-dark mt-5">Mitgliedsantrag</a>
+      </div>
+    </div>
+  </section>
+
+  {/* KONTAKT */}
+  <section id="kontakt" class="bg-cream-100 text-navy-900">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14">
+      <div>
+        <div class="eyebrow mb-4">Kontakt</div>
+        <h2 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          Werden Sie Teil der Gemeinschaft.
+        </h2>
+        <p class="mt-6 leading-relaxed">
+          Ob als Mitglied, Förderer, ehrenamtliche Kraft oder Mensch, dem diese Kinder am Herzen liegen —
+          wir freuen uns auf Ihre Nachricht.
+        </p>
+        <div class="mt-8 space-y-4">
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold mb-1">Adresse</div>
+            <div>Gerresheimer Straße 34/36, 40211 Düsseldorf</div>
+          </div>
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold mb-1">E-Mail</div>
+            <a href={`mailto:${SITE.emailVerein}`} class="hover:text-gold-500">{SITE.emailVerein}</a>
+          </div>
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold mb-1">Rechtsstatus</div>
+            <div>Gemeinnütziger e. V. · Spendenquittungen möglich</div>
+          </div>
+        </div>
+      </div>
+      <form class="card space-y-4" method="post" action="https://formspree.io/f/REPLACE_FORM_ID">
+        <div>
+          <label class="text-sm font-semibold">Ihr Name</label>
+          <input required type="text" name="name" class="mt-1 w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:border-gold-500 outline-none" />
+        </div>
+        <div>
+          <label class="text-sm font-semibold">Ihre E-Mail-Adresse</label>
+          <input required type="email" name="email" class="mt-1 w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:border-gold-500 outline-none" />
+        </div>
+        <div>
+          <label class="text-sm font-semibold">Ihre Nachricht</label>
+          <textarea required name="message" rows="5" placeholder="Idee, Frage, Angebot zur Mitarbeit…" class="mt-1 w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:border-gold-500 outline-none"></textarea>
+        </div>
+        <button class="btn-dark w-full justify-center">Nachricht senden →</button>
+        <p class="text-xs text-navy-900/60">
+          Mit dem Absenden stimmen Sie der Verarbeitung Ihrer Daten gemäß unserer
+          <a href="/datenschutz/" class="underline">Datenschutzerklärung</a> zu.
+        </p>
+      </form>
+    </div>
+  </section>
+</Base>

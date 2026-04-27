@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../data/site.ts';
+---
+<Base title="Mitglied werden" variant="verein">
+  <section class="bg-navy-900 text-white pt-20 pb-12">
+    <div class="container-c">
+      <div class="eyebrow text-gold-500 mb-4">Mitgliedschaft</div>
+      <h1 class="text-5xl font-display font-extrabold">Schon ab <span class="accent">12 € / Jahr</span>.</h1>
+      <p class="mt-4 max-w-2xl text-white/80">
+        Eine Mitgliedschaft ist die verlässlichste Form der Unterstützung: planbar für uns, gestaltend für Sie.
+        Mitglieder haben Stimmrecht in der Mitgliederversammlung und entscheiden mit, welche Projekte gefördert werden.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50 text-navy-900 py-16">
+    <div class="container-c grid md:grid-cols-2 gap-12">
+      <div>
+        <h2 class="text-3xl font-display font-bold">So werden Sie Mitglied.</h2>
+        <ol class="mt-6 space-y-5 text-sm leading-relaxed list-decimal list-inside">
+          <li>Mitgliedsantrag herunterladen oder Online-Formular ausfüllen.</li>
+          <li>Mindestbeitrag wählen (12 € / Jahr) oder höheren Beitrag eintragen.</li>
+          <li>SEPA-Lastschriftmandat erteilen oder Überweisung wählen.</li>
+          <li>Antrag unterschrieben einreichen — per E-Mail, Post oder im Schulsekretariat.</li>
+          <li>Bestätigung erhalten und ab sofort Teil der Gemeinschaft sein.</li>
+        </ol>
+        <a href={`mailto:${SITE.emailVerein}?subject=Mitgliedsantrag`} class="btn-dark mt-8">Antrag per E-Mail anfordern</a>
+      </div>
+      <form class="card space-y-4" method="post" action="https://formspree.io/f/REPLACE_FORM_ID">
+        <h3 class="font-display font-bold text-xl">Online-Antrag</h3>
+        <div class="grid grid-cols-2 gap-3">
+          <input required name="vorname" placeholder="Vorname" class="px-4 py-3 border border-navy-900/15 rounded-sm" />
+          <input required name="nachname" placeholder="Nachname" class="px-4 py-3 border border-navy-900/15 rounded-sm" />
+        </div>
+        <input required type="email" name="email" placeholder="E-Mail" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
+        <input name="telefon" placeholder="Telefon (optional)" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
+        <input name="adresse" placeholder="Anschrift" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
+        <select name="beitrag" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm">
+          <option>12 € / Jahr (Mindestbeitrag)</option>
+          <option>24 € / Jahr</option>
+          <option>60 € / Jahr</option>
+          <option>120 € / Jahr</option>
+          <option>höherer Beitrag (im Antrag angegeben)</option>
+        </select>
+        <textarea name="bemerkung" placeholder="Bemerkung / Mitarbeit-Interesse" rows="3" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm"></textarea>
+        <button class="btn-gold w-full justify-center">Antrag absenden</button>
+        <p class="text-xs text-navy-900/60">
+          Hinweis: Die formale Aufnahme erfolgt nach Vorstandsbeschluss gemäß Vereinssatzung.
+        </p>
+      </form>
+    </div>
+  </section>
+</Base>

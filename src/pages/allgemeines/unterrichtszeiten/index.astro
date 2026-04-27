@@ -1,0 +1,48 @@
+---
+import Base from '../../../layouts/Base.astro';
+
+const stunden = [
+  ['1. Stunde', '08:00 – 08:45'],
+  ['2. Stunde', '08:45 – 09:30'],
+  ['Hofpause', '09:30 – 09:50'],
+  ['3. Stunde', '09:50 – 10:35'],
+  ['4. Stunde', '10:35 – 11:20'],
+  ['Hofpause', '11:20 – 11:35'],
+  ['5. Stunde', '11:35 – 12:20'],
+  ['6. Stunde', '12:20 – 13:05']
+];
+---
+<Base title="Unterrichtszeiten">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Tagesablauf</div>
+      <h1 class="text-5xl font-display font-extrabold">Unterrichtszeiten.</h1>
+    </div>
+  </section>
+  <section class="bg-cream-50 pb-16">
+    <div class="container-c grid md:grid-cols-2 gap-6">
+      <div class="card">
+        <div class="eyebrow mb-3">Unterricht</div>
+        <table class="w-full text-sm">
+          <tbody>
+            {stunden.map(([s, t]) => (
+              <tr class="border-b border-navy-900/5 last:border-0">
+                <td class="py-2 font-semibold">{s}</td>
+                <td class="py-2 text-right text-navy-900/70">{t}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="mt-4 text-xs text-navy-900/60">Hinweis: Genaue Zeiten klassenabhängig — bitte Stundenplan beachten.</p>
+      </div>
+      <div class="card bg-navy-900 text-white border-0">
+        <div class="eyebrow text-gold-500 mb-3">Offener Ganztag (OGS)</div>
+        <div class="font-display font-bold text-2xl">Mo – Do</div>
+        <div class="text-white/80">08:00 – 16:30 Uhr</div>
+        <div class="font-display font-bold text-2xl mt-4">Freitag</div>
+        <div class="text-white/80">08:00 – 15.30 Uhr</div>
+        <p class="mt-6 text-sm text-white/70">Trägerschaft: Flingern mobil e. V.</p>
+      </div>
+    </div>
+  </section>
+</Base>

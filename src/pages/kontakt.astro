@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../data/site.ts';
+
+const kontakte = [
+  { rolle: 'Schulleitung', name: 'Maike Dambeck', email: 'Maike.dambeck@duesseldorf.de' },
+  { rolle: 'Sekretariat', name: 'Fabienne Rost', email: 'sekretariat.gerresheimerstr-kg@duesseldorf.de', tel: '0211 / 89 23 752', zeit: 'Mo – Fr 7:30 – 12:30 Uhr' },
+  { rolle: 'OGS-Koordination', name: 'Andrea Schreiber', email: 'ogs.gerresheimerstr@flingern-mobil.de', tel: '0211 / 89 23 759' },
+  { rolle: 'Schulsozialarbeit', name: 'Lysanne Lohstädt', email: 'Lysanne.Lohstaedt@caritas-duesseldorf.de', tel: '0151 / 72 67 49 75', zeit: 'Mo – Fr 8:00 – 16:00 Uhr' }
+];
+---
+<Base title="Kontakt">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Wir freuen uns auf Sie</div>
+      <h1 class="text-5xl font-display font-extrabold">Kontakt.</h1>
+      <p class="mt-4 max-w-2xl">
+        Städt. Kath. Grundschule Gerresheimerstraße — Offene Ganztagsschule Paul-Klee-Schule.<br/>
+        {SITE.address.street}, {SITE.address.zip} {SITE.address.city}
+      </p>
+    </div>
+  </section>
+  <section class="bg-cream-50 pb-16">
+    <div class="container-c grid md:grid-cols-2 gap-6">
+      {kontakte.map(k => (
+        <div class="card">
+          <div class="eyebrow mb-2">{k.rolle}</div>
+          <div class="font-display font-bold text-xl">{k.name}</div>
+          {k.tel && <div class="mt-2 text-sm">Tel.: {k.tel}</div>}
+          <div class="text-sm">E-Mail: <a class="text-gold-600 hover:underline" href={`mailto:${k.email}`}>{k.email}</a></div>
+          {k.zeit && <div class="mt-2 text-xs text-navy-900/60">{k.zeit}</div>}
+        </div>
+      ))}
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Paul-Klee-Schule Düsseldorf" description="Städtisch katholische Grundschule im Herzen Düsseldorfs.">
+
+  {/* HERO */}
+  <section class="bg-cream-50">
+    <div class="container-c pt-16 pb-20 grid md:grid-cols-2 gap-14 items-center">
+      <div>
+        <div class="eyebrow mb-5">Städt. Kath. Grundschule · seit 1907</div>
+        <h1 class="text-5xl md:text-6xl font-display font-extrabold leading-[1.05]">
+          medden en de <span class="accent">Stadt.</span>
+        </h1>
+        <p class="mt-6 text-navy-900/80 text-lg leading-relaxed max-w-xl">
+          Eine offene Ganztagsschule mit knapp 220 Kindern und je zwei Klassen pro Jahrgang —
+          mittendrin und doch ruhig gelegen, im klassischen Altbau von 1907.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/anmeldung/" class="btn-dark">Anmeldung 2027/2028</a>
+          <a href="/schule/" class="btn-ghost">Über die Schule</a>
+        </div>
+      </div>
+      <div class="bg-navy-900 text-white p-10 rounded-sm">
+        <div class="eyebrow text-gold-500 mb-3">Aktuelles vom Förderverein</div>
+        <h2 class="font-display font-bold text-3xl leading-tight">Bildung ist kein <span class="accent">Privileg.</span></h2>
+        <p class="mt-4 text-white/75">
+          Ihre Spende finanziert, was das Land NRW nicht trägt: Lernmittel, Klassenfahrten, Frühstück,
+          digitale Teilhabe. 100% direkt an die Kinder.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="/foerderverein/#spenden" class="btn-gold">♥ Jetzt spenden</a>
+          <a href="/foerderverein/" class="btn border-2 border-white/30 text-white hover:bg-white hover:text-navy-900">Mehr erfahren</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* KENNZAHLEN */}
+  <section class="bg-white border-y border-navy-900/10">
+    <div class="container-c py-12 grid md:grid-cols-4 gap-6 text-center">
+      <div><div class="text-4xl font-display font-extrabold text-gold-500">~220</div><div class="mt-1 text-sm text-navy-900/70">Kinder</div></div>
+      <div><div class="text-4xl font-display font-extrabold text-gold-500">8</div><div class="mt-1 text-sm text-navy-900/70">Klassen (2 pro Jahrgang)</div></div>
+      <div><div class="text-4xl font-display font-extrabold text-gold-500">30+</div><div class="mt-1 text-sm text-navy-900/70">Herkunftsländer</div></div>
+      <div><div class="text-4xl font-display font-extrabold text-gold-500">1907</div><div class="mt-1 text-sm text-navy-900/70">Schulgebäude erbaut</div></div>
+    </div>
+  </section>
+
+  {/* AUSSTATTUNG */}
+  <section class="bg-cream-50">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14">
+      <div>
+        <div class="eyebrow mb-4">Unsere Schule</div>
+        <h2 class="text-4xl font-display font-bold leading-tight">Mitten in der Stadt — und doch ruhig.</h2>
+        <p class="mt-6 leading-relaxed">
+          Aufgrund unserer zentralen Lage sind wir aus vielen umliegenden Stadtteilen gut zu erreichen — Flingern,
+          Pempelfort, Düsseltal oder Stadtmitte.
+        </p>
+        <p class="mt-4 leading-relaxed">
+          Das Schulgebäude mit seinem klassischen Altbaucharme wurde 1907 erbaut und in den letzten Jahren umfassend saniert.
+          Als städtisch katholische Grundschule unterrichten wir nach den geltenden Lehrplänen sowie nach den Grundsätzen
+          des katholischen Bekenntnisses.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        {[
+          'Turnhalle','Bücherei','Werkraum','Musikraum',
+          'Lernstudio','Hygieneraum','OGS-Räume','Schulhof mit Klettergarten'
+        ].map(item => (
+          <div class="card flex items-start gap-3">
+            <span class="text-gold-500 font-bold">✦</span>
+            <span>{item}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* OGS */}
+  <section class="bg-navy-900 text-white">
+    <div class="container-c py-20 grid md:grid-cols-2 gap-14 items-center">
+      <div>
+        <div class="eyebrow text-gold-500 mb-4">Offener Ganztag</div>
+        <h2 class="text-4xl font-display font-bold leading-tight">Verlässliche Betreuung für berufstätige Familien.</h2>
+        <p class="mt-6 text-white/80 leading-relaxed">
+          Wir sind eine offene Ganztagsschule (OGS) in Trägerschaft von Flingern mobil e. V.
+        </p>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-navy-800 p-6 border-l-4 border-gold-500">
+          <div class="font-display font-bold text-2xl">Mo – Do</div>
+          <div class="text-white/80 mt-1">8.00 – 16.30 Uhr</div>
+        </div>
+        <div class="bg-navy-800 p-6 border-l-4 border-gold-500">
+          <div class="font-display font-bold text-2xl">Freitag</div>
+          <div class="text-white/80 mt-1">8.00 – 15.30 Uhr</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* CTA Förderverein */}
+  <section class="bg-brick-600 text-white">
+    <div class="container-c py-20 text-center">
+      <div class="eyebrow text-cream-50 mb-4">Förderverein</div>
+      <h2 class="text-4xl md:text-5xl font-display font-bold max-w-3xl mx-auto leading-tight">
+        Was das System nicht finanziert,<br/>finanzieren <span class="accent">Menschen wie Sie</span>.
+      </h2>
+      <p class="mt-6 max-w-2xl mx-auto text-white/85">
+        Unser Förderverein füllt die Lücken: Lernmittel, Klassenfahrten, Frühstück, digitale Teilhabe.
+        Mitglied werden Sie schon ab 12 € im Jahr.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/foerderverein/#spenden" class="btn-gold">♥ Jetzt spenden</a>
+        <a href="/foerderverein/mitglied-werden/" class="btn border-2 border-white text-white hover:bg-white hover:text-brick-600">Mitglied werden</a>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,26 @@
+---
+import { SCHOOL_NAV } from '../data/nav.ts';
+const { variant = 'school' } = Astro.props;
+const isVerein = variant === 'verein';
+---
+<header class={`${isVerein ? 'bg-navy-900 text-white' : 'bg-white text-navy-900'} border-b ${isVerein ? 'border-navy-700' : 'border-navy-900/10'}`}>
+  <div class="container-c flex items-center justify-between py-5">
+    <a href="/" class="flex items-center gap-3">
+      <div class={`w-10 h-10 grid place-items-center font-display font-bold ${isVerein ? 'bg-gold-500 text-navy-900' : 'bg-navy-900 text-gold-500'}`}>
+        PK
+      </div>
+      <div class="leading-tight">
+        <div class="font-display font-bold text-base">Paul-Klee-Schule</div>
+        <div class="text-xs opacity-70">Düsseldorf · seit 1907</div>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-7 text-sm font-semibold uppercase tracking-wider">
+      {SCHOOL_NAV.map(item => (
+        <a href={item.href} class="hover:text-gold-500 transition-colors">{item.label}</a>
+      ))}
+      <a href="/foerderverein/" class={`${isVerein ? 'text-gold-500' : 'text-brick-600'} hover:opacity-80`}>Förderverein</a>
+      <a href="/foerderverein/#spenden" class="btn-gold !py-2 !px-4 text-xs">Jetzt spenden</a>
+    </nav>
+    <button class="md:hidden text-2xl" aria-label="Menü">≡</button>
+  </div>
+</header>

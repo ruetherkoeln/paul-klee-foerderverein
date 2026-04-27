@@ -1,0 +1,92 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const team = {
+  leitung: [
+    { rolle: 'Schulleitung', name: 'Maike Dambeck' },
+    { rolle: 'Konrektorin', name: 'Janika Schahidi' },
+    { rolle: 'OGS-Koordination', name: 'Andrea Schreiber, Flingern mobil e. V.' },
+    { rolle: 'Stellvertretung OGS', name: 'Mimount Wellmann-Wolf' },
+    { rolle: 'Sekretariat', name: 'Fabienne Rost' },
+    { rolle: 'Hausmeister', name: 'Pascal Engasser' }
+  ],
+  klassenlehrkraefte: [
+    ['1a', 'Sarah Schmitz'], ['1b', 'Nina Sodtke'],
+    ['2a', 'Anja Kania'], ['2b', 'Anke Grindel & Andrea Stollenwerk'],
+    ['3a', 'Alexandra Klöcker'], ['3b', 'Ilka Dörtelmann'], ['3c', 'Janika Schahidi'],
+    ['4a', 'Katrin Beck'], ['4b', 'Sonja Thorn']
+  ],
+  fach: ['Klaus Bertagnolli','Bianca Blazejczak','Katharina Gossen','Rebecca Glaser','Michael Pampus','Brigitte Rosenstein','Simone Schüßler','Ketevan Hahn'],
+  erzieher: [
+    ['1a', 'Voula Tzella'], ['1b', 'Inessa Ibragimova'],
+    ['2a', 'Pia Ritchie'], ['2b', 'Peter Wendel'],
+    ['3a-c', 'Marlene Böckendorf / Sven Langfahl'],
+    ['4a', 'Mimount Wellmann-Wolf'], ['4b', 'Andrea Schreiber']
+  ],
+  weitere: [
+    { rolle: 'Sozialpädagogin Schuleingangsstufe', name: 'Emilia Knopek' },
+    { rolle: 'Sozialpädagogin Schuleingangsstufe', name: 'Melanie Weiß' },
+    { rolle: 'Sonderpädagogin', name: 'Christine Kammel' },
+    { rolle: 'Schulsozialarbeit', name: 'Lysanne Lohstädt' },
+    { rolle: 'Schulsozialarbeit', name: 'Rania Kassous' }
+  ]
+};
+---
+<Base title="Unser Team">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Über uns</div>
+      <h1 class="text-5xl font-display font-extrabold">Unser Team.</h1>
+      <p class="mt-4 max-w-2xl">Die Menschen, die unsere Schule jeden Tag mit Leben füllen.</p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50 pb-16">
+    <div class="container-c">
+      <h2 class="font-display font-bold text-2xl mb-4">Schulleitung & Verwaltung</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {team.leitung.map(p => (
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold">{p.rolle}</div>
+            <div class="mt-1 font-semibold">{p.name}</div>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="font-display font-bold text-2xl mt-12 mb-4">Klassenlehrkräfte</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {team.klassenlehrkraefte.map(([k, n]) => (
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold">Klasse {k}</div>
+            <div class="mt-1 font-semibold">{n}</div>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="font-display font-bold text-2xl mt-12 mb-4">Fachlehrkräfte</h2>
+      <div class="card flex flex-wrap gap-x-6 gap-y-2">
+        {team.fach.map(n => <span>{n}</span>)}
+      </div>
+
+      <h2 class="font-display font-bold text-2xl mt-12 mb-4">ErzieherInnen</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {team.erzieher.map(([k, n]) => (
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold">Klasse {k}</div>
+            <div class="mt-1 font-semibold">{n}</div>
+          </div>
+        ))}
+      </div>
+
+      <h2 class="font-display font-bold text-2xl mt-12 mb-4">Sozial- und Sonderpädagogik</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {team.weitere.map(p => (
+          <div class="card">
+            <div class="text-xs uppercase tracking-wider text-gold-600 font-semibold">{p.rolle}</div>
+            <div class="mt-1 font-semibold">{p.name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

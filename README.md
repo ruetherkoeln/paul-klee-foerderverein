@@ -1,35 +1,54 @@
-# Foerderverein Paul-Klee-Schule
+# Paul-Klee-Schule Düsseldorf — Webpräsenz
 
-Webpraesenz des Foerdervereins der Grundschule Paul-Klee, Duesseldorf.
+Gemeinsame Webpräsenz der Städt. Kath. Grundschule Gerresheimerstraße (Paul-Klee-Schule) und ihres Fördervereins.
 
-## Status
-Initiale Aufbauphase. Ziel: moderne, KI-faehige Webpraesenz mit niedrigschwelligem Zugang zu Mitgliedschaft und Spenden.
+## Stack
+- Astro 5 (statisches Hosting)
+- Tailwind CSS 3
+- Vercel (Hosting + Auto-Deploy)
+- Inter + Playfair Display (Webfonts)
 
-## Architektur (geplant)
-- Hosting: Vercel
-- Repository: GitHub
-- Stack: TBD (Kandidaten: Next.js, Astro)
-- Content: Headless / Markdown-basiert
-- CI/CD: Auto-Deploy auf Push (main -> production, feature-branches -> preview)
+## Lokal entwickeln
+
+```bash
+npm install
+npm run dev      # Dev-Server auf http://localhost:4321
+npm run build    # Produktions-Build nach dist/
+npm run preview  # Preview des Builds
+```
+
+## Struktur
+
+```
+src/
+  components/   - Header, Footer, ggf. weitere UI-Komponenten
+  layouts/      - Base.astro (Globales Layout)
+  pages/        - Seiten (1:1 Routing)
+  data/         - Site-Konstanten, Navigation
+  styles/       - Globale CSS / Tailwind-Schichten
+public/         - Statische Assets (favicon etc.)
+```
+
+## Architektur
+- Schule und Förderverein in **einer** Domain — keine Doppelpflege.
+- Förderverein-Bereich unter `/foerderverein/` mit eigenem dunklem Theme (variant="verein").
+- Schul-Bereich im hellen Theme (variant="school") als Default.
+- Header bietet permanenten, prominenten Förderverein- und Spenden-Link.
 
 ## Branches
-- `main` - Produktiv-Code (initial leer, Aufbau in Vorbereitung)
-- `legacy-mirror` - Snapshot der Schul-Website (https://www.grundschule-paul-klee.de/) vom 2026-04-27, dient als Inhaltsbasis und Vergleichsreferenz
+- `main` — Produktiv-Code (Astro-Skelett mit erstem Stand)
+- `legacy-mirror` — Snapshot der alten WordPress-Seite (Migrations-/Vergleichsbasis, **nicht** publizieren)
 
-## Roadmap
-1. Stack-Entscheidung und Skelett-Setup
-2. Vercel-Deployment mit Preview-Umgebung
-3. Migration der relevanten Inhalte (mit Rechte-Klaerung)
-4. Module: Mitgliedschaft, Spenden (digital, niedrigschwellig, DSGVO-konform)
-5. Module: Newsletter-Anmeldung, Aktionen, Projekt-Showcase
-6. Domain-Konfiguration
+## TODOs
+- Formspree-/Form-Backend-ID in Kontakt- und Mitgliedsformular einsetzen
+- PayPal-Donate-Link auf finalen Endpoint umstellen (Hosted Button ID)
+- IBAN nach Vereinsregister-Eintrag in Spendenbereich ergänzen
+- Bilder/Fotos der Schule (legal frei) integrieren
+- Newsletter-Modul (z. B. Mailjet, Brevo) einbinden
 
 ## Hinweise
-- Sensible credentials (API-Keys, SMTP, Zahlungsanbieter) gehoeren ausschliesslich in Vercel-Environment-Variables, nicht in dieses Repo.
-- Inhalte aus dem `legacy-mirror`-Branch unterliegen dem Urheberrecht Dritter und duerfen nicht ohne Rechte-Klaerung uebernommen werden.
+- Sensible credentials gehören in Vercel-Environment-Variables, **nicht** ins Repo.
+- Inhalte aus `legacy-mirror` unterliegen Urheberrecht Dritter — nur als Migrationsbasis verwenden.
 
 ## Vorstand
 Andreas Ruether (1. Vorsitzender)
-
-## Lizenz
-MIT (Code) - Inhalte separat geregelt.
