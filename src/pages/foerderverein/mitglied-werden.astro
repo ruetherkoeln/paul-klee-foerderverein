@@ -2,51 +2,159 @@
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../data/site.ts';
 ---
-<Base title="Mitglied werden" variant="verein">
+<Base title="Mitglied werden" variant="verein" description="Mitglied im Förderverein der Paul-Klee-Schule Düsseldorf e. V. werden — Mitgliedsantrag online ausfüllen.">
   <section class="bg-navy-900 text-white pt-20 pb-12">
     <div class="container-c">
       <div class="eyebrow text-gold-500 mb-4">Mitgliedschaft</div>
-      <h1 class="text-5xl font-display font-extrabold">Schon ab <span class="accent">12 € / Jahr</span>.</h1>
-      <p class="mt-4 max-w-2xl text-white/80">
-        Eine Mitgliedschaft ist die verlässlichste Form der Unterstützung: planbar für uns, gestaltend für Sie.
-        Mitglieder haben Stimmrecht in der Mitgliederversammlung und entscheiden mit, welche Projekte gefördert werden.
+      <h1 class="text-5xl font-display font-extrabold">Werden Sie <span class="accent">Mitglied</span>.</h1>
+      <p class="mt-4 max-w-2xl text-white/80 leading-relaxed">
+        Eine Mitgliedschaft im Förderverein ist die verlässlichste Form der Unterstützung —
+        planbar für unsere Arbeit und gestaltend für Sie. Mitglieder haben Stimmrecht in der
+        Mitgliederversammlung und entscheiden mit, welche Projekte gefördert werden.
       </p>
     </div>
   </section>
 
   <section class="bg-cream-50 text-navy-900 py-16">
-    <div class="container-c grid md:grid-cols-2 gap-12">
+    <div class="container-c grid lg:grid-cols-[1fr_1.4fr] gap-12">
+
+      {/* LINKE SPALTE: Ablauf & Kontext */}
       <div>
-        <h2 class="text-3xl font-display font-bold">So werden Sie Mitglied.</h2>
-        <ol class="mt-6 space-y-5 text-sm leading-relaxed list-decimal list-inside">
-          <li>Mitgliedsantrag herunterladen oder Online-Formular ausfüllen.</li>
-          <li>Mindestbeitrag wählen (12 € / Jahr) oder höheren Beitrag eintragen.</li>
-          <li>SEPA-Lastschriftmandat erteilen oder Überweisung wählen.</li>
-          <li>Antrag unterschrieben einreichen — per E-Mail, Post oder im Schulsekretariat.</li>
-          <li>Bestätigung erhalten und ab sofort Teil der Gemeinschaft sein.</li>
+        <h2 class="text-3xl font-display font-bold">So funktioniert's.</h2>
+        <ol class="mt-6 space-y-4 leading-relaxed list-decimal list-inside">
+          <li>Formular rechts ausfüllen und absenden.</li>
+          <li>Wir bestätigen den Eingang per E-Mail.</li>
+          <li>Der Vorstand entscheidet über die Aufnahme gemäß Vereinssatzung.</li>
+          <li>Sie erhalten die Aufnahmebestätigung und sind ab sofort stimmberechtigtes Mitglied.</li>
         </ol>
-        <a href={`mailto:${SITE.emailVerein}?subject=Mitgliedsantrag`} class="btn-dark mt-8">Antrag per E-Mail anfordern</a>
-      </div>
-      <form class="card space-y-4" method="post" action="https://formspree.io/f/REPLACE_FORM_ID">
-        <h3 class="font-display font-bold text-xl">Online-Antrag</h3>
-        <div class="grid grid-cols-2 gap-3">
-          <input required name="vorname" placeholder="Vorname" class="px-4 py-3 border border-navy-900/15 rounded-sm" />
-          <input required name="nachname" placeholder="Nachname" class="px-4 py-3 border border-navy-900/15 rounded-sm" />
+
+        <div class="mt-10 p-6 border-l-4 border-gold-500 bg-white">
+          <h3 class="font-display font-bold text-lg mb-2">Lieber per Post oder E-Mail?</h3>
+          <p class="text-sm leading-relaxed">
+            Sie können den Antrag auch unterschrieben einreichen — per E-Mail an <a href={`mailto:${SITE.email}?subject=Mitgliedsantrag`} class="text-gold-600 hover:underline">{SITE.email}</a>,
+            per Post an unsere Anschrift oder im Schulsekretariat.
+          </p>
         </div>
-        <input required type="email" name="email" placeholder="E-Mail" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
-        <input name="telefon" placeholder="Telefon (optional)" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
-        <input name="adresse" placeholder="Anschrift" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm" />
-        <select name="beitrag" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm">
-          <option>12 € / Jahr (Mindestbeitrag)</option>
-          <option>24 € / Jahr</option>
-          <option>60 € / Jahr</option>
-          <option>120 € / Jahr</option>
-          <option>höherer Beitrag (im Antrag angegeben)</option>
-        </select>
-        <textarea name="bemerkung" placeholder="Bemerkung / Mitarbeit-Interesse" rows="3" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm"></textarea>
-        <button class="btn-gold w-full justify-center">Antrag absenden</button>
-        <p class="text-xs text-navy-900/60">
-          Hinweis: Die formale Aufnahme erfolgt nach Vorstandsbeschluss gemäß Vereinssatzung.
+
+        <div class="mt-6 text-sm text-navy-900/70 leading-relaxed">
+          <strong class="text-navy-900">Bankverbindung (für Überweisung):</strong><br/>
+          IBAN, BIC, Verwendungszweck — werden in der Aufnahmebestätigung mitgeteilt.
+        </div>
+      </div>
+
+      {/* RECHTE SPALTE: FORMULAR */}
+      <form
+        method="post"
+        action="https://formspree.io/f/REPLACE_FORM_ID"
+        class="card space-y-5"
+        id="mitgliedsantrag"
+      >
+        <h2 class="font-display font-bold text-2xl">Online-Mitgliedsantrag</h2>
+
+        {/* Name */}
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="vorname" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Vorname *</label>
+            <input id="vorname" required name="vorname" autocomplete="given-name" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Name *</label>
+            <input id="name" required name="name" autocomplete="family-name" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        {/* Adresse: Straße + Hausnummer */}
+        <div class="grid grid-cols-[1fr_120px] gap-3">
+          <div>
+            <label for="strasse" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Straße *</label>
+            <input id="strasse" required name="strasse" autocomplete="address-line1" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="hausnummer" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Nr. *</label>
+            <input id="hausnummer" required name="hausnummer" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        {/* PLZ + Ort */}
+        <div class="grid grid-cols-[120px_1fr] gap-3">
+          <div>
+            <label for="plz" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">PLZ *</label>
+            <input id="plz" required name="plz" autocomplete="postal-code" pattern="[0-9]{5}" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="ort" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Ort *</label>
+            <input id="ort" required name="ort" autocomplete="address-level2" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        {/* E-Mail */}
+        <div>
+          <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">E-Mail-Adresse *</label>
+          <input id="email" required type="email" name="email" autocomplete="email" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+        </div>
+
+        {/* Beitragsstufen */}
+        <fieldset class="border-t border-navy-900/10 pt-5">
+          <legend class="text-sm font-semibold mb-3">
+            Ich möchte Mitglied im Förderverein der Paul-Klee-Schule Düsseldorf e. V. werden und
+            unterstütze den Verein mit einem Jahresbeitrag von: *
+          </legend>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+            {[15, 25, 50, 100].map(betrag => (
+              <label class="cursor-pointer border-2 border-navy-900/15 rounded-sm px-3 py-3 text-center font-semibold hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+                <input type="radio" name="beitrag" value={`${betrag} €`} class="sr-only" required />
+                {betrag} €
+              </label>
+            ))}
+          </div>
+
+          <label class="flex items-center gap-3 border-2 border-navy-900/15 rounded-sm px-3 py-2 hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+            <input type="radio" name="beitrag" value="freier_betrag" id="beitrag-frei" class="shrink-0" />
+            <span class="text-sm font-semibold whitespace-nowrap">Eigener Betrag:</span>
+            <input
+              type="number"
+              name="beitrag_frei"
+              min="12"
+              step="1"
+              placeholder="€ / Jahr"
+              aria-label="Eigener Jahresbeitrag in Euro"
+              class="w-full px-3 py-2 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500"
+              onclick="document.getElementById('beitrag-frei').checked = true"
+            />
+          </label>
+          <p class="mt-2 text-xs text-navy-900/60">Mindestbeitrag laut Satzung: 12 € / Jahr.</p>
+        </fieldset>
+
+        {/* Rechtsverbindlichkeit */}
+        <fieldset class="border-t border-navy-900/10 pt-5">
+          <label class="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+            <input
+              type="checkbox"
+              required
+              name="rechtsverbindlich"
+              class="mt-1 shrink-0"
+            />
+            <span>
+              Mit dem Absenden dieses Antrags gebe ich einen <strong>rechtsverbindlichen Mitgliedsantrag</strong>
+              gemäß der Vereinssatzung ab. Die formale Aufnahme erfolgt nach Vorstandsbeschluss. Ich verpflichte
+              mich zur Zahlung des oben gewählten Jahresbeitrags ab dem auf die Aufnahme folgenden Monat. *
+            </span>
+          </label>
+        </fieldset>
+
+        {/* Datenschutz */}
+        <p class="text-xs text-navy-900/60 leading-relaxed">
+          Mit Absenden willige ich in die Verarbeitung meiner Daten zum Zweck der Mitgliederverwaltung
+          gemäß Art. 6 Abs. 1 lit. b DSGVO ein. Weitere Informationen in der <a href="/datenschutz/" class="text-gold-600 hover:underline">Datenschutzerklärung</a>.
+        </p>
+
+        <button type="submit" class="btn-gold w-full justify-center">
+          Antrag absenden
+        </button>
+
+        <p class="text-xs text-navy-900/50 text-center">
+          Felder mit * sind Pflichtangaben.
         </p>
       </form>
     </div>
