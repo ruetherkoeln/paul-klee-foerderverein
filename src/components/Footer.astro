@@ -4,28 +4,35 @@ import { SITE } from '../data/site.ts';
 <footer class="bg-navy-900 text-white/80 mt-24">
   <div class="container-c py-14 grid md:grid-cols-3 gap-10">
     <div>
-      <div class="font-display font-bold text-lg text-white mb-3">Paul-Klee-Schule</div>
+      <div class="flex items-center gap-3 mb-3">
+        <img src={SITE.school.logo} alt="" class="w-10 h-auto" width="40" />
+        <div class="font-display font-bold text-lg text-white leading-tight">
+          Förderverein der<br/>Paul-Klee-Schule e. V.
+        </div>
+      </div>
       <p class="text-sm leading-relaxed">
-        Städtisch Katholische Grundschule Gerresheimerstraße<br/>
         {SITE.address.street}<br/>
         {SITE.address.zip} {SITE.address.city}
       </p>
       <p class="text-sm mt-3">
-        Tel.: {SITE.phone}<br/>
-        E-Mail: <a href={`mailto:${SITE.emailSchool}`} class="hover:text-gold-500">{SITE.emailSchool}</a>
+        E-Mail: <a href={`mailto:${SITE.email}`} class="hover:text-gold-500">{SITE.email}</a>
       </p>
+      <a href="/foerderverein/#spenden" class="btn-gold mt-4 !py-2 !px-4 text-xs">♥ Jetzt spenden</a>
     </div>
     <div>
-      <div class="font-display font-bold text-lg text-white mb-3">Förderverein</div>
+      <div class="font-display font-bold text-lg text-white mb-3">Die Schule, die wir unterstützen</div>
       <p class="text-sm leading-relaxed">
-        Förderverein der Paul-Klee-Schule Düsseldorf e. V.<br/>
-        Gerresheimer Straße 34/36<br/>
-        40211 Düsseldorf
+        {SITE.school.fullName}<br/>
+        {SITE.school.address.street}<br/>
+        {SITE.school.address.zip} {SITE.school.address.city}
       </p>
       <p class="text-sm mt-3">
-        E-Mail: <a href={`mailto:${SITE.emailVerein}`} class="hover:text-gold-500">{SITE.emailVerein}</a>
+        Tel.: {SITE.school.phone}<br/>
+        E-Mail: <a href={`mailto:${SITE.school.email}`} class="hover:text-gold-500">{SITE.school.email}</a>
       </p>
-      <a href="/foerderverein/#spenden" class="btn-gold mt-4 !py-2 !px-4 text-xs">Jetzt spenden</a>
+      <p class="text-sm mt-3">
+        Schulwebsite: <a href={SITE.school.website} target="_blank" rel="noopener" class="hover:text-gold-500 underline">grundschule-paul-klee.de</a>
+      </p>
     </div>
     <div>
       <div class="font-display font-bold text-lg text-white mb-3">Rechtliches</div>
@@ -38,8 +45,8 @@ import { SITE } from '../data/site.ts';
   </div>
   <div class="border-t border-white/10">
     <div class="container-c py-4 text-xs flex flex-col md:flex-row justify-between gap-2">
-      <span>© {new Date().getFullYear()} Paul-Klee-Schule Düsseldorf · Förderverein e. V.</span>
-      <span>Eine Initiative von Schulgemeinschaft und Förderverein.</span>
+      <span>© {new Date().getFullYear()} {SITE.name}</span>
+      <span>Bildung ist kein Privileg.</span>
     </div>
   </div>
 </footer>
