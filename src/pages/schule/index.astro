@@ -1,32 +1,117 @@
 ---
 import Base from '../../layouts/Base.astro';
-const links = [
-  { href: '/schule/unser-team/', title: 'Unser Team', body: 'Schulleitung, Lehrkräfte, ErzieherInnen, Schulsozialarbeit.' },
-  { href: '/schule/schulsozialarbeit/', title: 'Schulsozialarbeit', body: 'Beratung, Begleitung, Vermittlung — vertraulich.' },
-  { href: '/anmeldung/', title: 'Anmeldung', body: 'Termine und Informationen zur Einschulung.' },
-  { href: '/allgemeines/unterrichtszeiten/', title: 'Unterrichtszeiten', body: 'Tagesablauf, OGS-Zeiten, Termine.' }
-];
+import { SITE } from '../../data/site.ts';
 ---
-<Base title="Unsere Schule">
-  <section class="bg-cream-50 pt-16 pb-10">
-    <div class="container-c">
-      <div class="eyebrow mb-4">Über uns</div>
-      <h1 class="text-5xl font-display font-extrabold">Unsere Schule.</h1>
-      <p class="mt-4 max-w-2xl leading-relaxed">
-        Eine kleine, städtisch katholische Grundschule mit Charakter — mit knapp 220 Kindern,
-        zwei Klassen pro Jahrgang und einem Schulgebäude, das Geschichte atmet.
-      </p>
+<Base title="Die Schule, die wir unterstützen" description="Die Paul-Klee-Grundschule in Düsseldorf-Pempelfort — Träger der Bildungsarbeit, die unser Förderverein unterstützt.">
+
+  {/* HERO */}
+  <section class="bg-cream-50 pt-16 pb-12">
+    <div class="container-c grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <div class="eyebrow mb-4">Wer steht hinter unserer Arbeit</div>
+        <h1 class="text-5xl font-display font-extrabold leading-tight">
+          Die Schule, die wir <span class="accent">unterstützen</span>.
+        </h1>
+        <p class="mt-6 leading-relaxed max-w-xl">
+          Wir sind nicht die Schule — wir sind der Förderverein. Unsere Arbeit zielt zu 100 %
+          auf eine einzige Einrichtung: die <strong>{SITE.school.fullName}</strong> im Herzen
+          von Düsseldorf-Pempelfort.
+        </p>
+        <p class="mt-4 leading-relaxed max-w-xl">
+          Alle Informationen zu Unterrichtszeiten, Anmeldung, Team und schulischem Alltag
+          findet ihr auf der offiziellen Schulwebsite — direkt von der Schulleitung gepflegt.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a
+            href={SITE.school.website}
+            target="_blank"
+            rel="noopener"
+            class="btn-dark"
+          >Zur Schulwebsite →</a>
+          <a href="/foerderverein/" class="btn-ghost">Was wir tun</a>
+        </div>
+      </div>
+      <div class="bg-white p-10 rounded-sm border border-navy-900/10 flex items-center justify-center">
+        <a href={SITE.school.website} target="_blank" rel="noopener" class="block">
+          <img
+            src={SITE.school.logo}
+            alt={`Logo der ${SITE.school.fullName}`}
+            class="max-w-[260px] mx-auto h-auto"
+            width="260"
+          />
+        </a>
+      </div>
     </div>
   </section>
-  <section class="bg-cream-100 py-14">
-    <div class="container-c grid md:grid-cols-2 gap-6">
-      {links.map(l => (
-        <a href={l.href} class="card hover:border-gold-500 hover:bg-white transition-colors">
-          <div class="font-display font-bold text-2xl">{l.title}</div>
-          <p class="mt-2 text-sm text-navy-900/70 leading-relaxed">{l.body}</p>
-          <div class="mt-4 text-gold-600 font-semibold text-sm">Mehr erfahren →</div>
-        </a>
-      ))}
+
+  {/* KENNZAHLEN: die Realität, die unsere Arbeit motiviert */}
+  <section class="bg-white border-y border-navy-900/10">
+    <div class="container-c py-12 grid md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-4xl font-display font-extrabold text-gold-500">~220</div>
+        <div class="mt-1 text-sm text-navy-900/70">Kinder, die wir mittragen</div>
+      </div>
+      <div>
+        <div class="text-4xl font-display font-extrabold text-gold-500">8</div>
+        <div class="mt-1 text-sm text-navy-900/70">Klassen, zwei pro Jahrgang</div>
+      </div>
+      <div>
+        <div class="text-4xl font-display font-extrabold text-gold-500">30+</div>
+        <div class="mt-1 text-sm text-navy-900/70">Herkunftsländer der Familien</div>
+      </div>
+      <div>
+        <div class="text-4xl font-display font-extrabold text-gold-500">1907</div>
+        <div class="mt-1 text-sm text-navy-900/70">Baujahr des Schulgebäudes</div>
+      </div>
+    </div>
+  </section>
+
+  {/* PROFIL DER SCHULE — kurz, mit Link */}
+  <section class="bg-cream-50 py-16">
+    <div class="container-c max-w-3xl">
+      <div class="eyebrow mb-4">Kurzprofil</div>
+      <h2 class="text-4xl font-display font-bold leading-tight">
+        Eine offene Ganztagsschule mit Charakter.
+      </h2>
+      <p class="mt-6 leading-relaxed">
+        Die Paul-Klee-Schule ist eine städtisch katholische Grundschule mit rund 220 Kindern,
+        zwei Klassen pro Jahrgang, einem Schulgebäude von 1907 und einer der vielfältigsten
+        Schülerschaften der Stadt. Trägerin des offenen Ganztags ist Flingern mobil e. V.
+      </p>
+      <p class="mt-4 leading-relaxed">
+        Genau diese Vielfalt — und der Bedarf, der mit ihr einhergeht — macht unsere Förderarbeit
+        notwendig: Lernmittel für Familien ohne Reserven, Klassenfahrten ohne Aussiebung,
+        Frühstück ohne Stigma, digitale Teilhabe ohne Sondersteuer.
+      </p>
+      <div class="mt-8 p-6 border-l-4 border-gold-500 bg-white">
+        <p class="text-sm leading-relaxed text-navy-900/80">
+          <strong>Inhalte zu Lehrkräften, Anmeldung, Unterrichtszeiten, Schulsozialarbeit und
+          allen Schulthemen pflegt die Schule selbst:</strong>
+        </p>
+        <a
+          href={SITE.school.website}
+          target="_blank"
+          rel="noopener"
+          class="inline-block mt-3 text-gold-600 font-semibold hover:underline"
+        >grundschule-paul-klee.de →</a>
+      </div>
+    </div>
+  </section>
+
+  {/* CTA Förderverein */}
+  <section class="bg-brick-600 text-white">
+    <div class="container-c py-16 text-center">
+      <div class="eyebrow text-cream-50 mb-4">Was wir tun</div>
+      <h2 class="text-3xl md:text-4xl font-display font-bold max-w-3xl mx-auto leading-tight">
+        Wir füllen die Lücken,<br/>die das System hinterlässt.
+      </h2>
+      <p class="mt-6 max-w-2xl mx-auto text-white/85">
+        Lernmittel, Klassenfahrten, Frühstück, digitale Teilhabe — gemeinnützig und transparent.
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/foerderverein/#spenden" class="btn-gold">♥ Jetzt spenden</a>
+        <a href="/foerderverein/mitglied-werden/" class="btn border-2 border-white text-white hover:bg-white hover:text-brick-600">Mitglied werden</a>
+      </div>
     </div>
   </section>
 </Base>
