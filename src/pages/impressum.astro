@@ -1,58 +1,73 @@
 ---
 import Base from '../layouts/Base.astro';
+import { SITE } from '../data/site.ts';
 ---
 <Base title="Impressum">
   <section class="bg-cream-50 pt-16 pb-10">
     <div class="container-c max-w-3xl">
-      <h1 class="text-5xl font-display font-extrabold">Impressum.</h1>
+      <div class="eyebrow mb-4">Rechtliches</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Impressum.</h1>
     </div>
   </section>
-  <section class="bg-cream-50 pb-16">
-    <div class="container-c max-w-3xl prose-sm space-y-6">
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl space-y-10">
       <div>
-        <h2 class="font-display font-bold text-2xl">Schule</h2>
-        <p class="mt-3 leading-relaxed">
-          Städtische Katholische Grundschule Gerresheimerstraße<br/>
-          Schulleiterin: Maike Dambeck<br/>
-          Gerresheimer Str. 34, 40211 Düsseldorf<br/>
-          Tel.: 0211 / 89 23 752 · Fax: 0211 / 89 23 756<br/>
-          E-Mail: <a href="mailto:Maike.dambeck@duesseldorf.de" class="text-gold-600">Maike.dambeck@duesseldorf.de</a>
+        <div class="eyebrow mb-2">Diensteanbieter</div>
+        <h2 class="font-display font-bold text-2xl">Förderverein</h2>
+        <p class="mt-4 leading-relaxed text-navy-900/80">
+          Förderverein der Paul-Klee-Schule Düsseldorf e. V.<br/>
+          {SITE.address.street}<br/>
+          {SITE.address.zip} {SITE.address.city}<br/>
+          E-Mail: <a href={`mailto:${SITE.email}`} class="text-pk-red hover:underline">{SITE.email}</a>
         </p>
-        <p class="mt-3 text-sm text-navy-900/70">
-          Die Katholische Grundschule Gerresheimerstraße ist eine Körperschaft des öffentlichen Rechts.
-          Sie wird durch die Schulleiterin gesetzlich vertreten.
+        <p class="mt-4 leading-relaxed text-sm text-navy-900/70">
+          Vereinsregister: VR 7008 — Amtsgericht Düsseldorf.<br/>
+          Steuerlich anerkannt als gemeinnützig (Freistellungsbescheid 2021).<br/>
+          Vertreten durch den Vorstand gemäß § 26 BGB.
         </p>
       </div>
-      <div>
+
+      <div class="border-t border-navy-900/10 pt-10">
+        <div class="eyebrow mb-2">Schule, die wir unterstützen</div>
+        <h2 class="font-display font-bold text-2xl">Paul-Klee-Schule</h2>
+        <p class="mt-4 leading-relaxed text-navy-900/80">
+          {SITE.school.fullName}<br/>
+          Schulleitung: Maike Dambeck<br/>
+          {SITE.school.address.street}, {SITE.school.address.zip} {SITE.school.address.city}<br/>
+          Tel.: {SITE.school.phone} · Fax: {SITE.school.fax}<br/>
+          E-Mail: <a href={`mailto:${SITE.school.email}`} class="text-pk-red hover:underline">{SITE.school.email}</a>
+        </p>
+        <p class="mt-4 leading-relaxed text-sm text-navy-900/70">
+          Eine eigene Webpräsenz pflegt die Schule unter
+          <a href={SITE.school.website} target="_blank" rel="noopener" class="text-pk-red hover:underline">grundschule-paul-klee.de</a>.
+          Sie wird durch die Schulleitung gesetzlich vertreten.
+        </p>
+      </div>
+
+      <div class="border-t border-navy-900/10 pt-10">
         <h2 class="font-display font-bold text-2xl">Schulträger</h2>
-        <p class="mt-3 leading-relaxed">
+        <p class="mt-4 leading-relaxed text-navy-900/80">
           Landeshauptstadt Düsseldorf<br/>
           vertreten durch den Oberbürgermeister<br/>
           Marktplatz 2, 40213 Düsseldorf<br/>
-          E-Mail: <a href="mailto:info@duesseldorf.de" class="text-gold-600">info@duesseldorf.de</a>
+          E-Mail: <a href="mailto:info@duesseldorf.de" class="text-pk-red hover:underline">info@duesseldorf.de</a>
         </p>
       </div>
-      <div>
-        <h2 class="font-display font-bold text-2xl">Förderverein</h2>
-        <p class="mt-3 leading-relaxed">
-          Förderverein der Paul-Klee-Schule Düsseldorf e. V.<br/>
-          Gerresheimer Straße 34/36, 40211 Düsseldorf<br/>
-          E-Mail: <a href="mailto:info@foerderverein-paulklee-duesseldorf.de" class="text-gold-600">info@foerderverein-paulklee-duesseldorf.de</a><br/>
-          Vereinsregister: VR 7008 — Amtsgericht Düsseldorf<br/>
-          Steuerlich anerkannt als gemeinnützig (Freistellungsbescheid 2021).
-        </p>
-      </div>
-      <div>
+
+      <div class="border-t border-navy-900/10 pt-10">
         <h2 class="font-display font-bold text-2xl">Urheberrecht</h2>
-        <p class="mt-3 leading-relaxed text-sm">
-          Texte, Bilder, Grafiken und Fotos sowie die Gestaltung dieser Internetseiten unterliegen dem Urheberrecht.
-          Sie dürfen nur zum privaten und sonstigen eigenen Gebrauch im Rahmen des § 53 UrhG ohne jede Änderung
-          vervielfältigt werden. Eine darüber hinausgehende Verbreitung ist nur mit schriftlicher Genehmigung zulässig.
+        <p class="mt-4 leading-relaxed text-sm text-navy-900/70">
+          Texte, Bilder, Grafiken und die Gestaltung dieser Internetseiten unterliegen dem Urheberrecht.
+          Sie dürfen nur zum privaten und sonstigen eigenen Gebrauch im Rahmen des § 53 UrhG ohne jede
+          Änderung vervielfältigt werden. Eine darüber hinausgehende Verbreitung ist nur mit schriftlicher
+          Genehmigung zulässig. Das Logo der Paul-Klee-Schule wird mit Erlaubnis der Schule verwendet.
         </p>
       </div>
-      <div>
+
+      <div class="border-t border-navy-900/10 pt-10">
         <h2 class="font-display font-bold text-2xl">Haftung für Inhalte</h2>
-        <p class="mt-3 leading-relaxed text-sm">
+        <p class="mt-4 leading-relaxed text-sm text-navy-900/70">
           Die Informationen wurden nach bestem Wissen und Gewissen sorgfältig zusammengestellt und geprüft.
           Für Richtigkeit, Vollständigkeit, Aktualität oder Qualität wird keine Gewähr übernommen.
           Diensteanbieter sind gemäß § 7 Abs. 1 TMG für eigene Inhalte verantwortlich.
