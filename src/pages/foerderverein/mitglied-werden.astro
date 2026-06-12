@@ -15,38 +15,59 @@ import { SITE } from '../../data/site.ts';
     </div>
   </section>
 
+  {/* Ablauf & Hinweise — über dem Formular */}
   <section class="bg-cream-50">
-    <div class="container-c border-t border-navy-900/10 py-12 grid lg:grid-cols-[1fr_1.4fr] gap-12">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">So funktioniert es</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">Vom Antrag zur Mitgliedschaft.</h2>
+      <ol class="mt-8 space-y-3 leading-relaxed">
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-yellow flex gap-4">
+          <span class="font-display font-bold text-pk-yellow text-xl flex-shrink-0">1.</span>
+          <span>Formular unten ausfüllen und absenden.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-orange flex gap-4">
+          <span class="font-display font-bold text-pk-orange text-xl flex-shrink-0">2.</span>
+          <span>Wir bestätigen den Eingang per E-Mail.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-red flex gap-4">
+          <span class="font-display font-bold text-pk-red text-xl flex-shrink-0">3.</span>
+          <span>Der Vorstand entscheidet über die Aufnahme gemäß Vereinssatzung.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-blue flex gap-4">
+          <span class="font-display font-bold text-pk-blue text-xl flex-shrink-0">4.</span>
+          <span>Sie erhalten die Aufnahmebestätigung und sind ab sofort stimmberechtigtes Mitglied.</span>
+        </li>
+      </ol>
 
-      {/* LINKE SPALTE: Ablauf & Kontext */}
-      <div>
-        <h2 class="text-3xl font-display font-bold">So funktioniert's.</h2>
-        <ol class="mt-6 space-y-4 leading-relaxed list-decimal list-inside">
-          <li>Formular rechts ausfüllen und absenden.</li>
-          <li>Wir bestätigen den Eingang per E-Mail.</li>
-          <li>Der Vorstand entscheidet über die Aufnahme gemäß Vereinssatzung.</li>
-          <li>Sie erhalten die Aufnahmebestätigung und sind ab sofort stimmberechtigtes Mitglied.</li>
-        </ol>
-
-        <div class="mt-10 p-6 border-l-4 border-gold-500 bg-white">
-          <h3 class="font-display font-bold text-lg mb-2">Lieber per Post oder E-Mail?</h3>
+      <div class="mt-10 grid sm:grid-cols-2 gap-4">
+        <div class="bg-white p-5 border border-navy-900/10">
+          <div class="eyebrow mb-2">Per Post oder E-Mail</div>
           <p class="text-sm leading-relaxed">
-            Sie können den Antrag auch unterschrieben einreichen — per E-Mail an <a href={`mailto:${SITE.email}?subject=Mitgliedsantrag`} class="text-gold-600 hover:underline">{SITE.email}</a>,
-            per Post an unsere Anschrift oder im Schulsekretariat.
+            Sie können den Antrag auch unterschrieben einreichen — per E-Mail an
+            <a href={`mailto:${SITE.email}?subject=Mitgliedsantrag`} class="text-pk-red hover:underline">{SITE.email}</a>,
+            per Post oder im Schulsekretariat.
           </p>
         </div>
-
-        <div class="mt-6 text-sm text-navy-900/70 leading-relaxed">
-          <strong class="text-navy-900">Bankverbindung (für Überweisung):</strong><br/>
-          IBAN, BIC, Verwendungszweck — werden in der Aufnahmebestätigung mitgeteilt.
+        <div class="bg-white p-5 border border-navy-900/10">
+          <div class="eyebrow mb-2">Bankverbindung</div>
+          <p class="text-sm leading-relaxed">
+            IBAN, BIC und Verwendungszweck werden in der Aufnahmebestätigung mitgeteilt.
+          </p>
         </div>
       </div>
+    </div>
+  </section>
 
-      {/* RECHTE SPALTE: FORMULAR */}
+  {/* FORMULAR — unten, volle Breite */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Online-Antrag</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold mb-8">Mitgliedsantrag.</h2>
+
       <form
         method="post"
         action="https://formspree.io/f/REPLACE_FORM_ID"
-        class="card space-y-5"
+        class="bg-white p-6 md:p-8 border border-navy-900/10 space-y-5"
         id="mitgliedsantrag"
       >
         <h2 class="font-display font-bold text-2xl">Online-Mitgliedsantrag</h2>
