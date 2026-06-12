@@ -42,5 +42,5 @@
   }
 }
 
-/* Webfonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap');
+/* Webfonts — Montserrat in einer Familie, mehrere Gewichte */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');

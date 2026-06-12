@@ -4,6 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Aus dem Schullogo abgeleitete Markenfarben (Bögen + Schriftzug)
+        pk: {
+          blue:   '#3a78b8', // Spitze oben (Dach)
+          green:  '#7fb83e', // Spitze unten
+          yellow: '#e0a836', // linke Säule  (= gold-500)
+          orange: '#d97b3a', // mittlere Säule
+          red:    '#b13830', // rechte Säule + Unterstrich  (= brick-600)
+          ink:    '#1c1c1c'  // Schriftzug
+        },
+        // Funktionale Aliase (für bestehende Komponenten)
         navy: {
           900: '#0e1424',
           800: '#141a2e',
@@ -11,11 +21,11 @@ export default {
         },
         gold: {
           400: '#f5c042',
-          500: '#e8af2a',
+          500: '#e0a836', // an Logo-Gelb angeglichen
           600: '#c89010'
         },
         brick: {
-          600: '#a14237',
+          600: '#b13830', // an Logo-Rot angeglichen
           700: '#8a3329'
         },
         cream: {
@@ -24,8 +34,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['"Playfair Display"', 'Georgia', 'serif']
+        // Klar, ohne Serifen — Montserrat durchgehend
+        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        display: ['Montserrat', 'system-ui', 'sans-serif']
       },
       maxWidth: {
         content: '1200px'
