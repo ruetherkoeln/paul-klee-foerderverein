@@ -1,0 +1,71 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Type-Query-Param entscheidet Wording (mitglied vs kontakt vs default)
+const type = Astro.url.searchParams.get('type');
+const isMitglied = type === 'mitglied';
+const isKontakt = type === 'kontakt';
+---
+<Base
+  title="Vielen Dank"
+  description="Ihre Nachricht ist bei uns eingegangen."
+>
+
+  <section class="bg-cream-50 pt-16 pb-12">
+    <div class="container-c max-w-2xl">
+      <div class="eyebrow mb-4">Eingegangen</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Vielen Dank.</h1>
+      <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+        {isMitglied && (
+          <>
+            Ihr Mitgliedsantrag ist bei uns eingegangen. Wir bestätigen den Eingang
+            in Kürze per E-Mail. Der Vorstand entscheidet über die Aufnahme gemäß
+            Vereinssatzung — Sie erhalten danach Ihre Aufnahmebestätigung.
+          </>
+        )}
+        {isKontakt && (
+          <>
+            Ihre Nachricht ist bei uns eingegangen. Wir antworten in der Regel
+            innerhalb weniger Werktage.
+          </>
+        )}
+        {!isMitglied && !isKontakt && (
+          <>Ihre Nachricht ist bei uns eingegangen. Wir melden uns in Kürze.</>
+        )}
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-2xl">
+      <div class="grid sm:grid-cols-2 gap-3">
+        <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+          <div class="eyebrow mb-2">Direkter Kontakt</div>
+          <p class="text-sm leading-relaxed">
+            Falls Sie etwas vergessen haben oder eine Frage anhängen möchten:
+            <a href="mailto:info@foerderverein-paulklee-duesseldorf.de" class="text-pk-red hover:underline block mt-2">
+              info@foerderverein-paulklee-duesseldorf.de
+            </a>
+          </p>
+        </div>
+        <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-blue">
+          <div class="eyebrow mb-2">Weiterstöbern</div>
+          <p class="text-sm leading-relaxed">
+            Mehr zu unserer Arbeit auf der Vereinsseite.
+          </p>
+          <a href="/foerderverein/" class="btn-ghost mt-4 text-xs !py-2 !px-4">Der Verein</a>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="/" class="btn-dark">Zur Startseite</a>
+        {isKontakt && (
+          <a href="/foerderverein/mitglied-werden/" class="btn-ghost">Mitglied werden</a>
+        )}
+        {isMitglied && (
+          <a href="/foerderverein/#spenden" class="btn-ghost">Spenden</a>
+        )}
+      </div>
+    </div>
+  </section>
+</Base>

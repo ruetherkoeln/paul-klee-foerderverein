@@ -245,7 +245,14 @@ const spendenStufen = [10, 25, 50, 100];
           </div>
         </div>
       </div>
-      <form class="bg-white p-6 border border-navy-900/10 space-y-4" method="post" action="https://formspree.io/f/REPLACE_FORM_ID">
+      <form class="bg-white p-6 border border-navy-900/10 space-y-4" method="post" action="https://api.web3forms.com/submit">
+        {/* Web3Forms Setup */}
+        <input type="hidden" name="access_key" value="f634ff3d-5084-45f6-84d2-e6796b6924c5" />
+        <input type="hidden" name="subject" value="Neue Kontaktanfrage – Förderverein Paul-Klee-Schule" />
+        <input type="hidden" name="from_name" value="Förderverein Paul-Klee-Schule – Kontakt" />
+        <input type="hidden" name="redirect" value="https://paul-klee-foerderverein.vercel.app/danke/?type=kontakt" />
+        <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
+
         <div>
           <label for="kontakt-name" class="text-sm font-semibold">Ihr Name</label>
           <input id="kontakt-name" required type="text" name="name" class="mt-1 w-full px-4 py-3 border border-navy-900/15 focus:border-gold-500 outline-none" />
