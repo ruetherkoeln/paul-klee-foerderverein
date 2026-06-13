@@ -194,17 +194,62 @@ const spendenStufen = [10, 25, 50, 100];
         </button>
       </div>
 
-      <div class="mt-10 max-w-2xl bg-white p-6 border border-navy-900/10">
-        <h3 class="text-xl font-display font-semibold">Spende per PayPal oder Überweisung.</h3>
+      {/* BANKVERBINDUNG (primär) */}
+      <div class="mt-10 max-w-2xl bg-white p-6 md:p-8 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+        <div class="eyebrow mb-2">Bankverbindung</div>
+        <h3 class="text-xl font-display font-semibold">Spende per Überweisung.</h3>
         <p class="mt-3 text-sm leading-relaxed text-navy-900/75">
           Ihre Spende geht direkt an den Förderverein der Paul-Klee-Schule Düsseldorf e. V. —
-          gemeinnützig anerkannt. Spendenquittung auf Anfrage.
+          gemeinnützig anerkannt. Spendenquittung auf Anfrage per E-Mail.
         </p>
-        <a href="https://www.paypal.com/donate" class="btn-dark mt-5">
-          Jetzt per PayPal spenden
-        </a>
-        <p class="mt-4 text-xs text-navy-900/60">
-          Überweisung: IBAN und Verwendungszweck werden nach Vereinsregistereintrag bekannt gegeben.
+
+        <dl class="mt-6 space-y-4 text-sm">
+          <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
+            <dt class="text-navy-900/60 font-semibold">Kontoinhaber</dt>
+            <dd>Förderverein der Paul-Klee-Schule</dd>
+          </div>
+          <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
+            <dt class="text-navy-900/60 font-semibold">IBAN</dt>
+            <dd class="flex items-center gap-2 flex-wrap">
+              <code class="font-mono text-base bg-cream-100 px-2 py-1 select-all">DE81 3005 0110 0037 0362 66</code>
+              <button
+                type="button"
+                class="copy-btn text-xs px-3 py-1 border border-navy-900/15 hover:border-pk-yellow hover:bg-cream-100 transition-colors uppercase tracking-wider font-semibold"
+                data-copy="DE81300501100037036266"
+                aria-label="IBAN in die Zwischenablage kopieren"
+              >Kopieren</button>
+            </dd>
+          </div>
+          <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
+            <dt class="text-navy-900/60 font-semibold">BIC</dt>
+            <dd class="flex items-center gap-2 flex-wrap">
+              <code class="font-mono text-base bg-cream-100 px-2 py-1 select-all">DUSSDEDDXXX</code>
+              <span class="text-xs text-navy-900/50">Stadtsparkasse Düsseldorf</span>
+            </dd>
+          </div>
+          <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
+            <dt class="text-navy-900/60 font-semibold">Verwendungs-<br/>zweck</dt>
+            <dd>
+              <code class="font-mono text-sm bg-cream-100 px-2 py-1">Spende</code>
+              <span class="text-xs text-navy-900/60 ml-2">— oder Anlass z. B. „Klassenfahrt 3a"</span>
+            </dd>
+          </div>
+        </dl>
+
+        <p class="mt-6 text-xs text-navy-900/60">
+          Für eine Spendenquittung bitte E-Mail an
+          <a href={`mailto:${SITE.email}?subject=Spendenquittung`} class="text-pk-red hover:underline">{SITE.email}</a>
+          mit Datum und Höhe der Spende.
+        </p>
+      </div>
+
+      {/* PAYPAL (sekundär, ausstehend) */}
+      <div class="mt-6 max-w-2xl bg-white p-6 border border-navy-900/10 border-l-4 border-l-pk-blue/30">
+        <div class="eyebrow mb-2">Demnächst auch online</div>
+        <h3 class="text-base font-display font-semibold">Spende per PayPal.</h3>
+        <p class="mt-2 text-sm leading-relaxed text-navy-900/75">
+          Wir richten gerade ein PayPal-Konto für den Verein ein. Sobald verfügbar,
+          finden Sie hier den Online-Spendenbutton.
         </p>
       </div>
 
@@ -274,3 +319,24 @@ const spendenStufen = [10, 25, 50, 100];
     </div>
   </section>
 </Base>
+
+<script>
+  // Copy-Buttons (IBAN etc.) — universal "click to clipboard"
+  document.querySelectorAll<HTMLButtonElement>('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const value = btn.dataset.copy;
+      if (!value) return;
+      const original = btn.textContent ?? 'Kopieren';
+      try {
+        await navigator.clipboard.writeText(value);
+        btn.textContent = 'Kopiert ✓';
+      } catch {
+        // Fallback: selektieren
+        btn.textContent = 'Bitte manuell kopieren';
+      }
+      setTimeout(() => {
+        btn.textContent = original;
+      }, 2000);
+    });
+  });
+</script>
