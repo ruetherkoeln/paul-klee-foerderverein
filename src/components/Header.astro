@@ -20,6 +20,66 @@ const isVerein = variant === 'verein';
       ))}
       <a href="/foerderverein/#spenden" class="btn-dark !py-2 !px-4 text-xs">Spenden</a>
     </nav>
-    <button class="md:hidden text-2xl" aria-label="Menü">≡</button>
+    <button
+      id="hamburger"
+      class="md:hidden text-3xl leading-none w-10 h-10 grid place-items-center"
+      aria-label="Menü öffnen"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >≡</button>
   </div>
 </header>
+
+{/* Mobile menu — hidden by default, JS toggles .hidden */}
+<div
+  id="mobile-menu"
+  class={`hidden md:hidden border-b ${isVerein ? 'bg-navy-900 text-white border-navy-700' : 'bg-white text-navy-900 border-navy-900/10'}`}
+>
+  <nav class="container-c py-4 flex flex-col text-sm font-semibold uppercase tracking-wider">
+    {MAIN_NAV.filter(item => item.label !== 'Spenden').map(item => (
+      <a
+        href={item.href}
+        class={`py-3 border-b ${isVerein ? 'border-navy-700' : 'border-navy-900/10'} hover:text-gold-500`}
+      >{item.label}</a>
+    ))}
+    <a
+      href="/foerderverein/#spenden"
+      class="btn-dark !py-3 !px-5 text-xs mt-4 self-start"
+    >Spenden</a>
+  </nav>
+</div>
+
+<script>
+  const btn = document.getElementById('hamburger');
+  const menu = document.getElementById('mobile-menu');
+
+  function setOpen(isOpen: boolean) {
+    if (!btn || !menu) return;
+    if (isOpen) {
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+      btn.setAttribute('aria-label', 'Menü schließen');
+      btn.textContent = '×';
+    } else {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-label', 'Menü öffnen');
+      btn.textContent = '≡';
+    }
+  }
+
+  btn?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    setOpen(!isOpen);
+  });
+
+  // Auf Link-Klick im Mobile-Menü das Menü zumachen
+  menu?.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => setOpen(false));
+  });
+
+  // ESC schließt das Menü
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setOpen(false);
+  });
+</script>
