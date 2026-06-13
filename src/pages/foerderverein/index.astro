@@ -1,6 +1,31 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../data/site.ts';
+import QRCode from 'qrcode';
+
+// EPC QR Code (GiroCode) — deutsche Banking-Apps scannen den Code
+// und füllen den Überweisungs-Dialog automatisch aus.
+const epcData = [
+  'BCD',                                              // Service Tag
+  '002',                                              // Version
+  '1',                                                // Encoding (UTF-8)
+  'SCT',                                              // SEPA Credit Transfer
+  'DUSSDEDDXXX',                                      // BIC (Stadtsparkasse Düsseldorf)
+  'Förderverein der Paul-Klee-Schule',                // Zahlungsempfänger
+  'DE81300501100037036266',                           // IBAN (ohne Leerzeichen)
+  '',                                                 // Betrag (leer = im Banking eingeben)
+  'CHAR',                                             // Verwendungsschlüssel: Charity
+  '',                                                 // Strukturierte Referenz
+  'Spende',                                           // Verwendungszweck
+  ''                                                  // Zusatzinfo
+].join('\n');
+
+const spendenQr = await QRCode.toString(epcData, {
+  type: 'svg',
+  errorCorrectionLevel: 'M',
+  margin: 1,
+  width: 180
+});
 
 const kennzahlen = [
   { value: '~220', label: 'Kinder an der Schule' },
@@ -183,15 +208,21 @@ const spendenStufen = [10, 25, 50, 100];
         50 € finanzieren eine Woche Frühstück für fünf Kinder. 100 € einen Sportgeräte-Satz.
       </p>
 
-      <div class="mt-8 grid grid-cols-2 sm:grid-cols-5 gap-3 max-w-2xl">
-        {spendenStufen.map(s => (
-          <button type="button" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-white font-display font-semibold text-lg bg-white transition-colors">
-            {s} €
+      <div class="mt-8 max-w-2xl">
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {spendenStufen.map(s => (
+            <button type="button" data-paypal-amount={s} class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-white font-display font-semibold text-lg bg-white transition-colors opacity-60 cursor-not-allowed" disabled aria-disabled="true">
+              {s} €
+            </button>
+          ))}
+          <button type="button" data-paypal-amount="custom" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 font-display font-semibold text-lg bg-white transition-colors opacity-60 cursor-not-allowed" disabled aria-disabled="true">
+            Frei
           </button>
-        ))}
-        <button type="button" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 font-display font-semibold text-lg bg-white transition-colors">
-          Frei
-        </button>
+        </div>
+        <p class="mt-3 text-xs text-navy-900/60">
+          Direkt-Spende per PayPal — funktional, sobald das PayPal-Konto eingerichtet ist.
+          Bis dahin: Überweisung über die IBAN unten.
+        </p>
       </div>
 
       {/* BANKVERBINDUNG (primär) */}
@@ -203,7 +234,8 @@ const spendenStufen = [10, 25, 50, 100];
           gemeinnützig anerkannt. Spendenquittung auf Anfrage per E-Mail.
         </p>
 
-        <dl class="mt-6 space-y-4 text-sm">
+        <div class="mt-6 grid md:grid-cols-[1fr_180px] gap-6 md:gap-8 items-start">
+        <dl class="space-y-4 text-sm">
           <div class="grid grid-cols-[100px_1fr] gap-3 items-start">
             <dt class="text-navy-900/60 font-semibold">Kontoinhaber</dt>
             <dd>Förderverein der Paul-Klee-Schule</dd>
@@ -235,6 +267,15 @@ const spendenStufen = [10, 25, 50, 100];
             </dd>
           </div>
         </dl>
+
+        {/* EPC GiroCode — scannen statt tippen */}
+        <div class="flex flex-col items-center gap-3">
+          <div class="bg-white p-2 border border-navy-900/10" set:html={spendenQr} />
+          <p class="text-xs text-navy-900/60 text-center max-w-[180px] leading-snug">
+            Mit der Banking-App scannen — Überweisungs-Dialog füllt sich aus.
+          </p>
+        </div>
+        </div>
 
         <p class="mt-6 text-xs text-navy-900/60">
           Für eine Spendenquittung bitte E-Mail an
