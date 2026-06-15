@@ -29,12 +29,12 @@ export const SITE = {
   },
 
   // Kontakt zum Förderverein
-  email: 'info@foerderverein-paulklee-duesseldorf.de',
+  email: 'info@pks-foerderverein.de',
 
   // Backwards-compat: alte Felder, damit bestehende Komponenten weiter bauen
   // (TODO: nach vollständiger Migration entfernen)
   phone: '0211 89 23 752',
   fax: '0211 89 23 756',
   emailSchool: 'sekretariat.gerresheimerstr-kg@duesseldorf.de',
-  emailVerein: 'info@foerderverein-paulklee-duesseldorf.de'
+  emailVerein: 'info@pks-foerderverein.de'
 };
