@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../data/site.ts';
+import { STEUER } from '../../data/verein-steuer.ts';
 import QRCode from 'qrcode';
 
 // EPC QR Code (GiroCode) — deutsche Banking-Apps scannen den Code
@@ -277,11 +278,19 @@ const spendenStufen = [10, 25, 50, 100];
         </div>
         </div>
 
-        <p class="mt-6 text-xs text-navy-900/60">
-          Für eine Spendenquittung bitte E-Mail an
-          <a href={`mailto:${SITE.email}?subject=Spendenquittung`} class="text-pk-red hover:underline">{SITE.email}</a>
-          mit Datum und Höhe der Spende.
-        </p>
+        {STEUER.AUSSTELLUNG_AKTIV ? (
+          <p class="mt-6 text-sm text-navy-900/75">
+            <a href="/spenden/bescheinigung/" class="text-pk-red font-semibold hover:underline">Zuwendungsbescheinigung online anfordern →</a>
+            <br />
+            <span class="text-xs text-navy-900/60">Alternativ per E-Mail an {SITE.email} mit Datum und Höhe der Spende.</span>
+          </p>
+        ) : (
+          <p class="mt-6 text-xs text-navy-900/60">
+            Für eine Spendenquittung bitte E-Mail an
+            <a href={`mailto:${SITE.email}?subject=Spendenquittung`} class="text-pk-red hover:underline">{SITE.email}</a>
+            mit Datum und Höhe der Spende.
+          </p>
+        )}
       </div>
 
       {/* PAYPAL (sekundär, ausstehend) */}
