@@ -1,0 +1,190 @@
+---
+import Base from '../../layouts/Base.astro';
+import { STEUER } from '../../data/verein-steuer.ts';
+
+const status = Astro.url.searchParams.get('status');
+const aktiv = STEUER.AUSSTELLUNG_AKTIV;
+// Datum-Max = heute (kein Spendendatum in der Zukunft)
+const heute = new Date().toISOString().slice(0, 10);
+---
+<Base
+  title="Zuwendungsbescheinigung anfordern"
+  description="Spenderdaten eintragen und eine Zuwendungsbescheinigung (Spendenquittung) des Fördervereins der Paul-Klee-Schule anfordern."
+>
+  {/* HERO + BUTTON */}
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Spendenquittung</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Zuwendungsbescheinigung.</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-navy-900/80">
+        Sie haben den Förderverein mit einer Spende unterstützt? Fordern Sie hier Ihre
+        Zuwendungsbescheinigung für die Steuererklärung an — digital und in wenigen Minuten.
+      </p>
+      <a href="#formular" class="btn-gold mt-8">Zuwendungsbescheinigung anfordern</a>
+    </div>
+  </section>
+
+  {/* WAS IST DAS & WIE GEHT ES */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Was ist das & wie funktioniert es</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">In drei Schritten zur Bescheinigung.</h2>
+      <p class="mt-4 leading-relaxed text-navy-900/80">
+        Eine Zuwendungsbescheinigung (umgangssprachlich „Spendenquittung") ist der Nachweis,
+        mit dem Sie Ihre Spende beim Finanzamt als Sonderausgabe geltend machen können.
+      </p>
+      <ol class="mt-8 space-y-3 leading-relaxed">
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-yellow flex gap-4">
+          <span class="font-display font-bold text-pk-yellow text-xl flex-shrink-0">1.</span>
+          <span>Sie füllen das Formular mit den gesetzlich erforderlichen Angaben aus.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-orange flex gap-4">
+          <span class="font-display font-bold text-pk-orange text-xl flex-shrink-0">2.</span>
+          <span>Der Vorstand gleicht Ihre Spende mit dem Eingang auf dem Vereinskonto ab.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-red flex gap-4">
+          <span class="font-display font-bold text-pk-red text-xl flex-shrink-0">3.</span>
+          <span>Sie erhalten die Bescheinigung als PDF an Ihre E-Mail-Adresse.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  {/* REGELN */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Das sollten Sie wissen</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold mb-6">Welche Regeln gelten.</h2>
+      <ul class="space-y-3 text-sm leading-relaxed text-navy-900/80">
+        <li class="bg-white p-4 border border-navy-900/10">
+          <strong>Bis 300 €</strong> genügt dem Finanzamt der vereinfachte Nachweis (Ihr Kontoauszug) —
+          eine förmliche Bescheinigung ist dann nicht zwingend nötig. Gern stellen wir sie trotzdem aus.
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10">
+          Wir stellen die Bescheinigung erst aus, wenn der Betrag <strong>tatsächlich auf dem
+          Vereinskonto eingegangen</strong> ist.
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10">
+          Bitte geben Sie <strong>korrekte und vollständige Daten</strong> an — die Angaben stehen
+          wörtlich auf einem rechtsverbindlichen Steuerdokument.
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10">
+          Die Bescheinigung geht an die <strong>von Ihnen angegebene E-Mail-Adresse</strong>.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {/* FORMULAR */}
+  <section class="bg-cream-50" id="formular">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Ihre Angaben</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">Gesetzlich erforderliche Angaben.</h2>
+      <p class="mt-3 mb-8 text-sm text-navy-900/70 leading-relaxed">
+        Für eine gültige Zuwendungsbescheinigung schreibt das Finanzamt diese Angaben vor:
+        vollständiger Name und Anschrift, Spendenbetrag und Tag der Spende.
+      </p>
+
+      {!aktiv && (
+        <div class="bg-white p-6 border border-navy-900/10 border-l-4 border-l-pk-orange mb-8">
+          <div class="eyebrow mb-2">Vorübergehend nicht verfügbar</div>
+          <p class="text-sm leading-relaxed">
+            Die automatische Ausstellung von Zuwendungsbescheinigungen ist derzeit pausiert.
+            Für eine Spendenquittung schreiben Sie uns bitte kurz an
+            <a href="mailto:info@pks-foerderverein.de" class="text-pk-red hover:underline">info@pks-foerderverein.de</a> —
+            wir kümmern uns persönlich darum.
+          </p>
+        </div>
+      )}
+
+      {status === 'fehler' && (
+        <div class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-red mb-6 text-sm">
+          Es ist etwas schiefgelaufen. Bitte prüfen Sie Ihre Eingaben und versuchen Sie es erneut.
+        </div>
+      )}
+      {status === 'inaktiv' && (
+        <div class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-orange mb-6 text-sm">
+          Die Ausstellung ist derzeit pausiert. Bitte wenden Sie sich an info@pks-foerderverein.de.
+        </div>
+      )}
+
+      <form
+        method="post"
+        action="/api/zuwendung"
+        class={`bg-white p-6 md:p-8 border border-navy-900/10 space-y-5 ${aktiv ? '' : 'opacity-50 pointer-events-none'}`}
+        aria-disabled={!aktiv}
+      >
+        {/* Honeypot */}
+        <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" />
+
+        {/* Name und Anschrift des Zuwendenden (gesetzlich erforderlich) */}
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="vorname" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Vorname *</label>
+            <input id="vorname" required name="vorname" autocomplete="given-name" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Name *</label>
+            <input id="name" required name="name" autocomplete="family-name" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_120px] gap-3">
+          <div>
+            <label for="strasse" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Straße *</label>
+            <input id="strasse" required name="strasse" autocomplete="address-line1" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="hausnummer" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Nr. *</label>
+            <input id="hausnummer" required name="hausnummer" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[120px_1fr] gap-3">
+          <div>
+            <label for="plz" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">PLZ *</label>
+            <input id="plz" required name="plz" autocomplete="postal-code" pattern="[0-9]{5}" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="ort" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Ort *</label>
+            <input id="ort" required name="ort" autocomplete="address-level2" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">E-Mail-Adresse * (hierhin senden wir die Bescheinigung)</label>
+          <input id="email" required type="email" name="email" autocomplete="email" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+        </div>
+
+        {/* Betrag + Tag der Zuwendung (gesetzlich erforderlich) */}
+        <fieldset class="border-t border-navy-900/10 pt-5 grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="betrag" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Spendenbetrag (€) *</label>
+            <input id="betrag" required name="betrag" inputmode="decimal" placeholder="z. B. 50" class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+          <div>
+            <label for="datum" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Tag der Spende *</label>
+            <input id="datum" required type="date" name="datum" max={heute} class="w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500" />
+          </div>
+        </fieldset>
+
+        <label class="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+          <input type="checkbox" name="verzicht" class="mt-1 shrink-0" />
+          <span>Es handelt sich um den Verzicht auf Erstattung von Aufwendungen (Aufwandsspende). In der Regel nicht zutreffend — nur ankreuzen, wenn Sie auf eine Erstattung verzichtet haben.</span>
+        </label>
+
+        <p class="text-xs text-navy-900/60 leading-relaxed border-t border-navy-900/10 pt-4">
+          Mit Absenden willige ich in die Verarbeitung meiner Daten zum Zweck der Ausstellung der
+          Zuwendungsbescheinigung gemäß Art. 6 Abs. 1 lit. c DSGVO ein. Weitere Informationen in der
+          <a href="/datenschutz/" class="text-gold-600 hover:underline">Datenschutzerklärung</a>.
+        </p>
+
+        <button type="submit" class="btn-gold w-full justify-center" disabled={!aktiv}>
+          Bescheinigung anfordern
+        </button>
+
+        <p class="text-xs text-navy-900/50 text-center">Felder mit * sind Pflichtangaben.</p>
+      </form>
+    </div>
+  </section>
+</Base>
