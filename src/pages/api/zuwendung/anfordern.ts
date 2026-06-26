@@ -20,6 +20,9 @@ function parseBetragToCent(raw: string): number {
 
 const redirect = (url: string) => new Response(null, { status: 303, headers: { Location: url } });
 
+// Direktaufruf im Browser (GET) → zurück zum Formular, statt 404/403.
+export const GET: APIRoute = async () => redirect('/spenden/bescheinigung/');
+
 export const POST: APIRoute = async ({ request }) => {
   const base = baseUrl(request);
 
