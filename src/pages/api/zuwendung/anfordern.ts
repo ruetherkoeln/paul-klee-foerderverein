@@ -4,7 +4,7 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 import { STEUER } from '../../../data/verein-steuer.ts';
-import { getEnv, signSpende, formatEuro, type Spende } from '../../../lib/zuwendung.ts';
+import { getEnv, baseUrl, signSpende, formatEuro, type Spende } from '../../../lib/zuwendung.ts';
 
 export const prerender = false;
 
@@ -18,11 +18,10 @@ function parseBetragToCent(raw: string): number {
   return Math.round(val * 100);
 }
 
-const origin = (req: Request) => getEnv('PUBLIC_SITE_URL') || new URL(req.url).origin;
 const redirect = (url: string) => new Response(null, { status: 303, headers: { Location: url } });
 
 export const POST: APIRoute = async ({ request }) => {
-  const base = origin(request);
+  const base = baseUrl(request);
 
   if (!STEUER.AUSSTELLUNG_AKTIV) {
     return redirect(`${base}/spenden/bescheinigung/?status=inaktiv`);

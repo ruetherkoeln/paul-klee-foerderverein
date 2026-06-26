@@ -11,6 +11,18 @@ export function getEnv(key: string): string | undefined {
   return fromProcess ?? fromMeta;
 }
 
+// Öffentliche Basis-URL der Site. Auf Vercel ist new URL(request.url) intern
+// "localhost" — daher aus den Forwarded-Headern bzw. PUBLIC_SITE_URL bilden.
+export function baseUrl(request: Request): string {
+  const env = getEnv('PUBLIC_SITE_URL');
+  if (env) return env.replace(/\/$/, '');
+  const h = request.headers;
+  const host = h.get('x-forwarded-host') ?? h.get('host');
+  const proto = h.get('x-forwarded-proto') ?? 'https';
+  if (host) return `${proto}://${host}`;
+  return new URL(request.url).origin;
+}
+
 function signingSecret(): string {
   const s = getEnv('ZUWENDUNG_SIGNING_SECRET');
   if (!s) throw new Error('ZUWENDUNG_SIGNING_SECRET fehlt');
