@@ -5,6 +5,7 @@ import Base from '../layouts/Base.astro';
 const type = Astro.url.searchParams.get('type');
 const isMitglied = type === 'mitglied';
 const isKontakt = type === 'kontakt';
+const isZuwendung = type === 'zuwendung';
 ---
 <Base
   title="Vielen Dank"
@@ -29,7 +30,14 @@ const isKontakt = type === 'kontakt';
             innerhalb weniger Werktage.
           </>
         )}
-        {!isMitglied && !isKontakt && (
+        {isZuwendung && (
+          <>
+            Ihre Anfrage für eine Zuwendungsbescheinigung ist bei uns eingegangen.
+            Wir gleichen den Zahlungseingang mit unserem Konto ab und senden Ihnen die
+            Bescheinigung anschließend als PDF an Ihre E-Mail-Adresse.
+          </>
+        )}
+        {!isMitglied && !isKontakt && !isZuwendung && (
           <>Ihre Nachricht ist bei uns eingegangen. Wir melden uns in Kürze.</>
         )}
       </p>
