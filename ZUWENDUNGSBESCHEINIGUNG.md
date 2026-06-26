@@ -47,6 +47,7 @@ die API stellt nichts aus. Zum Scharfschalten auf `true` setzen und deployen.
 | `VORSTAND_EMAIL` | Empfänger der Freigabe-Anfrage |
 | `VEREIN_KOPIE_EMAIL` | Kopie-Empfänger der fertigen Bescheinigung (Buchhaltung) |
 | `ZUWENDUNG_SIGNING_SECRET` | langer Zufallswert zum Signieren der Tokens |
+| `VEREIN_STEUERNUMMER` | Steuernummer des Vereins (bewusst nicht im Repo) |
 | `PUBLIC_SITE_URL` | optional, Basis-URL für die Links (sonst aus Request) |
 
 **Resend:** Domain `pks-foerderverein.de` verifizieren (DNS-Records) und einen

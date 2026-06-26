@@ -3,7 +3,7 @@
 // und dem Spenden-Datensatz.
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 import { STEUER } from '../data/verein-steuer.ts';
-import { type Spende, formatEuro, euroInWorten } from './zuwendung.ts';
+import { type Spende, formatEuro, euroInWorten, getEnv } from './zuwendung.ts';
 
 const A4 = { w: 595.28, h: 841.89 };
 const MARGIN = 56;
@@ -114,7 +114,7 @@ export async function buildZuwendungsPdf(spende: Spende): Promise<Uint8Array> {
 
   // ── Befreiungstext (je nach Bescheid-Art) ───────────────────────────────────
   const fa = STEUER.finanzamt;
-  const stnr = STEUER.steuernummer;
+  const stnr = getEnv('VEREIN_STEUERNUMMER') || 'PLATZHALTER StNr.';
   if (STEUER.bescheid.art === 'freistellung') {
     wrapped(
       `Wir sind wegen Förderung ${STEUER.zwecke} durch Freistellungsbescheid des ${fa}, ` +

@@ -22,9 +22,11 @@ export const STEUER = {
     ort: 'Düsseldorf',
   },
 
-  // Finanzamt + Steuernummer (aus dem Bescheid)
+  // Finanzamt (öffentlich unkritisch)
   finanzamt: 'Finanzamt Düsseldorf-Mitte',
-  steuernummer: '133/5906/1539',
+  // Steuernummer NICHT hier hinterlegen (öffentliches Repo) —
+  // sie kommt zur Laufzeit aus der Env-Variable VEREIN_STEUERNUMMER
+  // (siehe zuwendung-pdf.ts). Auf der Bescheinigung erscheint sie ohnehin.
 
   // ── Anerkennung der Gemeinnützigkeit ──────────────────────────────────────
   // Art des Bescheids bestimmt den exakten Wortlaut im Muster:
