@@ -1,10 +1,10 @@
-// POST /api/zuwendung
+// POST /api/zuwendung/anfordern
 // Nimmt die Spender-Eingaben entgegen, signiert sie und schickt dem Vorstand
 // eine Freigabe-Mail mit Prüf-Link. Es wird hier noch NICHTS ausgestellt.
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
-import { STEUER } from '../../data/verein-steuer.ts';
-import { getEnv, signSpende, formatEuro, type Spende } from '../../lib/zuwendung.ts';
+import { STEUER } from '../../../data/verein-steuer.ts';
+import { getEnv, signSpende, formatEuro, type Spende } from '../../../lib/zuwendung.ts';
 
 export const prerender = false;
 

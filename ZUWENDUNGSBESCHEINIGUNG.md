@@ -7,8 +7,8 @@ geht an den Spender, Kopie an den Verein.
 ## Ablauf (ohne Datenbank)
 
 1. `/spenden/bescheinigung` – Formular für den Spender.
-2. `POST /api/zuwendung` – signiert die Eingaben (HMAC) und mailt dem **Vorstand**
-   einen Freigabe-Link. Es wird hier noch nichts ausgestellt.
+2. `POST /api/zuwendung/anfordern` – signiert die Eingaben (HMAC) und mailt dem
+   **Vorstand** einen Freigabe-Link. Es wird hier noch nichts ausgestellt.
 3. `GET /api/zuwendung/freigeben?token=…` – Vorschau für den Vorstand.
    Erst der **POST** (Button „Jetzt senden") erzeugt das PDF und versendet es.
 
