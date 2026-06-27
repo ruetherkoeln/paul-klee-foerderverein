@@ -22,10 +22,10 @@ export const ARTIKEL: Artikel[] = [
     bild: '/img/shop/trinkflasche.jpg',
   },
   {
-    name: 'Kaffee-Reisebecher',
-    preis: '24,99 €',
-    beschreibung: 'Isolierter Coffee-to-go-Becher mit Schul-Logo – hält Heißes lange warm.',
-    bild: '/img/shop/reisebecher.jpg',
+    name: 'Frühstücksbecher',
+    preis: '9,99 €',
+    beschreibung: 'Keramik-Frühstücksbecher mit Schul-Logo – erhältlich in Weiß und Hellblau.',
+    bild: '/img/shop/fruehstuecksbecher.jpg',
   },
   {
     name: 'Brotdose',
