@@ -17,7 +17,10 @@ import { SITE } from '../data/site.ts';
       <p class="text-sm mt-3">
         E-Mail: <a href={`mailto:${SITE.email}`} class="hover:text-gold-500">{SITE.email}</a>
       </p>
-      <a href="/foerderverein/#spenden" class="btn-gold mt-4 !py-2 !px-4 text-xs">Jetzt spenden</a>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <a href="/foerderverein/#spenden" class="btn-gold !py-2 !px-4 text-xs">Jetzt spenden</a>
+        <a href="/shop/" class="btn-shop !py-2 !px-4 text-xs">🛍 Shop</a>
+      </div>
     </div>
     <div>
       <div class="font-display font-bold text-lg text-white mb-3">Die Schule, die wir unterstützen</div>

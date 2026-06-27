@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../data/site.ts';
+import { ARTIKEL } from '../data/shop.ts';
+
+// Akzentfarben für Karten im Wechsel
+const akzente = ['pk-yellow', 'pk-orange', 'pk-red', 'pk-blue', 'pk-yellow'];
+---
+<Base
+  title="Shop"
+  description="Shop des Fördervereins der Paul-Klee-Schule — Trinkflasche, Brotdose, Poloshirt & mehr mit Schul-Logo. Ausgabe an die Kinder über die Schule."
+>
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Shop</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Unser Shop.</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-navy-900/80">
+        Hochwertige Artikel mit dem Logo der Paul-Klee-Grundschule. Der Erlös fließt
+        direkt in die Projekte des Fördervereins. Hier wird nichts online verkauft oder
+        versendet — die Artikel werden <strong>in der Schule an die Kinder ausgegeben</strong>.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {ARTIKEL.map((a, i) => (
+          <div class={`bg-white border border-navy-900/10 border-t-4 border-t-${akzente[i % akzente.length]} flex flex-col`}>
+            <div class="relative w-full aspect-[4/3] bg-cream-50 border-b border-navy-900/10 flex items-center justify-center">
+              <span class="eyebrow text-navy-900/40">Foto folgt</span>
+              {a.bild && (
+                <img src={a.bild} alt={a.name} loading="lazy" onerror="this.remove()" class="absolute inset-0 w-full h-full object-cover" />
+              )}
+            </div>
+            <div class="p-5 flex flex-col flex-1">
+              <div class="flex items-baseline justify-between gap-3">
+                <h2 class="text-lg font-display font-bold">{a.name}</h2>
+                {a.preis && <span class="font-display font-bold text-pk-red whitespace-nowrap">{a.preis}</span>}
+              </div>
+              <p class="mt-2 text-sm leading-relaxed text-navy-900/75 flex-1">{a.beschreibung}</p>
+              <a
+                href={`mailto:${SITE.email}?subject=${encodeURIComponent('Shop-Anfrage: ' + a.name)}&body=${encodeURIComponent('Hallo, ich interessiere mich für folgenden Artikel: ' + a.name + '.\n\nName des Kindes / der Klasse:\nAnzahl / Größe / Farbe:\n\nVielen Dank!')}`}
+                class="btn-gold mt-5 !py-2 text-sm justify-center"
+              >
+                Anfragen
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* So funktioniert es */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">So funktioniert es</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">Anfragen & über die Schule erhalten.</h2>
+      <ol class="mt-8 space-y-3 leading-relaxed">
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-yellow flex gap-4">
+          <span class="font-display font-bold text-pk-yellow text-xl flex-shrink-0">1.</span>
+          <span>Über „Anfragen" eine kurze E-Mail mit Artikel, Anzahl/Größe/Farbe und Name des Kindes senden.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-orange flex gap-4">
+          <span class="font-display font-bold text-pk-orange text-xl flex-shrink-0">2.</span>
+          <span>Wir bestätigen Verfügbarkeit und Betrag per E-Mail.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-red flex gap-4">
+          <span class="font-display font-bold text-pk-red text-xl flex-shrink-0">3.</span>
+          <span>Die Ausgabe erfolgt über die Schule direkt an Ihr Kind.</span>
+        </li>
+      </ol>
+      <p class="mt-6 text-sm text-navy-900/70">
+        Fragen? Schreiben Sie uns an
+        <a href={`mailto:${SITE.email}`} class="text-pk-red hover:underline">{SITE.email}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
