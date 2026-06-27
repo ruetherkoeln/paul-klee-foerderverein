@@ -31,9 +31,6 @@
   .btn-ghost {
     @apply btn border-2 border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white;
   }
-  .btn-shop {
-    @apply btn bg-pk-red hover:bg-pk-red/90 text-white shadow-sm;
-  }
   .eyebrow {
     @apply text-xs font-semibold uppercase tracking-[0.2em] text-gold-600;
   }
