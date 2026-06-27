@@ -17,7 +17,7 @@ export interface Artikel {
 export const ARTIKEL: Artikel[] = [
   {
     name: 'Trinkflasche',
-    preis: '29,99 €',
+    preis: '19,99 €',
     beschreibung: 'Isolierte Edelstahl-Trinkflasche mit dem Logo der Paul-Klee-Grundschule. Erhältlich in Schwarz, Rosé und Gelb.',
     bild: '/img/shop/trinkflasche.jpg',
   },
@@ -38,5 +38,11 @@ export const ARTIKEL: Artikel[] = [
     preis: '29,99 €',
     beschreibung: 'Offizielle Schulkleidung: hellblaues Poloshirt mit Schul-Logo. In verschiedenen Größen (z. B. 128).',
     bild: '/img/shop/poloshirt.jpg',
+  },
+  {
+    name: 'Sporttasche',
+    preis: '19,99 €',
+    beschreibung: 'Kleine Sporttasche mit Schul-Logo und abnehmbarem Schultergurt – ideal für die Sportsachen.',
+    bild: '/img/shop/sporttasche.jpg',
   },
 ].slice(0, 5); // Sicherheitsnetz: maximal 5 Artikel
