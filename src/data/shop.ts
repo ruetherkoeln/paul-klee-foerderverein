@@ -45,4 +45,10 @@ export const ARTIKEL: Artikel[] = [
     beschreibung: 'Kleine Sporttasche mit Schul-Logo und abnehmbarem Schultergurt – ideal für die Sportsachen.',
     bild: '/img/shop/sporttasche.jpg',
   },
-].slice(0, 5); // Sicherheitsnetz: maximal 5 Artikel
+  {
+    name: 'Poster „Revolution des Viaduktes"',
+    preis: '7,99 €',
+    beschreibung: 'Paul Klee, „Revolution des Viaduktes" (1937) · 60 × 50 cm. Das Logo der Paul-Klee-Schule beruht auf diesem ikonischen Bild des Malers. Ein Poster fürs Kinderzimmer – Erinnerung an den ersten Schritt.',
+    bild: '/img/shop/poster-viadukt.jpg',
+  },
+].slice(0, 6); // Sicherheitsnetz: maximal 6 Artikel
