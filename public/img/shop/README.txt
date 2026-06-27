@@ -4,6 +4,7 @@ Produktbilder für den Shop hier ablegen (exakt diese Dateinamen):
   fruehstuecksbecher.jpg  – Frühstücksbecher (Keramik, Weiß/Hellblau)  [vorhanden]
   brotdose.jpg            – Mepal-Brotdose (mint)
   poloshirt.jpg           – hellblaues Poloshirt / Schulkleidung        [vorhanden]
+  sporttasche.jpg         – kleine Sporttasche (hellblau)               [vorhanden]
 
 Empfehlung: ca. 1200 px breit, Seitenverhältnis ~4:3, als .jpg.
 Fehlt ein Bild, zeigt die Seite automatisch einen „Foto folgt"-Platzhalter.
