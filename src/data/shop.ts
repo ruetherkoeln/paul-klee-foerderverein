@@ -29,7 +29,7 @@ export const ARTIKEL: Artikel[] = [
   },
   {
     name: 'Brotdose',
-    preis: '34,99 €',
+    preis: '19,99 €',
     beschreibung: 'Hochwertige Mepal-Brotdose mit Schul-Logo – ideal fürs Pausenbrot.',
     bild: '/img/shop/brotdose.jpg',
   },
