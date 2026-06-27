@@ -12,6 +12,9 @@ export interface Artikel {
   preis?: string;
   beschreibung: string;
   bild?: string;
+  // Optional: auswählbare Größen (z. B. Kleidung). Wenn gesetzt, zeigt die
+  // Shop-Seite ein Größen-Dropdown; die Auswahl wird in die Anfrage-Mail übernommen.
+  groessen?: string[];
 }
 
 export const ARTIKEL: Artikel[] = [
@@ -36,8 +39,14 @@ export const ARTIKEL: Artikel[] = [
   {
     name: 'Poloshirt',
     preis: '29,99 €',
-    beschreibung: 'Offizielle Schulkleidung: hellblaues Poloshirt mit Schul-Logo. In verschiedenen Größen (z. B. 128).',
+    beschreibung: 'Offizielle Schulkleidung: hellblaues Poloshirt mit Schul-Logo. Bitte gewünschte Größe wählen.',
     bild: '/img/shop/poloshirt.jpg',
+    groessen: [
+      '110/116 (ca. 5–6 Jahre)',
+      '122/128 (ca. 7–8 Jahre)',
+      '134/140 (ca. 9–10 Jahre)',
+      '146/152 (ca. 10–11 Jahre)',
+    ],
   },
   {
     name: 'Sporttasche',

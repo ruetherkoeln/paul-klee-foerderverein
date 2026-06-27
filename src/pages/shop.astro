@@ -40,12 +40,28 @@ const akzente = ['pk-yellow', 'pk-orange', 'pk-red', 'pk-blue', 'pk-yellow'];
                 {a.preis && <span class="font-display font-bold text-pk-red whitespace-nowrap">{a.preis}</span>}
               </div>
               <p class="mt-2 text-sm leading-relaxed text-navy-900/75 flex-1">{a.beschreibung}</p>
-              <a
-                href={`mailto:${SITE.email}?subject=${encodeURIComponent('Shop-Anfrage: ' + a.name)}&body=${encodeURIComponent('Hallo, ich interessiere mich für folgenden Artikel: ' + a.name + '.\n\nName des Kindes / der Klasse:\nAnzahl / Größe / Farbe:\n\nVielen Dank!')}`}
-                class="btn-gold mt-5 !py-2 text-sm justify-center"
-              >
-                Anfragen
-              </a>
+              {a.groessen ? (
+                <div class="mt-4">
+                  <label for={`size-${i}`} class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">Größe wählen</label>
+                  <select id={`size-${i}`} class="w-full px-3 py-2 border border-navy-900/15 rounded-sm bg-white text-sm focus:outline-none focus:border-gold-500">
+                    {a.groessen.map(g => <option value={g}>{g}</option>)}
+                  </select>
+                  <button
+                    type="button"
+                    class="js-size-order btn-gold w-full mt-3 !py-2 text-sm justify-center"
+                    data-name={a.name}
+                    data-email={SITE.email}
+                    data-select={`size-${i}`}
+                  >Anfragen</button>
+                </div>
+              ) : (
+                <a
+                  href={`mailto:${SITE.email}?subject=${encodeURIComponent('Shop-Anfrage: ' + a.name)}&body=${encodeURIComponent('Hallo, ich interessiere mich für folgenden Artikel: ' + a.name + '.\n\nName des Kindes / der Klasse:\nAnzahl / Größe / Farbe:\n\nVielen Dank!')}`}
+                  class="btn-gold mt-5 !py-2 text-sm justify-center"
+                >
+                  Anfragen
+                </a>
+              )}
             </div>
           </div>
         ))}
@@ -78,4 +94,20 @@ const akzente = ['pk-yellow', 'pk-orange', 'pk-red', 'pk-blue', 'pk-yellow'];
       </p>
     </div>
   </section>
+
+  <script>
+    // Größenauswahl in die Anfrage-Mail übernehmen
+    document.querySelectorAll('.js-size-order').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const el = btn as HTMLElement;
+        const sel = document.getElementById(el.dataset.select || '') as HTMLSelectElement | null;
+        const groesse = sel ? sel.value : '';
+        const name = el.dataset.name || '';
+        const email = el.dataset.email || '';
+        const subject = `Shop-Anfrage: ${name} (Größe ${groesse})`;
+        const body = `Hallo, ich interessiere mich für folgenden Artikel: ${name}.\n\nGröße: ${groesse}\nName des Kindes / der Klasse:\nAnzahl:\n\nVielen Dank!`;
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      });
+    });
+  </script>
 </Base>
