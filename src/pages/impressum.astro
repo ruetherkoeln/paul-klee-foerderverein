@@ -12,31 +12,51 @@ import { SITE } from '../data/site.ts';
 
   <section class="bg-cream-50">
     <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl space-y-10">
-      <div>
-        <div class="eyebrow mb-2">Diensteanbieter</div>
-        <h2 class="font-display font-bold text-2xl">Förderverein</h2>
-        <p class="mt-4 leading-relaxed text-navy-900/80">
-          Förderverein der Paul-Klee-Schule Düsseldorf e. V.<br/>
-          {SITE.address.street}<br/>
-          {SITE.address.zip} {SITE.address.city}<br/>
-          E-Mail: <a href={`mailto:${SITE.email}`} class="text-pk-red hover:underline">{SITE.email}</a>
-        </p>
-        <p class="mt-4 leading-relaxed text-sm text-navy-900/70">
-          Vereinsregister: VR 7008 — Amtsgericht Düsseldorf.<br/>
-          Steuerlich anerkannt als gemeinnützig (Freistellungsbescheid 2021).
-        </p>
-        <div class="mt-4">
-          <div class="eyebrow mb-2">Vertretungsberechtigter Vorstand</div>
-          <p class="leading-relaxed text-sm text-navy-900/70">
-            Vorstand gemäß § 26 BGB, gewählt durch Beschluss der Mitgliederversammlung
-            vom 21. April 2026:
+      <div class="space-y-6">
+        <div>
+          <div class="eyebrow mb-2">Angaben gemäß § 5 DDG</div>
+          <h2 class="font-display font-bold text-2xl">Förderverein Paul-Klee-Schule e.V.</h2>
+          <p class="mt-4 leading-relaxed text-navy-900/80">
+            Gerresheimer Str. 34/36<br/>
+            40211 Düsseldorf
           </p>
-          <ul class="mt-2 leading-relaxed text-sm text-navy-900/70 list-disc pl-5 space-y-1">
-            <li>A. Rüther — 1. Vorsitzender</li>
-            <li>S. Buchwald — 2. Vorsitzende</li>
-            <li>P. Müller — Kassenwartin</li>
-            <li>H. Bassit — Beisitzerin</li>
+        </div>
+
+        <div>
+          <h3 class="font-display font-semibold text-lg">Vertreten durch den Vorstand</h3>
+          <p class="mt-1 text-sm text-navy-900/70">
+            (gem. Beschluss der Mitgliederversammlung vom 21. April 2026)
+          </p>
+          <ul class="mt-2 leading-relaxed text-sm text-navy-900/80 list-disc pl-5 space-y-1">
+            <li>A. Ruether – 1. Vorsitzender</li>
+            <li>S. Buchwald – 2. Vorsitzende</li>
+            <li>P. Müller – Kassenwartin</li>
+            <li>H. Bassit – Beisitzerin</li>
           </ul>
+        </div>
+
+        <div>
+          <h3 class="font-display font-semibold text-lg">Registereintrag</h3>
+          <p class="mt-1 leading-relaxed text-sm text-navy-900/80">
+            Eingetragen im Vereinsregister<br/>
+            Registergericht: Amtsgericht Düsseldorf<br/>
+            Registernummer: VR 7008
+          </p>
+        </div>
+
+        <div>
+          <h3 class="font-display font-semibold text-lg">Kontakt</h3>
+          <p class="mt-1 leading-relaxed text-sm text-navy-900/80">
+            E-Mail: <a href={`mailto:${SITE.email}`} class="text-pk-red hover:underline">{SITE.email}</a>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="font-display font-semibold text-lg">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+          <p class="mt-1 leading-relaxed text-sm text-navy-900/80">
+            A. Ruether, über Förderverein der Paul Klee Grundschule e.V.,<br/>
+            Gerresheimer Str. 34/36, 40211 Düsseldorf
+          </p>
         </div>
       </div>
 
