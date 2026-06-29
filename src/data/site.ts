@@ -2,6 +2,7 @@ export const SITE = {
   // Identität: Wir sind der Förderverein, nicht die Schule
   name: 'Förderverein der Paul-Klee-Schule Düsseldorf e. V.',
   shortName: 'Förderverein Paul-Klee-Schule',
+  logo: '/img/foerderverein-logo.png',
   url: 'https://www.foerderverein-paulklee-duesseldorf.de',
   description: 'Wir unterstützen die Städt. Katholische Grundschule Paul-Klee in Düsseldorf-Zentrum — unter anderem mit Lernmitteln, Klassenfahrten, Frühstück und digitaler Teilhabe für rund 220 Kinder.',
 
