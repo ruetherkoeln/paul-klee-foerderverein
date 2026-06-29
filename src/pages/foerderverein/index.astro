@@ -28,6 +28,16 @@ const spendenQr = await QRCode.toString(epcData, {
   width: 180
 });
 
+// PayPal-Spende — Managed-QR-Link des Vereinskontos.
+// Scannbar (Handykamera / PayPal-App) und im Browser anklickbar.
+const paypalUrl = 'https://www.paypal.com/qrcodes/managed/df0fcaad-efe2-41b3-9f80-59c2423d8459?utm_source=payandgetpaid';
+const paypalQr = await QRCode.toString(paypalUrl, {
+  type: 'svg',
+  errorCorrectionLevel: 'M',
+  margin: 1,
+  width: 180
+});
+
 const kennzahlen = [
   { value: '~220', label: 'Kinder an der Schule' },
   { value: '30+', label: 'Herkunftsländer der Familien' },
@@ -213,17 +223,17 @@ const spendenStufen = [10, 25, 50, 100];
       <div class="mt-8 max-w-2xl">
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {spendenStufen.map(s => (
-            <button type="button" data-paypal-amount={s} class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-white font-display font-semibold text-lg bg-white transition-colors opacity-60 cursor-not-allowed" disabled aria-disabled="true">
+            <a href={paypalUrl} target="_blank" rel="noopener" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-white font-display font-semibold text-lg bg-white transition-colors text-center">
               {s} €
-            </button>
+            </a>
           ))}
-          <button type="button" data-paypal-amount="custom" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 font-display font-semibold text-lg bg-white transition-colors opacity-60 cursor-not-allowed" disabled aria-disabled="true">
+          <a href={paypalUrl} target="_blank" rel="noopener" class="px-4 py-4 border-2 border-navy-900/15 hover:border-gold-500 hover:bg-white font-display font-semibold text-lg bg-white transition-colors text-center">
             Frei
-          </button>
+          </a>
         </div>
         <p class="mt-3 text-xs text-navy-900/60">
-          Direkt-Spende per PayPal — funktional, sobald das PayPal-Konto eingerichtet ist.
-          Bis dahin: Überweisung über die IBAN unten.
+          Direkt-Spende per PayPal — den genauen Betrag wählen Sie anschließend in PayPal.
+          Lieber per Überweisung? Bankverbindung und GiroCode finden Sie unten.
         </p>
       </div>
 
@@ -294,14 +304,29 @@ const spendenStufen = [10, 25, 50, 100];
         )}
       </div>
 
-      {/* PAYPAL (sekundär, ausstehend) */}
-      <div class="mt-6 max-w-2xl bg-white p-6 border border-navy-900/10 border-l-4 border-l-pk-blue/30">
-        <div class="eyebrow mb-2">Demnächst auch online</div>
-        <h3 class="text-base font-display font-semibold">Spende per PayPal.</h3>
-        <p class="mt-2 text-sm leading-relaxed text-navy-900/75">
-          Wir richten gerade ein PayPal-Konto für den Verein ein. Sobald verfügbar,
-          finden Sie hier den Online-Spendenbutton.
+      {/* PAYPAL (online, sofort) */}
+      <div id="paypal" class="mt-6 max-w-2xl bg-white p-6 md:p-8 border border-navy-900/10 border-l-4 border-l-pk-blue">
+        <div class="eyebrow mb-2">Online spenden</div>
+        <h3 class="text-xl font-display font-semibold">Spende per PayPal.</h3>
+        <p class="mt-3 text-sm leading-relaxed text-navy-900/75">
+          Schnell und ohne Kontodaten — mit PayPal oder Kredit- bzw. Girokarte.
+          Am Smartphone den Code scannen, am Rechner einfach auf den Button tippen.
         </p>
+
+        <div class="mt-6 grid sm:grid-cols-[180px_1fr] gap-6 sm:gap-8 items-center">
+          {/* QR zum Scannen */}
+          <a href={paypalUrl} target="_blank" rel="noopener" class="block bg-white p-2 border border-navy-900/10 w-[180px] mx-auto sm:mx-0" aria-label="PayPal-Spendenseite öffnen" set:html={paypalQr} />
+
+          <div>
+            <a href={paypalUrl} target="_blank" rel="noopener" class="btn-dark">
+              Mit PayPal spenden
+            </a>
+            <p class="mt-3 text-xs text-navy-900/60 leading-snug">
+              Den Spendenbetrag legen Sie auf der PayPal-Seite fest.
+              Spendenquittung auf Anfrage per E-Mail.
+            </p>
+          </div>
+        </div>
       </div>
 
       <div class="mt-10 max-w-2xl">
