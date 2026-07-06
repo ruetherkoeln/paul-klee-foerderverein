@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel';
 
 export default defineConfig({
-  site: 'https://www.grundschule-paul-klee.de',
+  site: 'https://www.pks-foerderverein.de',
   integrations: [tailwind()],
   // Site bleibt statisch; einzelne API-Routen rendern serverseitig
   // (export const prerender = false) — dafür der Vercel-Adapter.
