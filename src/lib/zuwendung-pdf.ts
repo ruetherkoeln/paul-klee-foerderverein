@@ -4,6 +4,7 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib';
 import { STEUER } from '../data/verein-steuer.ts';
 import { type Spende, formatEuro, euroInWorten, getEnv } from './zuwendung.ts';
+import { LOGO_PNG_BASE64 } from './logo-base64.ts';
 
 const A4 = { w: 595.28, h: 841.89 };
 const MARGIN = 56;
@@ -71,9 +72,22 @@ export async function buildZuwendungsPdf(spende: Spende): Promise<Uint8Array> {
     y -= gap / 2;
   };
 
-  // ── Aussteller (Briefkopf) ────────────────────────────────────────────────
-  line(STEUER.verein.name, { font: bold, size: 11, gap: 15 });
-  line(`${STEUER.verein.strasse}, ${STEUER.verein.plz} ${STEUER.verein.ort}`, { size: 9, gap: 22 });
+  // ── Briefkopf: Logo + Aussteller ──────────────────────────────────────────
+  const muted = rgb(0.42, 0.47, 0.53);
+  const logo = await doc.embedPng(LOGO_PNG_BASE64);
+  const logoH = 54;
+  const logoW = (logoH * logo.width) / logo.height;
+  page.drawImage(logo, { x, y: y - logoH, width: logoW, height: logoH });
+  const hx = x + logoW + 16;
+  page.drawText(STEUER.verein.name, { x: hx, y: y - 16, size: 11.5, font: bold, color: ink });
+  page.drawText(`${STEUER.verein.strasse} · ${STEUER.verein.plz} ${STEUER.verein.ort}`, {
+    x: hx, y: y - 30, size: 9, font, color: ink,
+  });
+  page.drawText(`${STEUER.kontakt.email} · ${STEUER.kontakt.web}`, {
+    x: hx, y: y - 42, size: 9, font, color: muted,
+  });
+  y -= logoH + 10;
+  rule(12);
 
   // ── Titel ─────────────────────────────────────────────────────────────────
   wrapped('Bestätigung über Geldzuwendungen', { font: bold, size: 12, lh: 16 });
@@ -171,6 +185,34 @@ export async function buildZuwendungsPdf(spende: Spende): Promise<Uint8Array> {
       `Diese Bestätigung wird nicht als Nachweis für den Sonderausgabenabzug anerkannt, ${hinweisDatumSatz}.`,
     { size: 7.5, lh: 10 },
   );
+
+  // ── Fußzeile: Briefpapier-Angaben (feste Position am Seitenfuß) ────────────
+  const footSize = 7;
+  let fy = 84;
+  page.drawLine({ start: { x, y: fy + 10 }, end: { x: right, y: fy + 10 }, thickness: 0.6, color: rgb(0.8, 0.83, 0.87) });
+  const footParas = [
+    `${STEUER.verein.name} · ${STEUER.verein.strasse} · ${STEUER.verein.plz} ${STEUER.verein.ort} · ${STEUER.kontakt.email} · ${STEUER.kontakt.web}`,
+    `${STEUER.register.gericht}, ${STEUER.register.nummer} · Vorstand: ${STEUER.vorstand.join(', ')}`,
+    `Bankverbindung: ${STEUER.bank.institut} · IBAN ${STEUER.bank.iban} · BIC ${STEUER.bank.bic}`,
+  ];
+  for (const para of footParas) {
+    const words = para.split(' ');
+    let cur = '';
+    for (const w of words) {
+      const test = cur ? cur + ' ' + w : w;
+      if (font.widthOfTextAtSize(test, footSize) > width && cur) {
+        page.drawText(cur, { x, y: fy, size: footSize, font, color: muted });
+        fy -= 9.5;
+        cur = w;
+      } else {
+        cur = test;
+      }
+    }
+    if (cur) {
+      page.drawText(cur, { x, y: fy, size: footSize, font, color: muted });
+      fy -= 9.5;
+    }
+  }
 
   return await doc.save();
 }

@@ -60,4 +60,25 @@ export const STEUER = {
     // erstellt und versendet).
     grafik: '', // z.B. '/img/unterschrift.png'
   },
+
+  // ── Briefpapier: Angaben für Kopf/Fußzeile der Bescheinigung ───────────────
+  kontakt: {
+    email: 'info@pks-foerderverein.de',
+    web: 'www.pks-foerderverein.de',
+  },
+  register: {
+    gericht: 'Amtsgericht Düsseldorf',
+    nummer: 'VR 7008',
+  },
+  bank: {
+    institut: 'Stadtsparkasse Düsseldorf',
+    iban: 'DE81 3005 0110 0037 0362 66',
+    bic: 'DUSSDEDDXXX',
+  },
+  vorstand: [
+    'A. Ruether (1. Vorsitzender)',
+    'S. Buchwald (2. Vorsitzende)',
+    'P. Müller (Kassenwartin)',
+    'H. Bassit (Beisitzerin)',
+  ],
 } as const;
