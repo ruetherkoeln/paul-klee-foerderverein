@@ -1,3 +1,2 @@
-# Hidden preview deployment - all crawlers disallowed
 User-agent: *
-Disallow: /
+Allow: /

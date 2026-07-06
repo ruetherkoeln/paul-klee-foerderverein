@@ -14,7 +14,7 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.shortName}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{fullTitle}</title>
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+    <meta name="robots" content="index, follow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class={variant === 'verein' ? 'bg-navy-900 text-white' : 'bg-cream-50 text-navy-900'}>
