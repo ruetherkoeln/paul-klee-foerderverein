@@ -55,7 +55,7 @@ const werte = [
   { color: 'border-l-pk-yellow', title: 'Gemeinnützig und transparent', body: 'Eingetragener Verein, steuerlich anerkannt — Spendenquittungen auf Anfrage.' },
   { color: 'border-l-pk-orange', title: '100 % direkt für die Projekte', body: 'Keine Verwaltungskosten — jeder Euro kommt bei den Schülerinnen und Schülern an.' },
   { color: 'border-l-pk-red',    title: 'Ehrenamtlich geführt', body: 'Alle Vorstandsmitglieder arbeiten ohne Vergütung.' },
-  { color: 'border-l-pk-blue',   title: 'Mitgliedschaft offen für alle', body: 'Ab 12 € im Jahr — Mitsprache in der Mitgliederversammlung.' }
+  { color: 'border-l-pk-blue',   title: 'Mitgliedschaft offen für alle', body: 'Ab 12 € im Jahr — Mitsprache in der Mitgliederversammlung.', extra: 'Wer den Förderverein der Paul-Klee-Schule unterstützt, tut mehr, als einer einzelnen Schule zu helfen. Die Grundschule ist die Keimzelle unseres Stadtteils: Hier wachsen die Kinder heran, die morgen unsere Nachbarn, Kollegen und Mitbürger sein werden. Was sie in diesen Jahren an Bildung, Zusammenhalt und Charakter mitbekommen, prägt nicht nur ihren eigenen Weg, sondern das Zusammenleben in unserer Stadt.' }
 ];
 
 const projekte = [
@@ -132,6 +132,7 @@ const spendenStufen = [10, 25, 50, 100];
           <div class={`bg-white p-5 border border-navy-900/10 border-l-4 ${w.color}`}>
             <div class="font-semibold text-base">{w.title}</div>
             <p class="text-sm text-navy-900/70 mt-2 leading-relaxed">{w.body}</p>
+            {w.extra && <p class="text-sm text-navy-900/70 mt-3 leading-relaxed">{w.extra}</p>}
           </div>
         ))}
       </div>
