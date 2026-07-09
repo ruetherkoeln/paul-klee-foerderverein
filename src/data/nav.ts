@@ -7,6 +7,7 @@ export const MAIN_NAV = [
   { label: 'Mitglied werden', href: '/foerderverein/mitglied-werden/' },
   { label: 'Shop', href: '/shop/' },
   { label: 'Spenden', href: '/foerderverein/#spenden' },
+  { label: 'Downloads', href: '/downloads/' },
   { label: 'Kontakt', href: '/kontakt/' }
 ];
 
