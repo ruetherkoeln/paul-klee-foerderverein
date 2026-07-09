@@ -1,0 +1,69 @@
+---
+import Base from '../layouts/Base.astro';
+
+const downloads = [
+  {
+    color: 'border-l-pk-yellow',
+    title: 'Sommerferien – Zeltstadt 2026',
+    desc: 'Informationen zum Ferienangebot „Zeltstadt“ in den Sommerferien.',
+    file: '/dokumente/sommerferien-zeltstadt-2026.pdf',
+    meta: 'PDF · 174 KB'
+  },
+  {
+    color: 'border-l-pk-orange',
+    title: 'Einladung Elterncafé',
+    desc: 'Einladung zum nächsten Elterncafé der Paul-Klee-Schule.',
+    file: '/dokumente/einladung-elterncafe.pdf',
+    meta: 'PDF · 2,1 MB'
+  },
+  {
+    color: 'border-l-pk-red',
+    title: 'Elternbrief Schulbuchbestellung 2026/27',
+    desc: 'Elternbrief der Schulleitung zur Schulbuchbestellung für das Schuljahr 2026/27.',
+    file: '/dokumente/elternbrief-schulbuchbestellung-2026-27.pdf',
+    meta: 'PDF · 107 KB'
+  }
+];
+---
+<Base title="Downloads" description="Aktuelle Informationen der Schulleitung sowie Formulare zum Herunterladen.">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-3xl">
+      <div class="eyebrow mb-4">Service</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Downloads.</h1>
+      <p class="mt-6 leading-relaxed text-navy-900/80">
+        Hier finden Sie aktuelle Informationen der Schulleitung. Formulare und
+        Dokumente können Sie an dieser Stelle einfach herunterladen. Die Übersicht
+        wird laufend ergänzt.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl space-y-3">
+      {downloads.map(d => (
+        <a
+          href={d.file}
+          download
+          class={`group flex items-center gap-4 bg-white p-5 border border-navy-900/10 border-l-4 ${d.color} hover:border-navy-900/30 transition-colors`}
+        >
+          <span class="shrink-0 w-11 h-11 grid place-items-center bg-cream-50 text-navy-900" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <path d="M14 2v6h6"></path>
+              <path d="M12 12v6"></path>
+              <path d="m9 15 3 3 3-3"></path>
+            </svg>
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block font-semibold text-base group-hover:text-gold-600 transition-colors">{d.title}</span>
+            <span class="block text-sm text-navy-900/70 mt-1 leading-relaxed">{d.desc}</span>
+            <span class="block text-xs uppercase tracking-wider text-navy-900/50 mt-2">{d.meta}</span>
+          </span>
+          <span class="shrink-0 text-xs font-semibold uppercase tracking-wider text-navy-900/70 group-hover:text-gold-600 transition-colors hidden sm:inline">
+            Herunterladen
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
