@@ -1,6 +1,6 @@
 export const SITE = {
   // Identität: Wir sind der Förderverein, nicht die Schule
-  name: 'Förderverein der Paul-Klee-Schule Düsseldorf e. V.',
+  name: 'Förderverein Paul-Klee-Schule Düsseldorf e. V.',
   shortName: 'Förderverein Paul-Klee-Schule',
   logo: '/img/foerderverein-logo.png',
   url: 'https://www.pks-foerderverein.de',
