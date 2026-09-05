@@ -16,7 +16,7 @@ export const STEUER = {
 
   // Aussteller (Verein)
   verein: {
-    name: 'Förderverein der Paul-Klee-Schule Düsseldorf e. V.',
+    name: 'Förderverein Paul-Klee-Schule Düsseldorf e. V.',
     strasse: 'Gerresheimer Straße 34/36',
     plz: '40211',
     ort: 'Düsseldorf',

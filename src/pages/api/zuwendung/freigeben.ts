@@ -82,7 +82,7 @@ export const POST: APIRoute = async ({ request }) => {
   const spenderHtml = `
     <div style="font-family:Arial,sans-serif;color:#0d1726;line-height:1.6">
       <p>Guten Tag ${s.vorname} ${s.name},</p>
-      <p>vielen Dank für Ihre Unterstützung des Fördervereins der Paul-Klee-Schule.
+      <p>vielen Dank für Ihre Unterstützung des Fördervereins Paul-Klee-Schule.
       Im Anhang finden Sie Ihre Zuwendungsbescheinigung über <strong>${formatEuro(s.betragCent)}</strong>
       zur Vorlage beim Finanzamt.</p>
       <p>Herzliche Grüße<br>${STEUER.verein.name}</p>
