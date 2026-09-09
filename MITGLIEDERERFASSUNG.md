@@ -24,6 +24,18 @@ Die Tabellen legt der Code beim ersten Absenden selbst an
 | `erfassung_zaehler` | fortlaufende Mandatsreferenz je Jahr |
 | `erfassung_ratelimit` | Absendeversuche je IP-Hash |
 
+## 1b. Ausführungsregion auf Frankfurt stellen (wichtig)
+
+Die Serverless-Funktionen des Projekts laufen derzeit in **iad1 (Washington, D. C.)** —
+das ist Vercels Voreinstellung. Damit würden Name, Anschrift und IBAN der Mitglieder
+in den USA verarbeitet.
+
+Vercel-Dashboard → Projekt → **Settings → Functions → Function Region** →
+**Frankfurt (fra1)** wählen, danach einmal neu deployen. Die Region lässt sich nicht
+im Repository setzen; der Astro-Vercel-Adapter kennt dafür keine Option.
+
+Anschließend im Deployment prüfen: `"regions": ["fra1"]`.
+
 ## 2. Umgebungsvariablen
 
 Alle unter Vercel → Settings → Environment Variables, Bereich **Production**.
@@ -63,6 +75,7 @@ Möglichkeit.
       ohne sie sind die Mandate zwar wirksam, aber nicht einziehbar
 - [ ] Datenschutzerklärung um die Mitgliedererfassung ergänzt
 - [ ] Verarbeitungsverzeichnis nach Art. 30 DSGVO um die neue Datenbank ergänzt
+- [ ] Ausführungsregion auf Frankfurt umgestellt (Abschnitt 1b) und Neon-Region in der EU
 - [ ] Testeintragung durchgeführt, Bestätigungsmail und PDF geprüft
 
 ## 4. Exporte
