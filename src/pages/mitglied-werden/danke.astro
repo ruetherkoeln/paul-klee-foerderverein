@@ -1,0 +1,90 @@
+---
+// Bestätigung nach erfolgreicher Eintragung.
+// Serverseitig, weil hier der signierte Token geprüft wird.
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import { ERFASSUNG } from '../../data/erfassung.ts';
+import { verifyId } from '../../lib/erfassung-crypto.ts';
+import { ladeEintrag } from '../../lib/erfassung-db.ts';
+
+const token = Astro.url.searchParams.get('t') ?? '';
+const id = token ? verifyId(token) : null;
+
+let eintrag: Record<string, any> | null = null;
+if (id !== null) {
+  try {
+    eintrag = await ladeEintrag(id);
+  } catch {
+    eintrag = null;
+  }
+}
+
+const istSepa = eintrag?.zahlweise === 'sepa';
+const pdfUrl = istSepa ? `/api/mitglieder-mandat?t=${encodeURIComponent(token)}` : null;
+const v = ERFASSUNG.verein;
+---
+<Base title="Vielen Dank" robots="noindex, nofollow" description="Bestätigung der Mitgliedsdaten-Erfassung">
+  <section class="container-c py-10 md:py-16 max-w-2xl">
+    <div class="card">
+      <p class="eyebrow mb-3">Eingegangen</p>
+      <h1 class="text-2xl md:text-3xl mb-5">Vielen Dank — wir haben Ihre Angaben.</h1>
+
+      <p class="leading-relaxed mb-4">
+        Ihre Daten sind bei uns eingetragen. Eine Bestätigung mit allen Angaben ist an
+        {eintrag ? <strong> {eintrag.email}</strong> : ' Ihre E-Mail-Adresse'} unterwegs.
+        Schauen Sie bei Gelegenheit auch in den Spam-Ordner.
+      </p>
+
+      {istSepa && (
+        <div class="mt-6 p-5 bg-cream-100 rounded-sm">
+          <p class="text-sm text-navy-900/70 mb-1">Ihre Mandatsreferenz</p>
+          <p class="text-2xl font-semibold font-mono tracking-wide">{eintrag!.mandatsreferenz}</p>
+          <p class="text-sm text-navy-900/70 mt-3 leading-relaxed">
+            Bitte bewahren Sie diese Nummer auf. Sie erscheint später auf Ihrem Kontoauszug
+            neben dem Namen des Vereins.
+          </p>
+        </div>
+      )}
+
+      {pdfUrl && (
+        <p class="mt-6">
+          <a href={pdfUrl} class="btn-gold w-full justify-center">SEPA-Mandat als PDF laden</a>
+          <span class="block text-sm text-navy-900/60 mt-2 text-center">
+            Enthält Mandatstext, Ihre Unterschrift, Datum, Gläubiger-Identifikationsnummer
+            und Mandatsreferenz.
+          </span>
+        </p>
+      )}
+
+      {eintrag?.zahlweise === 'ueberweisung' && (
+        <div class="mt-6 p-5 bg-cream-100 rounded-sm text-sm leading-relaxed">
+          <p class="font-semibold mb-2">So erreicht uns Ihr Beitrag</p>
+          <p>{v.name}</p>
+          <p>{ERFASSUNG.bank.institut}</p>
+          <p class="font-mono">IBAN: {ERFASSUNG.bank.iban}</p>
+          <p class="font-mono">BIC: {ERFASSUNG.bank.bic}</p>
+          <p class="mt-2">Verwendungszweck: <strong>Mitgliedsbeitrag, Ihr Name</strong></p>
+        </div>
+      )}
+
+      {!eintrag && (
+        <p class="mt-6 p-4 bg-cream-100 rounded-sm text-sm leading-relaxed">
+          Wenn Sie diese Seite später erneut aufrufen, können wir Ihre Angaben aus
+          Datenschutzgründen nicht noch einmal anzeigen. Ihre Bestätigungsmail enthält alles
+          Wichtige. Bei Fragen erreichen Sie uns unter
+          <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline"> {v.email}</a>.
+        </p>
+      )}
+
+      <p class="text-sm text-navy-900/70 leading-relaxed mt-8 pt-6 border-t border-navy-900/10">
+        Sie können Ihre Einwilligungen jederzeit widerrufen — eine formlose Nachricht an
+        <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline"> {v.email}</a> genügt.
+      </p>
+
+      <p class="mt-6">
+        <a href="/" class="text-gold-600 font-semibold hover:underline">Zurück zur Startseite</a>
+      </p>
+    </div>
+  </section>
+</Base>
