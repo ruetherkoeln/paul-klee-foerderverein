@@ -5,6 +5,16 @@ const { variant = 'school' } = Astro.props;
 const isVerein = variant === 'verein';
 ---
 <div class="bg-gold-500 text-navy-900 text-center text-xs font-semibold py-2 tracking-wider">Webseite des Fördervereins Paul-Klee-Schule Düsseldorf e. V.</div>
+<!-- Befristete Aktion: Erfassung des Mitgliederbestands (Ende 30.11.2026).
+     Nach Ablauf diesen Block entfernen — die Zielseite zeigt dann ohnehin
+     nur noch einen Hinweis. -->
+<div class={isVerein ? 'bg-navy-800' : 'bg-cream-100'}>
+  <div class="container-c py-3 flex justify-center">
+    <a href="/mitglied-werden/" class="btn-pink !py-2.5 !px-5 text-[11px] md:text-xs text-center leading-tight">
+      Digitalisierung der Mitgliedschaft
+    </a>
+  </div>
+</div>
 <header class={`${isVerein ? 'bg-navy-900 text-white' : 'bg-white text-navy-900'} border-b ${isVerein ? 'border-navy-700' : 'border-navy-900/10'}`}>
   <div class="container-c flex items-center justify-between py-5">
     <a href="/" class="flex items-center gap-3">
