@@ -1,6 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import { SITE } from '../data/site.ts';
+import { ERFASSUNG } from '../data/erfassung.ts';
+
+// Befristete Aktion: Erfassung des Mitgliederbestands.
+// Das Datum kommt aus derselben Quelle wie die Zielseite, damit beide
+// nicht auseinanderlaufen. Nach Ablauf das Band unten entfernen — die
+// Zielseite zeigt dann ohnehin nur noch einen Hinweis.
+const erfassungEnde = ERFASSUNG.ENDE.split('-').reverse().join('.');
 
 const foerderbereiche = [
   {
@@ -85,6 +92,43 @@ const kennzahlen = [
     </div>
   </section>
 
+  {/* DIGITALISIERUNG — befristete Erfassung des Mitgliederbestands.
+       Laeuft am {erfassungEnde} aus, danach diesen Block entfernen. */}
+  <section class="bg-cream-50">
+    <div class="container-c pb-14">
+      <div class="bg-white border-2 p-8 md:p-10" style="border-color:#c2185b">
+        <div class="md:flex md:items-center md:gap-10">
+          <div class="md:flex-1">
+            <div class="text-xs font-semibold uppercase tracking-wider" style="color:#c2185b">
+              Befristete Aktion · noch bis {erfassungEnde}
+            </div>
+            <h2 class="mt-3 text-2xl md:text-3xl font-display font-bold leading-tight">
+              Sie sind bereits Mitglied? Bitte tragen Sie Ihre Daten einmal digital ein.
+            </h2>
+            <p class="mt-4 leading-relaxed text-navy-900/80 max-w-2xl">
+              Unsere Mitgliederliste liegt bislang auf Papier. Damit wir Beiträge künftig
+              verlässlich einziehen und Sie erreichen können, bitten wir alle bestehenden
+              Mitglieder, ihre Angaben einmal selbst zu erfassen — das dauert wenige Minuten.
+              Eine neue Mitgliedschaft entsteht dadurch nicht.
+            </p>
+          </div>
+          <div class="mt-8 md:mt-0 md:w-auto md:shrink-0">
+            <a
+              href="/mitglied-werden/"
+              class="btn-pink block text-center !py-5 !px-10 text-base md:text-lg font-bold leading-snug"
+            >
+              Digitalisierung —<br class="hidden md:inline" />
+              Eintrag bestehender Mitglieder
+            </a>
+            <p class="mt-3 text-xs text-center text-navy-900/60">
+              5 Schritte · SEPA-Mandat optional
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   {/* KENNZAHLEN */}
   <section class="bg-cream-50">
     <div class="container-c border-t border-navy-900/10 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -151,6 +195,13 @@ const kennzahlen = [
         <a href="/spenden/bescheinigung/" class="btn-ghost">Bescheinigung anfordern</a>
         <a href="/foerderverein/mitglied-werden/" class="btn-ghost">Mitglied werden</a>
       </div>
+      <p class="mt-8 text-sm text-navy-900/70">
+        Schon Mitglied?
+        <a href="/mitglied-werden/" class="font-semibold hover:underline" style="color:#c2185b">
+          Daten digital erfassen
+        </a>
+        — noch bis {erfassungEnde} möglich.
+      </p>
     </div>
   </section>
 </Base>
