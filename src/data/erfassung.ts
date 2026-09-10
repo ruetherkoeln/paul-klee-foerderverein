@@ -58,7 +58,6 @@ export function erfassungAktiv(getEnv: (k: string) => string | undefined): {
 //     ERFASSUNG_AKTIV=true
 //     ERFASSUNG_CRYPTO_KEY         32 Byte, base64 — verschlüsselt IBAN/Inhaber
 //     ERFASSUNG_SIGNING_SECRET     signiert die Links zum Mandats-PDF
-//     VEREIN_GLAEUBIGER_ID         Gläubiger-ID der Bundesbank ⚠️ fehlt noch
 //     VEREIN_KOPIE_EMAIL           Empfänger der Eintragungs-Kopien
 //     RESEND_API_KEY / MAIL_FROM   Versand der Bestätigungen
 //     EXPORT_USER / EXPORT_PASSWORT
@@ -83,4 +82,8 @@ export const FEHLERTEXT: Record<string, string> = {
   technik: 'Die Angaben konnten nicht gespeichert werden. Bitte versuchen Sie es später erneut.',
 };
 
-export const GLAEUBIGER_ID_PLATZHALTER = 'DE00ZZZ00000000000';
+// Gläubiger-Identifikationsnummer des Vereins (Deutsche Bundesbank).
+// Steht auf jedem erteilten Mandat und auf den Kontoauszügen aller Mitglieder,
+// ist also kein Geheimnis — daher hier fest hinterlegt statt als Env-Variable.
+// VEREIN_GLAEUBIGER_ID überschreibt den Wert, falls er sich einmal ändert.
+export const GLAEUBIGER_ID = 'DE63ZZZ00002943367';

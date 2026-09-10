@@ -6,7 +6,7 @@ import { getEnv } from '../../lib/zuwendung.ts';
 import { verifyId, entschluesseln } from '../../lib/erfassung-crypto.ts';
 import { ladeEintrag, schemaSicherstellen } from '../../lib/erfassung-db.ts';
 import { buildMandatPdf } from '../../lib/erfassung-pdf.ts';
-import { GLAEUBIGER_ID_PLATZHALTER } from '../../data/erfassung.ts';
+import { GLAEUBIGER_ID } from '../../data/erfassung.ts';
 
 export const prerender = false;
 
@@ -49,7 +49,7 @@ export const GET: APIRoute = async ({ request }) => {
     kontoinhaber,
     iban,
     mandatsreferenz: eintrag.mandatsreferenz ?? '—',
-    glaeubigerId: getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID_PLATZHALTER,
+    glaeubigerId: getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID,
     signaturDataUrl: eintrag.mandat_signatur ?? null,
     erteiltAm: eintrag.mandat_erteilt_am ? new Date(eintrag.mandat_erteilt_am) : new Date(),
     beitragEur: eintrag.beitrag_eur,

@@ -46,7 +46,7 @@ Alle unter Vercel → Settings → Environment Variables, Bereich **Production**
 | `ERFASSUNG_AKTIV` | `true` | **von dir zu setzen** |
 | `ERFASSUNG_CRYPTO_KEY` | 32 Byte, base64 — verschlüsselt IBAN und Kontoinhaber | **von dir zu setzen** |
 | `ERFASSUNG_SIGNING_SECRET` | beliebige lange Zufallszeichenkette — signiert PDF-Links und salzt den IP-Hash | **von dir zu setzen** |
-| `VEREIN_GLAEUBIGER_ID` | Gläubiger-Identifikationsnummer der Bundesbank | **fehlt noch** |
+| `VEREIN_GLAEUBIGER_ID` | überschreibt die im Code hinterlegte Gläubiger-ID `DE63ZZZ00002943367` | nur bei Änderung nötig |
 | `VEREIN_KOPIE_EMAIL` | Empfänger der Eintragungs-Kopien, z. B. `info@pks-foerderverein.de` | **von dir zu setzen** |
 | `RESEND_API_KEY` | API-Schlüssel von Resend | **von dir zu setzen** |
 | `MAIL_FROM` | Absenderadresse, Domain bei Resend verifiziert | **von dir zu setzen** |
@@ -70,7 +70,6 @@ Möglichkeit.
 
 ## 3. Vor dem Scharfschalten prüfen
 
-- [ ] Gläubiger-Identifikationsnummer bei der Bundesbank beantragt und eingetragen
 - [ ] Inkassovereinbarung mit der Stadtsparkasse Düsseldorf geschlossen —
       ohne sie sind die Mandate zwar wirksam, aber nicht einziehbar
 - [ ] Datenschutzerklärung um die Mitgliedererfassung ergänzt

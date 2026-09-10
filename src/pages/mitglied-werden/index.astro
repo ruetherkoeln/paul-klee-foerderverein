@@ -5,13 +5,12 @@
 export const prerender = false;
 
 import Base from '../../layouts/Base.astro';
-import { ERFASSUNG, erfassungAktiv, FEHLERTEXT, GLAEUBIGER_ID_PLATZHALTER } from '../../data/erfassung.ts';
+import { ERFASSUNG, erfassungAktiv, FEHLERTEXT, GLAEUBIGER_ID } from '../../data/erfassung.ts';
 import { getEnv } from '../../lib/zuwendung.ts';
 import { mandatstext, REFERENZ_OFFEN } from '../../lib/mandat-text.ts';
 
 const status = erfassungAktiv(getEnv);
-const glaeubigerId = getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID_PLATZHALTER;
-const idFehlt = !getEnv('VEREIN_GLAEUBIGER_ID');
+const glaeubigerId = getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID;
 const fehlerCode = Astro.url.searchParams.get('fehler') ?? '';
 const fehlerText = fehlerCode ? (FEHLERTEXT[fehlerCode] ?? FEHLERTEXT.technik) : '';
 const v = ERFASSUNG.verein;
@@ -44,14 +43,6 @@ const label = 'block text-sm font-semibold mb-1.5';
 
     {status.aktiv && (
       <>
-        {idFehlt && (
-          <p class="mb-6 p-4 bg-brick-600/10 border border-brick-600/40 rounded-sm text-sm">
-            <strong>Hinweis für den Vorstand:</strong> Die Umgebungsvariable
-            <code class="mx-1">VEREIN_GLAEUBIGER_ID</code> ist noch nicht gesetzt. Im Mandatstext
-            steht solange ein Platzhalter. Bitte vor dem Versand der Anschreiben eintragen.
-          </p>
-        )}
-
         {fehlerText && (
           <p id="server-fehler" role="alert" class="mb-6 p-4 bg-brick-600/10 border border-brick-600/40 rounded-sm text-sm font-semibold">
             {fehlerText}
