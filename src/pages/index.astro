@@ -111,7 +111,7 @@ const kennzahlen = [
         </p>
         <a
           href="/mitglied-werden/"
-          class="btn-pink block mx-auto mt-10 max-w-2xl !py-7 !px-8 text-xl md:text-3xl font-bold leading-snug"
+          class="btn-pink puls block mx-auto mt-10 max-w-2xl !py-7 !px-8 text-xl md:text-3xl font-bold leading-snug"
         >
           Digitalisierung —<br class="hidden sm:inline" />
           Eintrag bestehender Mitglieder
@@ -199,3 +199,32 @@ const kennzahlen = [
     </div>
   </section>
 </Base>
+
+<style>
+  /* Aufmerksamkeits-Puls fuer den Digitalisierungs-Button.
+     Bewusst kein hartes Blinken: 0,6 Hz liegt weit unter der 3-Hz-Grenze
+     fuer photosensitive Anfaelle (WCAG 2.3.1), und nach drei Durchlaeufen
+     (4,8 s) ruht die Animation — damit bleibt sie unter den 5 Sekunden,
+     ab denen WCAG 2.2.2 eine Abschaltmoeglichkeit verlangt. */
+  @keyframes puls-aufmerksamkeit {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(194, 24, 91, 0.55);
+    }
+    50% {
+      transform: scale(1.035);
+      box-shadow: 0 0 0 16px rgba(194, 24, 91, 0);
+    }
+  }
+
+  .puls {
+    animation: puls-aufmerksamkeit 1.6s ease-in-out 3;
+  }
+
+  /* Wer Bewegung im System abgestellt hat, bekommt keine. */
+  @media (prefers-reduced-motion: reduce) {
+    .puls {
+      animation: none;
+    }
+  }
+</style>
