@@ -111,7 +111,7 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
       html: anPerson,
     });
     if (error) {
-      return { ok: false, fehler: `Resend lehnte die Bestätigung ab: ${error.name}` };
+      return { ok: false, fehler: `Resend lehnte die Bestätigung ab: ${error.name} — ${error.message}` };
     }
   } catch {
     return { ok: false, fehler: 'Bestätigung an die Person konnte nicht versendet werden' };
@@ -127,7 +127,7 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
         subject: `Neue Eintragung: ${d.vorname} ${d.nachname} (${d.beitragEur} €, ${d.zahlweise})`,
         html: huelle('Neue Eintragung in der Mitgliedererfassung', zusammenfassung(d)),
       });
-      if (error) return { ok: true, fehler: `Kopie an den Verein abgelehnt: ${error.name}` };
+      if (error) return { ok: true, fehler: `Kopie an den Verein abgelehnt: ${error.name} — ${error.message}` };
     } catch {
       return { ok: true, fehler: 'Kopie an den Verein konnte nicht versendet werden' };
     }
