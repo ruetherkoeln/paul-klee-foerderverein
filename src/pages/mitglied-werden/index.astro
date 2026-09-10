@@ -34,7 +34,13 @@ const label = 'block text-sm font-semibold mb-1.5';
             ? `Der Erfassungszeitraum endete am ${endeDe}. Vielen Dank an alle, die ihre Daten eingetragen haben.`
             : 'Diese Seite ist zurzeit nicht freigeschaltet.'}
         </p>
-        <p class="text-xs text-navy-900/40 mb-4">Status: {status.grund} · DB {getEnv('DATABASE_URL') ? 'verbunden' : 'fehlt'} · Mail {getEnv('RESEND_API_KEY') ? 'bereit' : 'fehlt'}</p>
+        <p class="text-xs text-navy-900/40 mb-4">
+          Status: {status.grund} · vorhanden: {[
+            'DATABASE_URL','ERFASSUNG_AKTIV','ERFASSUNG_CRYPTO_KEY','ERFASSUNG_SIGNING_SECRET',
+            'RESEND_API_KEY','MAIL_FROM','VEREIN_KOPIE_EMAIL','EXPORT_USER','EXPORT_PASSWORT',
+            'EXPORT_BANK_USER','EXPORT_BANK_PASSWORT','PUBLIC_SITE_URL',
+          ].filter((k) => getEnv(k)).join(', ') || 'keine'}
+        </p>
         <p class="leading-relaxed">
           Wenn Sie Ihre Angaben noch nachreichen oder ändern möchten, schreiben Sie uns bitte an
           <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline">{v.email}</a>.
