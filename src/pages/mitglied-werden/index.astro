@@ -34,6 +34,7 @@ const label = 'block text-sm font-semibold mb-1.5';
             ? `Der Erfassungszeitraum endete am ${endeDe}. Vielen Dank an alle, die ihre Daten eingetragen haben.`
             : 'Diese Seite ist zurzeit nicht freigeschaltet.'}
         </p>
+        <p class="text-xs text-navy-900/40 mb-4">Status: {status.grund} · DB {getEnv('DATABASE_URL') ? 'verbunden' : 'fehlt'} · Mail {getEnv('RESEND_API_KEY') ? 'bereit' : 'fehlt'}</p>
         <p class="leading-relaxed">
           Wenn Sie Ihre Angaben noch nachreichen oder ändern möchten, schreiben Sie uns bitte an
           <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline">{v.email}</a>.

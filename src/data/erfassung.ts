@@ -44,7 +44,9 @@ export function erfassungAktiv(getEnv: (k: string) => string | undefined): {
   aktiv: boolean;
   grund: 'aktiv' | 'abgeschaltet' | 'abgelaufen';
 } {
-  if ((getEnv('ERFASSUNG_AKTIV') ?? '').toLowerCase() !== 'true') {
+  // .trim(), weil beim Einfuegen in Vercel leicht ein Leerzeichen oder
+  // Zeilenumbruch mit im Wert landet.
+  if ((getEnv('ERFASSUNG_AKTIV') ?? '').trim().toLowerCase() !== 'true') {
     return { aktiv: false, grund: 'abgeschaltet' };
   }
   // Vergleich auf Tagesbasis in lokaler Zeit (Europe/Berlin auf Vercel via TZ)
