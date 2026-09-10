@@ -24,17 +24,57 @@ Die Tabellen legt der Code beim ersten Absenden selbst an
 | `erfassung_zaehler` | fortlaufende Mandatsreferenz je Jahr |
 | `erfassung_ratelimit` | Absendeversuche je IP-Hash |
 
-## 1b. Ausführungsregion auf Frankfurt stellen (wichtig)
+## 1b. Rechtsrahmen: Pro-Plan nötig (Stand 10.09.2026)
 
-Die Serverless-Funktionen des Projekts laufen derzeit in **iad1 (Washington, D. C.)** —
-das ist Vercels Voreinstellung. Damit würden Name, Anschrift und IBAN der Mitglieder
-in den USA verarbeitet.
+Zwei Punkte hängen an derselben Sache und sind **vor dem Scharfschalten zu klären**.
 
-Vercel-Dashboard → Projekt → **Settings → Functions → Function Region** →
-**Frankfurt (fra1)** wählen, danach einmal neu deployen. Die Region lässt sich nicht
-im Repository setzen; der Astro-Vercel-Adapter kennt dafür keine Option.
+### Auftragsverarbeitungsvertrag
 
-Anschließend im Deployment prüfen: `"regions": ["fra1"]`.
+Vercels Data Processing Addendum muss nicht unterschrieben werden — es wird
+automatisch mit dem Vertragsschluss verbindlich. Es gilt aber ausdrücklich nur für
+**Enterprise- und Pro-Pläne**:
+
+> „This Addendum applies to Vercel's Processing of Personal Data as a Processor
+> under the Agreement for Customers who are on Enterprise and Pro plans."
+> — <https://vercel.com/legal/dpa>
+
+Das Projekt läuft derzeit auf **Hobby**. Damit besteht kein AVV, obwohl Art. 28 DSGVO
+für die Beauftragung eines Auftragsverarbeiters einen Vertrag verlangt.
+
+Vercel nutzt die EU-Standardvertragsklauseln von 2021 (Beschluss 2021/914). Die Liste
+der Unterauftragsverarbeiter steht unter <https://security.vercel.com>; über
+privacy@vercel.com kann man Änderungsmeldungen abonnieren (fünf Tage Widerspruchsfrist).
+
+### Ausführungsregion
+
+Die Serverless-Funktionen laufen in **iad1 (Washington, D. C.)** — Vercels
+Voreinstellung. Damit würden Name, Anschrift und IBAN in den USA verarbeitet.
+
+Die Auswahl im Dashboard unter Settings → Functions → Function Region lässt sich auf
+Hobby zwar anklicken, greift aber nicht: Am 10.09.2026 wurde `fra1` gesetzt, drei
+darauffolgende Deployments meldeten unverändert `"regions": ["iad1"]`. Die freie
+Regionswahl ist dem Pro-Plan vorbehalten. Im Repository ist sie nicht setzbar — der
+Astro-Vercel-Adapter kennt dafür keine Option.
+
+### Konsequenz
+
+**Der Pro-Plan (20 $/Monat) löst beides zugleich:** AVV gilt automatisch, `fra1` wird
+wählbar. Nach der Erfassung lässt sich wieder auf Hobby zurückstellen.
+
+Alternativen, falls das nicht gewollt ist:
+
+- Nur Überweisung anbieten und auf SEPA verzichten — dann werden keine Bankdaten erhoben
+- Formular außerhalb von Vercel betreiben
+
+### Offen
+
+- [ ] Pro-Plan gebucht, danach Function Region auf `fra1` gesetzt und ein Deployment
+      geprüft (`"regions": ["fra1"]`)
+- [ ] Eigener AVV mit **Neon** geklärt — die Datenbank ist ein zweiter
+      Auftragsverarbeiter
+- [ ] Von der Kanzlei (LEX & Tax) gegenlesen lassen. Der Punkt betrifft nicht nur diese
+      Seite: Auch die Zuwendungsbescheinigung verarbeitet Namen und Anschriften über
+      dieselbe Infrastruktur.
 
 ## 2. Umgebungsvariablen
 
@@ -74,7 +114,7 @@ Möglichkeit.
       ohne sie sind die Mandate zwar wirksam, aber nicht einziehbar
 - [ ] Datenschutzerklärung um die Mitgliedererfassung ergänzt
 - [ ] Verarbeitungsverzeichnis nach Art. 30 DSGVO um die neue Datenbank ergänzt
-- [ ] Ausführungsregion auf Frankfurt umgestellt (Abschnitt 1b) und Neon-Region in der EU
+- [ ] Pro-Plan, AVV und Ausführungsregion geklärt (Abschnitt 1b), Neon-Region in der EU
 - [ ] Testeintragung durchgeführt, Bestätigungsmail und PDF geprüft
 
 ## 4. Exporte
