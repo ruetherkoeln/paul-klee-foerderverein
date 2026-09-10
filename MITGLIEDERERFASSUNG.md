@@ -24,9 +24,11 @@ Die Tabellen legt der Code beim ersten Absenden selbst an
 | `erfassung_zaehler` | fortlaufende Mandatsreferenz je Jahr |
 | `erfassung_ratelimit` | Absendeversuche je IP-Hash |
 
-## 1b. Rechtsrahmen: Pro-Plan nötig (Stand 10.09.2026)
+## 1b. Rechtsrahmen (Stand 10.09.2026)
 
-Zwei Punkte hängen an derselben Sache und sind **vor dem Scharfschalten zu klären**.
+> **Entscheidung des Vorstands vom 10.09.2026:** Der Verein bleibt vorerst auf dem
+> Hobby-Plan und nimmt die Verarbeitung in den USA in Kauf. Die beiden Punkte unten
+> sind damit bekannt und bewusst hingenommen, nicht übersehen.
 
 ### Auftragsverarbeitungsvertrag
 
@@ -56,20 +58,20 @@ darauffolgende Deployments meldeten unverändert `"regions": ["iad1"]`. Die frei
 Regionswahl ist dem Pro-Plan vorbehalten. Im Repository ist sie nicht setzbar — der
 Astro-Vercel-Adapter kennt dafür keine Option.
 
-### Konsequenz
+### Was daraus folgt
 
-**Der Pro-Plan (20 $/Monat) löst beides zugleich:** AVV gilt automatisch, `fra1` wird
-wählbar. Nach der Erfassung lässt sich wieder auf Hobby zurückstellen.
+Der **Pro-Plan (20 $/Monat) würde beides zugleich lösen** — AVV gilt dann automatisch,
+`fra1` wird wählbar, und nach der Erfassung ließe sich wieder auf Hobby zurückstellen.
+Das bleibt der Weg, falls die Entscheidung später revidiert wird.
 
-Alternativen, falls das nicht gewollt ist:
-
-- Nur Überweisung anbieten und auf SEPA verzichten — dann werden keine Bankdaten erhoben
-- Formular außerhalb von Vercel betreiben
+Solange es bei Hobby bleibt, ergibt sich daraus vor allem eine **Pflicht zur
+Transparenz**: Nach Art. 13 Abs. 1 lit. f DSGVO muss die Datenschutzerklärung die
+Übermittlung in ein Drittland benennen. Der entsprechende Absatz ist zu ergänzen,
+bevor die Erfassung freigeschaltet wird.
 
 ### Offen
 
-- [ ] Pro-Plan gebucht, danach Function Region auf `fra1` gesetzt und ein Deployment
-      geprüft (`"regions": ["fra1"]`)
+- [ ] Datenschutzerklärung um den Hinweis auf die Verarbeitung in den USA ergänzen
 - [ ] Eigener AVV mit **Neon** geklärt — die Datenbank ist ein zweiter
       Auftragsverarbeiter
 - [ ] Von der Kanzlei (LEX & Tax) gegenlesen lassen. Der Punkt betrifft nicht nur diese
@@ -114,7 +116,7 @@ Möglichkeit.
       ohne sie sind die Mandate zwar wirksam, aber nicht einziehbar
 - [ ] Datenschutzerklärung um die Mitgliedererfassung ergänzt
 - [ ] Verarbeitungsverzeichnis nach Art. 30 DSGVO um die neue Datenbank ergänzt
-- [ ] Pro-Plan, AVV und Ausführungsregion geklärt (Abschnitt 1b), Neon-Region in der EU
+- [ ] Datenschutzerklärung um den Drittlandhinweis ergänzt (Abschnitt 1b), Neon-Region in der EU
 - [ ] Testeintragung durchgeführt, Bestätigungsmail und PDF geprüft
 
 ## 4. Exporte
