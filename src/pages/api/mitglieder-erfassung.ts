@@ -149,7 +149,7 @@ export const POST: APIRoute = async ({ request }) => {
   const pdfUrl =
     zahlweise === 'sepa' ? `${base}/api/mitglieder-mandat?t=${encodeURIComponent(token)}` : null;
   try {
-    await sendeBestaetigung({
+    const mail = await sendeBestaetigung({
       vorname: t('vorname'),
       nachname: t('nachname'),
       strasse: t('strasse'),
@@ -166,6 +166,12 @@ export const POST: APIRoute = async ({ request }) => {
       einwilligungAnsprache: true,
       pdfUrl,
     });
+    // Ohne Auswertung bliebe ein abgelehnter Versand unbemerkt: die Person
+    // sähe die Danke-Seite, bekäme aber nie eine Bestätigung. Der Grund darf
+    // ins Log, die Eingaben nicht.
+    if (!mail.ok || mail.fehler) {
+      console.error(`Mitgliedererfassung: Mailversand — ${mail.fehler ?? 'unbekannt'}`);
+    }
   } catch {
     console.error('Mitgliedererfassung: Bestätigungsmail fehlgeschlagen');
   }

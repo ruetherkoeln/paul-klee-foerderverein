@@ -100,27 +100,36 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
        widerrufen — eine Nachricht an ${esc(v.email)} genügt.</p>`,
   );
 
+  // Das SDK wirft bei abgelehnten Sendungen nicht, sondern liefert { error }.
+  // Nur ein Transportfehler landet im catch — beide Wege müssen geprüft werden,
+  // sonst gilt eine unverifizierte Absenderdomain als erfolgreicher Versand.
   try {
-    await resend.emails.send({
+    const { error } = await resend.emails.send({
       from,
       to: d.email,
       subject: 'Ihre Mitgliedsdaten beim Förderverein Paul-Klee-Schule',
       html: anPerson,
     });
-  } catch (e) {
+    if (error) {
+      return { ok: false, fehler: `Resend lehnte die Bestätigung ab: ${error.name}` };
+    }
+  } catch {
     return { ok: false, fehler: 'Bestätigung an die Person konnte nicht versendet werden' };
   }
 
   if (kopie) {
+    // Die Kopie ist nachrangig — der Datensatz liegt bereits in der Datenbank.
+    // Ein Fehler wird gemeldet, kippt die Eintragung aber nicht.
     try {
-      await resend.emails.send({
+      const { error } = await resend.emails.send({
         from,
         to: kopie,
         subject: `Neue Eintragung: ${d.vorname} ${d.nachname} (${d.beitragEur} €, ${d.zahlweise})`,
         html: huelle('Neue Eintragung in der Mitgliedererfassung', zusammenfassung(d)),
       });
+      if (error) return { ok: true, fehler: `Kopie an den Verein abgelehnt: ${error.name}` };
     } catch {
-      // Die Kopie ist nachrangig — der Datensatz liegt bereits in der Datenbank
+      return { ok: true, fehler: 'Kopie an den Verein konnte nicht versendet werden' };
     }
   }
   return { ok: true };
