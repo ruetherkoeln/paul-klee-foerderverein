@@ -94,7 +94,7 @@ Alle unter Vercel → Settings → Environment Variables, Bereich **Production**
 | `MAIL_FROM` | Absenderadresse, Domain bei Resend verifiziert | **von dir zu setzen** |
 | `EXPORT_USER` / `EXPORT_PASSWORT` | Zugang zur Mitgliederliste | **von dir zu setzen** |
 | `EXPORT_BANK_USER` / `EXPORT_BANK_PASSWORT` | getrennter Zugang zu den Bankdaten | **von dir zu setzen** |
-| `PUBLIC_SITE_URL` | `https://www.pks-foerderverein.de` | empfohlen |
+| `PUBLIC_SITE_URL` | **nicht setzen.** Nur ein Rückfallwert; die Basis-URL kommt aus den `x-forwarded-host`-Headern. Gesetzt würde er Vorschau-Deployments auf die Produktionsdomain umleiten. Das Präfix `PUBLIC_` ist zudem eine Astro-Konvention für browserseitig sichtbare Werte, worauf Vercel zu Recht hinweist. | — |
 
 Schlüssel erzeugen:
 
