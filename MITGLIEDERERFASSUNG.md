@@ -71,7 +71,14 @@ bevor die Erfassung freigeschaltet wird.
 
 ### Offen
 
-- [ ] Datenschutzerklärung um den Hinweis auf die Verarbeitung in den USA ergänzen
+- [x] Datenschutzerklärung um den Hinweis auf die Verarbeitung in den USA ergänzen —
+      Ziffer 5 benennt jetzt ausdrücklich die Ausführung in Washington, D. C.
+- [ ] **Widerspruch in Ziffer 2 der Datenschutzerklärung auflösen.** Dort steht
+      „Mit dem Hoster besteht ein Vertrag zur Auftragsverarbeitung (Art. 28 DSGVO)".
+      Auf dem Hobby-Plan trifft das nach Vercels eigenem DPA nicht zu (siehe oben).
+      Entweder Pro-Plan buchen — dann stimmt der Satz — oder den Satz streichen.
+      Der Satz stand schon vor dieser Seite dort und betrifft auch die
+      Zuwendungsbescheinigung; deshalb hier bewusst nicht im Vorbeigehen geändert.
 - [ ] Eigener AVV mit **Neon** geklärt — die Datenbank ist ein zweiter
       Auftragsverarbeiter
 - [ ] Von der Kanzlei (LEX & Tax) gegenlesen lassen. Der Punkt betrifft nicht nur diese
@@ -80,7 +87,22 @@ bevor die Erfassung freigeschaltet wird.
 
 ## 2. Umgebungsvariablen
 
-Alle unter Vercel → Settings → Environment Variables, Bereich **Production**.
+Alle unter Vercel → Settings → Environment Variables. Beim Anlegen **beide**
+Umgebungen ankreuzen: **Production** *und* **Preview**.
+
+> **Warum Preview mitzählt.** Solange die Arbeit in einem Pull Request liegt, ist die
+> erreichbare Adresse ein Preview-Deployment — die Produktionsdomain kennt die Seite
+> noch gar nicht (404). Variablen, die nur für Production gelten, kommen dort nicht an:
+> Der Schalter `ERFASSUNG_AKTIV` bleibt leer, und die Seite zeigt „Die Erfassung ist
+> derzeit nicht geöffnet". Genau das war am 10.09.2026 der Fall — die Diagnosezeile
+> meldete auf dem Preview nur `DATABASE_URL, RESEND_API_KEY`, weil diese beiden von
+> Integrationen für alle Umgebungen gesetzt werden, die übrigen dagegen von Hand nur
+> für Production.
+>
+> Zum Testen vor dem Merge müssen die Variablen also auch für Preview gelten. Wer die
+> Testdaten nicht in der Produktionsdatenbank haben will, legt für Preview eine eigene
+> `DATABASE_URL` an; sonst genügt es, bei jeder Variablen beide Haken zu setzen.
+
 
 | Variable | Wert | Status |
 |---|---|---|
@@ -114,9 +136,13 @@ Möglichkeit.
 
 - [ ] Inkassovereinbarung mit der Stadtsparkasse Düsseldorf geschlossen —
       ohne sie sind die Mandate zwar wirksam, aber nicht einziehbar
-- [ ] Datenschutzerklärung um die Mitgliedererfassung ergänzt
+- [x] Datenschutzerklärung um die Mitgliedererfassung ergänzt — Ziffer 4 d) listet
+      die erhobenen Felder, die Rechtsgrundlagen und das Widerrufsrecht, Ziffer 7 die
+      Speicherdauer der Bankdaten
 - [ ] Verarbeitungsverzeichnis nach Art. 30 DSGVO um die neue Datenbank ergänzt
-- [ ] Datenschutzerklärung um den Drittlandhinweis ergänzt (Abschnitt 1b), Neon-Region in der EU
+- [x] Datenschutzerklärung um den Drittlandhinweis ergänzt (Abschnitt 1b)
+- [ ] Neon-Region als EU bestätigt — die Diagnosezeile auf `/mitglied-werden` zeigt
+      die Regionskennung aus der `DATABASE_URL` (erwartet: `eu-central-1`)
 - [ ] Testeintragung durchgeführt, Bestätigungsmail und PDF geprüft
 
 ## 4. Exporte
