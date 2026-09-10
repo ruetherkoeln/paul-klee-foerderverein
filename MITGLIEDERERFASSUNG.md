@@ -141,8 +141,9 @@ Möglichkeit.
       Speicherdauer der Bankdaten
 - [ ] Verarbeitungsverzeichnis nach Art. 30 DSGVO um die neue Datenbank ergänzt
 - [x] Datenschutzerklärung um den Drittlandhinweis ergänzt (Abschnitt 1b)
-- [ ] Neon-Region als EU bestätigt — die Diagnosezeile auf `/mitglied-werden` zeigt
-      die Regionskennung aus der `DATABASE_URL` (erwartet: `eu-central-1`)
+- [x] Neon-Region als EU bestätigt — die Diagnosezeile auf `/mitglied-werden` meldet
+      am 10.09.2026 `eu-central-1` (Frankfurt). Die Datenbank liegt in der EU, die
+      Funktionen laufen weiterhin in `iad1`.
 - [ ] Testeintragung durchgeführt, Bestätigungsmail und PDF geprüft
 
 ## 4. Exporte
