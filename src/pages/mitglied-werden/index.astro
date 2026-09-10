@@ -11,12 +11,6 @@ import { mandatstext, REFERENZ_OFFEN } from '../../lib/mandat-text.ts';
 
 const status = erfassungAktiv(getEnv);
 const glaeubigerId = getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID;
-// Diagnose (vor dem Merge entfernen): Regionskennung aus dem Host der
-// DATABASE_URL, um zu belegen, dass die Datenbank in der EU liegt.
-// Nur die Region, keine Zugangsdaten.
-const dbRegion =
-  (getEnv('DATABASE_URL') ?? '').match(/\b(?:af|ap|ca|eu|il|me|sa|us)-[a-z]+-\d\b/)?.[0] ??
-  'unbekannt';
 const fehlerCode = Astro.url.searchParams.get('fehler') ?? '';
 const fehlerText = fehlerCode ? (FEHLERTEXT[fehlerCode] ?? FEHLERTEXT.technik) : '';
 const v = ERFASSUNG.verein;
@@ -39,13 +33,6 @@ const label = 'block text-sm font-semibold mb-1.5';
           {status.grund === 'abgelaufen'
             ? `Der Erfassungszeitraum endete am ${endeDe}. Vielen Dank an alle, die ihre Daten eingetragen haben.`
             : 'Diese Seite ist zurzeit nicht freigeschaltet.'}
-        </p>
-        <p class="text-xs text-navy-900/40 mb-4">
-          Status: {status.grund} · vorhanden: {[
-            'DATABASE_URL','ERFASSUNG_AKTIV','ERFASSUNG_CRYPTO_KEY','ERFASSUNG_SIGNING_SECRET',
-            'RESEND_API_KEY','MAIL_FROM','VEREIN_KOPIE_EMAIL','EXPORT_USER','EXPORT_PASSWORT',
-            'EXPORT_BANK_USER','EXPORT_BANK_PASSWORT','PUBLIC_SITE_URL',
-          ].filter((k) => getEnv(k)).join(', ') || 'keine'} · DB-Region: {dbRegion}
         </p>
         <p class="leading-relaxed">
           Wenn Sie Ihre Angaben noch nachreichen oder ändern möchten, schreiben Sie uns bitte an
