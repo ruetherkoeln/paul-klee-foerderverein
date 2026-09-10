@@ -1,0 +1,620 @@
+---
+// Temporäre Erfassung des Mitgliederbestands.
+// Serverseitig gerendert, damit Schalter und Enddatum zur Laufzeit greifen
+// (bei statischem Bau würde das Enddatum erst beim nächsten Deploy wirken).
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import { ERFASSUNG, erfassungAktiv, FEHLERTEXT, GLAEUBIGER_ID } from '../../data/erfassung.ts';
+import { getEnv } from '../../lib/zuwendung.ts';
+import { mandatstext, REFERENZ_OFFEN } from '../../lib/mandat-text.ts';
+
+const status = erfassungAktiv(getEnv);
+const glaeubigerId = getEnv('VEREIN_GLAEUBIGER_ID') ?? GLAEUBIGER_ID;
+const fehlerCode = Astro.url.searchParams.get('fehler') ?? '';
+const fehlerText = fehlerCode ? (FEHLERTEXT[fehlerCode] ?? FEHLERTEXT.technik) : '';
+const v = ERFASSUNG.verein;
+const endeDe = ERFASSUNG.ENDE.split('-').reverse().join('.');
+
+const feld =
+  'w-full px-4 py-3.5 text-base border border-navy-900/20 rounded-sm bg-white ' +
+  'focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/30';
+const label = 'block text-sm font-semibold mb-1.5';
+---
+<Base title="Mitgliedsdaten erfassen" robots="noindex, nofollow" description="Erfassung des Mitgliederbestands des Fördervereins Paul-Klee-Schule Düsseldorf e. V.">
+  <section class="container-c py-10 md:py-16 max-w-2xl">
+
+    {!status.aktiv && (
+      <div class="card">
+        <h1 class="text-2xl md:text-3xl mb-4">
+          {status.grund === 'abgelaufen' ? 'Die Erfassung ist abgeschlossen' : 'Die Erfassung ist derzeit nicht geöffnet'}
+        </h1>
+        <p class="leading-relaxed mb-4">
+          {status.grund === 'abgelaufen'
+            ? `Der Erfassungszeitraum endete am ${endeDe}. Vielen Dank an alle, die ihre Daten eingetragen haben.`
+            : 'Diese Seite ist zurzeit nicht freigeschaltet.'}
+        </p>
+        <p class="leading-relaxed">
+          Wenn Sie Ihre Angaben noch nachreichen oder ändern möchten, schreiben Sie uns bitte an
+          <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline">{v.email}</a>.
+        </p>
+      </div>
+    )}
+
+    {status.aktiv && (
+      <>
+        {fehlerText && (
+          <p id="server-fehler" role="alert" class="mb-6 p-4 bg-brick-600/10 border border-brick-600/40 rounded-sm text-sm font-semibold">
+            {fehlerText}
+          </p>
+        )}
+
+        {/* Fortschritt */}
+        <div class="mb-8">
+          <div class="flex items-baseline justify-between mb-2">
+            <span class="eyebrow">Mitgliedsdaten</span>
+            <span class="text-sm font-semibold" id="fortschritt-text">Schritt 1 von 5</span>
+          </div>
+          <div class="h-1.5 bg-navy-900/10 rounded-full overflow-hidden">
+            <div id="fortschritt-balken" class="h-full bg-gold-500 transition-all duration-300" style="width:20%"></div>
+          </div>
+        </div>
+
+        <form id="erfassung" method="POST" action="/api/mitglieder-erfassung" novalidate>
+          {/* Honeypot — für Menschen unsichtbar, nicht fokussierbar */}
+          <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+            <label for="botcheck">Bitte leer lassen</label>
+            <input id="botcheck" type="text" name="botcheck" tabindex="-1" autocomplete="off" />
+          </div>
+
+          {/* ── Schritt 1 ─────────────────────────────────────────────── */}
+          <section data-schritt="1" class="card">
+            <h1 class="text-2xl md:text-3xl mb-5 leading-tight">Danke für Ihre Hilfe. Wir digitalisieren den Verein! Los geht’s!</h1>
+            <p class="leading-relaxed mb-4">
+              Wir stellen die Mitgliederverwaltung des Fördervereins auf eine digitale
+              Liste um. Damit wir Ihre Daten vollständig und richtig übernehmen können,
+              tragen Sie sie hier bitte selbst ein.
+            </p>
+            <p class="leading-relaxed mb-4">
+              Das dauert etwa zwei Minuten. Sie brauchen nur Ihre Anschrift — und, falls
+              Sie uns den Beitrag einziehen lassen möchten, Ihre IBAN.
+            </p>
+            <p class="leading-relaxed mb-7">
+              Das SEPA-Lastschriftmandat ist <strong>freiwillig</strong>. Sie können den
+              Beitrag genauso gut selbst überweisen.
+            </p>
+            <button type="button" class="btn-gold w-full justify-center text-base py-4" data-weiter>Los geht’s</button>
+          </section>
+
+          {/* ── Schritt 2 ─────────────────────────────────────────────── */}
+          <section data-schritt="2" class="card hidden">
+            <h2 class="text-2xl mb-1">Ihre Daten</h2>
+            <p class="text-sm text-navy-900/60 mb-6">Mit * markierte Felder brauchen wir.</p>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label class={label} for="vorname">Vorname *</label>
+                <input id="vorname" name="vorname" class={feld} autocomplete="given-name" required />
+              </div>
+              <div>
+                <label class={label} for="nachname">Nachname *</label>
+                <input id="nachname" name="nachname" class={feld} autocomplete="family-name" required />
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class={label} for="strasse">Straße und Hausnummer *</label>
+              <input id="strasse" name="strasse" class={feld} autocomplete="street-address" required />
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mt-4">
+              <div>
+                <label class={label} for="plz">PLZ *</label>
+                <input id="plz" name="plz" class={feld} inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" required />
+              </div>
+              <div class="col-span-2">
+                <label class={label} for="ort">Ort *</label>
+                <input id="ort" name="ort" class={feld} autocomplete="address-level2" required />
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label class={label} for="email">E-Mail-Adresse *</label>
+              <input id="email" name="email" type="email" class={feld} inputmode="email" autocomplete="email" required />
+            </div>
+
+            <p class="eyebrow mt-8 mb-3">Freiwillige Angaben</p>
+            <div>
+              <label class={label} for="telefon">Telefon</label>
+              <input id="telefon" name="telefon" type="tel" class={feld} inputmode="tel" autocomplete="tel" />
+            </div>
+            <div class="grid grid-cols-3 gap-4 mt-4">
+              <div class="col-span-2">
+                <label class={label} for="kind_name">Name des Kindes</label>
+                <input id="kind_name" name="kind_name" class={feld} />
+              </div>
+              <div>
+                <label class={label} for="klasse">Klasse</label>
+                <input id="klasse" name="klasse" class={feld} />
+              </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+              <button type="button" class="btn-ghost flex-1 justify-center" data-zurueck>Zurück</button>
+              <button type="button" class="btn-gold flex-1 justify-center" data-weiter>Weiter</button>
+            </div>
+          </section>
+
+          {/* ── Schritt 3 ─────────────────────────────────────────────── */}
+          <section data-schritt="3" class="card hidden">
+            <h2 class="text-2xl mb-1">Ihr Jahresbeitrag</h2>
+            <p class="text-sm text-navy-900/60 mb-6">
+              Der Mindestbeitrag beträgt {ERFASSUNG.MIN_EUR} Euro im Jahr. Höhere Beiträge sind
+              herzlich willkommen — jeder Euro geht in die Projekte an der Schule.
+            </p>
+
+            <div class="grid grid-cols-2 gap-3">
+              {ERFASSUNG.STUFEN.map((s) => (
+                <label class="cursor-pointer border-2 border-navy-900/15 rounded-sm py-5 text-center text-lg font-semibold hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+                  <input type="radio" name="beitrag" value={String(s)} class="sr-only" />
+                  {s} €
+                </label>
+              ))}
+            </div>
+
+            <label class="mt-3 flex items-center gap-3 border-2 border-navy-900/15 rounded-sm px-4 py-3 hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+              <input type="radio" name="beitrag" value="frei" id="beitrag-frei" class="shrink-0 w-5 h-5" />
+              <span class="font-semibold whitespace-nowrap">Eigener Betrag</span>
+              <input
+                type="number" name="beitrag_frei" id="beitrag_frei"
+                min={ERFASSUNG.MIN_EUR} max={ERFASSUNG.MAX_EUR} step="1"
+                inputmode="numeric" placeholder={`${ERFASSUNG.MIN_EUR}–${ERFASSUNG.MAX_EUR} €`}
+                aria-label="Eigener Jahresbeitrag in Euro"
+                class="w-full px-3 py-2.5 border border-navy-900/20 rounded-sm focus:outline-none focus:border-gold-500"
+              />
+            </label>
+
+            <div class="flex gap-3 mt-8">
+              <button type="button" class="btn-ghost flex-1 justify-center" data-zurueck>Zurück</button>
+              <button type="button" class="btn-gold flex-1 justify-center" data-weiter>Weiter</button>
+            </div>
+          </section>
+
+          {/* ── Schritt 4 ─────────────────────────────────────────────── */}
+          <section data-schritt="4" class="card hidden">
+            <h2 class="text-2xl mb-1">Wie möchten Sie zahlen?</h2>
+            <p class="text-sm text-navy-900/60 mb-6">Beides ist uns gleich recht.</p>
+
+            <label class="block cursor-pointer border-2 border-navy-900/15 rounded-sm p-4 hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+              <span class="flex items-center gap-3">
+                <input type="radio" name="zahlweise" value="sepa" id="zw-sepa" class="shrink-0 w-5 h-5" />
+                <span class="font-semibold">Sie ziehen den Beitrag ein (SEPA-Lastschrift)</span>
+              </span>
+              <span class="block text-sm text-navy-900/60 mt-1.5 ml-8">
+                Einmal einrichten, danach müssen Sie an nichts mehr denken.
+              </span>
+            </label>
+
+            <label class="block cursor-pointer border-2 border-navy-900/15 rounded-sm p-4 mt-3 hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+              <span class="flex items-center gap-3">
+                <input type="radio" name="zahlweise" value="ueberweisung" id="zw-ueberweisung" class="shrink-0 w-5 h-5" />
+                <span class="font-semibold">Ich überweise selbst</span>
+              </span>
+              <span class="block text-sm text-navy-900/60 mt-1.5 ml-8">
+                Wir erheben dann keine Bankdaten von Ihnen.
+              </span>
+            </label>
+
+            {/* SEPA-Block */}
+            <div id="sepa-block" class="hidden mt-6 pt-6 border-t border-navy-900/10">
+              <div>
+                <label class={label} for="kontoinhaber">Kontoinhaber *</label>
+                <input id="kontoinhaber" name="kontoinhaber" class={feld} autocomplete="name" />
+              </div>
+              <div class="mt-4">
+                <label class={label} for="iban">IBAN *</label>
+                <input id="iban" name="iban" class={`${feld} font-mono tracking-wider`} inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="DE00 0000 0000 0000 0000 00" />
+              </div>
+
+              <div class="mt-6 p-4 bg-cream-100 rounded-sm text-sm leading-relaxed space-y-3">
+                {mandatstext({ glaeubigerId }).map((t) => (
+                  <p>{t}</p>
+                ))}
+                <p class="text-navy-900/60">
+                  Die Mandatsreferenz vergeben wir beim Absenden. Sie erscheint auf der
+                  Bestätigungsseite, in Ihrer Bestätigungsmail und im PDF.
+                </p>
+              </div>
+
+              <div class="mt-6">
+                <span class={label}>Ihre Unterschrift *</span>
+                <p class="text-sm text-navy-900/60 mb-2">
+                  Zeichnen Sie mit dem Finger oder der Maus in das Feld.
+                </p>
+                <div class="border-2 border-dashed border-navy-900/25 rounded-sm bg-white">
+                  <canvas id="signatur-canvas" class="w-full block touch-none" style="height:170px"></canvas>
+                </div>
+                <div class="flex justify-end mt-2">
+                  <button type="button" id="signatur-loeschen" class="text-sm font-semibold text-gold-600 hover:underline">Unterschrift löschen</button>
+                </div>
+                <input type="hidden" name="signatur" id="signatur" />
+              </div>
+
+              <label class="flex items-start gap-3 mt-5 cursor-pointer text-sm leading-relaxed">
+                <input type="checkbox" name="mandat_bestaetigt" value="ja" id="mandat_bestaetigt" class="mt-1 shrink-0 w-5 h-5" />
+                <span>Ich erteile das oben stehende SEPA-Lastschriftmandat. *</span>
+              </label>
+            </div>
+
+            {/* Überweisungs-Block */}
+            <div id="ueberweisung-block" class="hidden mt-6 pt-6 border-t border-navy-900/10">
+              <p class="text-sm mb-3">Bitte überweisen Sie den Jahresbeitrag auf dieses Konto:</p>
+              <div class="p-4 bg-cream-100 rounded-sm text-sm leading-relaxed">
+                <p><strong>{v.name}</strong></p>
+                <p>{ERFASSUNG.bank.institut}</p>
+                <p class="font-mono">IBAN: {ERFASSUNG.bank.iban}</p>
+                <p class="font-mono">BIC: {ERFASSUNG.bank.bic}</p>
+                <p class="mt-2">Verwendungszweck: <strong>Mitgliedsbeitrag, Ihr Name</strong></p>
+              </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+              <button type="button" class="btn-ghost flex-1 justify-center" data-zurueck>Zurück</button>
+              <button type="button" class="btn-gold flex-1 justify-center" data-weiter>Weiter</button>
+            </div>
+          </section>
+
+          {/* ── Schritt 5 ─────────────────────────────────────────────── */}
+          <section data-schritt="5" class="card hidden">
+            <h2 class="text-2xl mb-1">Datenschutz und Absenden</h2>
+            <p class="text-sm text-navy-900/60 mb-6">Beide Einwilligungen brauchen wir, um Ihre Daten führen zu dürfen.</p>
+
+            <label class="flex items-start gap-3 cursor-pointer text-sm leading-relaxed border-2 border-navy-900/15 rounded-sm p-4 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+              <input type="checkbox" name="einwilligung_speicherung" value="ja" id="einw1" class="mt-0.5 shrink-0 w-5 h-5" />
+              <span>Ich willige ein, dass der {v.name} die hier angegebenen Daten speichert und zur Mitgliederverwaltung verarbeitet. *</span>
+            </label>
+
+            <label class="flex items-start gap-3 mt-3 cursor-pointer text-sm leading-relaxed border-2 border-navy-900/15 rounded-sm p-4 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+              <input type="checkbox" name="einwilligung_ansprache" value="ja" id="einw2" class="mt-0.5 shrink-0 w-5 h-5" />
+              <span>Ich willige ein, zu Vereinsangelegenheiten per Post und E-Mail angeschrieben zu werden. *</span>
+            </label>
+
+            <p class="text-sm text-navy-900/70 leading-relaxed mt-5">
+              Sie können beide Einwilligungen jederzeit widerrufen — eine formlose Nachricht an
+              <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline"> {v.email}</a> genügt.
+              Näheres in der <a href={v.datenschutzUrl} class="text-gold-600 font-semibold hover:underline">Datenschutzerklärung</a>.
+            </p>
+            <p class="text-sm text-navy-900/70 leading-relaxed mt-2">
+              {v.name}, {v.strasse}, {v.plz} {v.ort}
+            </p>
+
+            <h3 class="text-lg font-semibold mt-8 mb-3">Ihre Angaben</h3>
+            <dl id="zusammenfassung" class="text-sm divide-y divide-navy-900/10 border-y border-navy-900/10"></dl>
+
+            <div class="flex gap-3 mt-8">
+              <button type="button" class="btn-ghost flex-1 justify-center" data-zurueck>Zurück</button>
+              <button type="submit" id="absenden" class="btn-gold flex-1 justify-center">Verbindlich absenden</button>
+            </div>
+          </section>
+        </form>
+
+        <noscript>
+          <p class="mt-6 p-4 bg-cream-100 rounded-sm text-sm">
+            Ohne JavaScript sehen Sie alle Schritte untereinander. Das Formular funktioniert
+            trotzdem — nur die Unterschrift lässt sich nicht zeichnen. Wählen Sie in dem Fall
+            bitte „Ich überweise selbst“.
+          </p>
+          <style>{`form#erfassung section[data-schritt]{display:block !important}`}</style>
+        </noscript>
+      </>
+    )}
+  </section>
+</Base>
+
+<script>
+  import { pruefeIban, formatiereIban, normalisiereIban } from '../../lib/iban.ts';
+
+  const form = document.getElementById('erfassung') as HTMLFormElement | null;
+  if (form) {
+    const schritte = Array.from(
+      form.querySelectorAll<HTMLElement>('section[data-schritt]'),
+    );
+    const anzahl = schritte.length;
+    const balken = document.getElementById('fortschritt-balken')!;
+    const fortschrittText = document.getElementById('fortschritt-text')!;
+    let aktuell = 1;
+
+    // ── Fehlermeldungen am Feld ────────────────────────────────────────────
+    function meldungZeigen(feld: HTMLElement, text: string) {
+      meldungLoeschen(feld);
+      const p = document.createElement('p');
+      p.className = 'feld-fehler text-sm text-brick-600 font-semibold mt-1.5';
+      p.setAttribute('role', 'alert');
+      p.textContent = text;
+      feld.setAttribute('aria-invalid', 'true');
+      (feld.closest('div, label') ?? feld.parentElement)!.appendChild(p);
+    }
+    function meldungLoeschen(feld: HTMLElement) {
+      feld.removeAttribute('aria-invalid');
+      const eltern = feld.closest('div, label') ?? feld.parentElement;
+      eltern?.querySelectorAll('.feld-fehler').forEach((e) => e.remove());
+    }
+    function alleMeldungenLoeschen(bereich: HTMLElement) {
+      bereich.querySelectorAll('.feld-fehler').forEach((e) => e.remove());
+      bereich.querySelectorAll('[aria-invalid]').forEach((e) => e.removeAttribute('aria-invalid'));
+    }
+
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+    const wert = (name: string) =>
+      ((form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '').trim();
+    const gewaehlt = (name: string) =>
+      (form.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value ?? '');
+
+    // ── Prüfung je Schritt ─────────────────────────────────────────────────
+    function pruefe(nr: number): boolean {
+      const bereich = schritte[nr - 1]!;
+      alleMeldungenLoeschen(bereich);
+      let ok = true;
+      const fehlt = (id: string, text: string) => {
+        const f = el<HTMLInputElement>(id);
+        if (!f.value.trim()) { meldungZeigen(f, text); ok = false; return true; }
+        return false;
+      };
+
+      if (nr === 2) {
+        fehlt('vorname', 'Bitte geben Sie Ihren Vornamen ein.');
+        fehlt('nachname', 'Bitte geben Sie Ihren Nachnamen ein.');
+        fehlt('strasse', 'Bitte geben Sie Straße und Hausnummer ein.');
+        const plz = el<HTMLInputElement>('plz');
+        if (!/^\d{5}$/.test(plz.value.trim())) {
+          meldungZeigen(plz, 'Die Postleitzahl muss aus genau fünf Ziffern bestehen.');
+          ok = false;
+        }
+        fehlt('ort', 'Bitte geben Sie den Ort ein.');
+        const mail = el<HTMLInputElement>('email');
+        if (!/^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(mail.value.trim())) {
+          meldungZeigen(mail, 'Bitte geben Sie eine gültige E-Mail-Adresse ein.');
+          ok = false;
+        }
+      }
+
+      if (nr === 3) {
+        const auswahl = gewaehlt('beitrag');
+        const frei = el<HTMLInputElement>('beitrag_frei');
+        if (!auswahl) {
+          meldungZeigen(frei, 'Bitte wählen Sie einen Jahresbeitrag.');
+          ok = false;
+        } else if (auswahl === 'frei') {
+          const n = Number.parseInt(frei.value, 10);
+          if (!Number.isFinite(n) || n < 12 || n > 60) {
+            meldungZeigen(frei, 'Bitte tragen Sie einen Betrag zwischen 12 und 60 Euro ein.');
+            ok = false;
+          }
+        }
+      }
+
+      if (nr === 4) {
+        const zw = gewaehlt('zahlweise');
+        if (!zw) {
+          meldungZeigen(el('zw-sepa').closest('label')!, 'Bitte wählen Sie eine Zahlungsweise.');
+          return false;
+        }
+        if (zw === 'sepa') {
+          fehlt('kontoinhaber', 'Bitte geben Sie den Namen des Kontoinhabers an.');
+          const iban = el<HTMLInputElement>('iban');
+          const meldung = pruefeIban(iban.value);
+          if (meldung) { meldungZeigen(iban, meldung); ok = false; }
+          const sig = el<HTMLInputElement>('signatur');
+          if (!sig.value) {
+            meldungZeigen(el('signatur-canvas').parentElement!, 'Bitte unterschreiben Sie das Mandat.');
+            ok = false;
+          }
+          const best = el<HTMLInputElement>('mandat_bestaetigt');
+          if (!best.checked) {
+            meldungZeigen(best, 'Bitte bestätigen Sie das Mandat.');
+            ok = false;
+          }
+        }
+      }
+
+      if (nr === 5) {
+        for (const id of ['einw1', 'einw2']) {
+          const c = el<HTMLInputElement>(id);
+          if (!c.checked) {
+            meldungZeigen(c, 'Diese Einwilligung brauchen wir.');
+            ok = false;
+          }
+        }
+      }
+      return ok;
+    }
+
+    // ── Navigation ─────────────────────────────────────────────────────────
+    function zeige(nr: number) {
+      aktuell = Math.min(Math.max(nr, 1), anzahl);
+      schritte.forEach((s, i) => s.classList.toggle('hidden', i !== aktuell - 1));
+      fortschrittText.textContent = `Schritt ${aktuell} von ${anzahl}`;
+      balken.style.width = `${(aktuell / anzahl) * 100}%`;
+      if (aktuell === anzahl) zusammenfassungBauen();
+      const kopf = schritte[aktuell - 1]!.querySelector('h1, h2');
+      (kopf as HTMLElement | null)?.setAttribute('tabindex', '-1');
+      (kopf as HTMLElement | null)?.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    form.querySelectorAll('[data-weiter]').forEach((b) =>
+      b.addEventListener('click', () => { if (pruefe(aktuell)) zeige(aktuell + 1); }),
+    );
+    form.querySelectorAll('[data-zurueck]').forEach((b) =>
+      b.addEventListener('click', () => zeige(aktuell - 1)),
+    );
+
+    // Enter soll nicht vorzeitig absenden, sondern weiterblättern
+    form.addEventListener('keydown', (e) => {
+      const ziel = e.target as HTMLElement;
+      if (e.key === 'Enter' && ziel.tagName === 'INPUT' && (ziel as HTMLInputElement).type !== 'checkbox') {
+        if (aktuell < anzahl) { e.preventDefault(); if (pruefe(aktuell)) zeige(aktuell + 1); }
+      }
+    });
+
+    // ── Beitrag ────────────────────────────────────────────────────────────
+    el<HTMLInputElement>('beitrag_frei').addEventListener('focus', () => {
+      el<HTMLInputElement>('beitrag-frei').checked = true;
+    });
+
+    // ── Zahlungsweise ──────────────────────────────────────────────────────
+    const sepaBlock = el('sepa-block');
+    const uebBlock = el('ueberweisung-block');
+    function zahlweiseUmschalten() {
+      const zw = gewaehlt('zahlweise');
+      sepaBlock.classList.toggle('hidden', zw !== 'sepa');
+      uebBlock.classList.toggle('hidden', zw !== 'ueberweisung');
+    }
+    form.querySelectorAll('input[name="zahlweise"]').forEach((r) =>
+      r.addEventListener('change', zahlweiseUmschalten),
+    );
+
+    // ── IBAN: Vierergruppen beim Tippen ────────────────────────────────────
+    const ibanFeld = el<HTMLInputElement>('iban');
+    ibanFeld.addEventListener('input', () => {
+      const vorher = ibanFeld.selectionStart ?? 0;
+      const amEnde = vorher >= ibanFeld.value.length;
+      ibanFeld.value = formatiereIban(ibanFeld.value);
+      if (!amEnde) ibanFeld.setSelectionRange(vorher, vorher);
+      meldungLoeschen(ibanFeld);
+    });
+    ibanFeld.addEventListener('blur', () => {
+      if (!normalisiereIban(ibanFeld.value)) return;
+      const m = pruefeIban(ibanFeld.value);
+      if (m) meldungZeigen(ibanFeld, m); else meldungLoeschen(ibanFeld);
+    });
+
+    // ── Unterschrift ───────────────────────────────────────────────────────
+    const canvas = el<HTMLCanvasElement>('signatur-canvas');
+    const ctx = canvas.getContext('2d')!;
+    let zeichnet = false;
+    let etwasGezeichnet = false;
+
+    function canvasSkalieren() {
+      const dpr = window.devicePixelRatio || 1;
+      const breite = canvas.clientWidth;
+      const hoehe = canvas.clientHeight;
+      if (!breite || !hoehe) return;
+      const alt = etwasGezeichnet ? canvas.toDataURL('image/png') : null;
+      canvas.width = breite * dpr;
+      canvas.height = hoehe * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0e1424';
+      if (alt) {
+        const bild = new Image();
+        bild.onload = () => ctx.drawImage(bild, 0, 0, breite, hoehe);
+        bild.src = alt;
+      }
+    }
+    canvasSkalieren();
+    window.addEventListener('resize', canvasSkalieren);
+
+    function punkt(e: PointerEvent) {
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    canvas.addEventListener('pointerdown', (e) => {
+      zeichnet = true;
+      canvas.setPointerCapture(e.pointerId);
+      const p = punkt(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!zeichnet) return;
+      const p = punkt(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      etwasGezeichnet = true;
+      e.preventDefault();
+    });
+    const beenden = () => {
+      if (!zeichnet) return;
+      zeichnet = false;
+      if (etwasGezeichnet) {
+        el<HTMLInputElement>('signatur').value = canvas.toDataURL('image/png');
+        meldungLoeschen(canvas.parentElement!);
+      }
+    };
+    canvas.addEventListener('pointerup', beenden);
+    canvas.addEventListener('pointerleave', beenden);
+    canvas.addEventListener('pointercancel', beenden);
+
+    el('signatur-loeschen').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      etwasGezeichnet = false;
+      el<HTMLInputElement>('signatur').value = '';
+    });
+
+    // ── Zusammenfassung ────────────────────────────────────────────────────
+    function zusammenfassungBauen() {
+      const liste = el('zusammenfassung');
+      liste.textContent = '';
+      const beitrag = gewaehlt('beitrag') === 'frei' ? wert('beitrag_frei') : gewaehlt('beitrag');
+      const zw = gewaehlt('zahlweise');
+      const zeilen: [string, string, number][] = [
+        ['Name', `${wert('vorname')} ${wert('nachname')}`, 2],
+        ['Anschrift', `${wert('strasse')}, ${wert('plz')} ${wert('ort')}`, 2],
+        ['E-Mail', wert('email'), 2],
+      ];
+      if (wert('telefon')) zeilen.push(['Telefon', wert('telefon'), 2]);
+      if (wert('kind_name')) {
+        const k = wert('klasse') ? `${wert('kind_name')}, Klasse ${wert('klasse')}` : wert('kind_name');
+        zeilen.push(['Kind', k, 2]);
+      }
+      zeilen.push(['Jahresbeitrag', beitrag ? `${beitrag},00 Euro` : '—', 3]);
+      zeilen.push([
+        'Zahlungsweise',
+        zw === 'sepa' ? 'SEPA-Lastschrift' : zw === 'ueberweisung' ? 'Ich überweise selbst' : '—',
+        4,
+      ]);
+      if (zw === 'sepa') {
+        const iban = normalisiereIban(wert('iban'));
+        zeilen.push(['Konto', iban ? `•••• •••• •••• ${iban.slice(-4)}` : '—', 4]);
+      }
+
+      for (const [k, w, ziel] of zeilen) {
+        const zeile = document.createElement('div');
+        zeile.className = 'flex items-baseline gap-3 py-2.5';
+        const dt = document.createElement('dt');
+        dt.className = 'w-32 shrink-0 text-navy-900/60';
+        dt.textContent = k;
+        const dd = document.createElement('dd');
+        dd.className = 'flex-1 font-semibold break-words';
+        dd.textContent = w || '—';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'shrink-0 text-gold-600 font-semibold hover:underline';
+        btn.textContent = 'Ändern';
+        btn.addEventListener('click', () => zeige(ziel));
+        zeile.append(dt, dd, btn);
+        liste.appendChild(zeile);
+      }
+    }
+
+    // ── Absenden ───────────────────────────────────────────────────────────
+    form.addEventListener('submit', (e) => {
+      if (!pruefe(5)) { e.preventDefault(); return; }
+      // Alle Schritte noch einmal prüfen — z. B. wenn per „Ändern“ gesprungen wurde
+      for (const nr of [2, 3, 4]) {
+        if (!pruefe(nr)) { e.preventDefault(); zeige(nr); return; }
+      }
+      const btn = el<HTMLButtonElement>('absenden');
+      btn.disabled = true;
+      btn.textContent = 'Wird gesendet …';
+    });
+
+    // Bei Serverfehler zurück auf den ersten Eingabeschritt
+    if (document.getElementById('server-fehler')) zeige(2);
+    else zeige(1);
+  }
+</script>

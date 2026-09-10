@@ -4,7 +4,14 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../data/site.ts';
 
-const { title = SITE.name, description = SITE.description, variant = 'school' } = Astro.props;
+const {
+  title = SITE.name,
+  description = SITE.description,
+  variant = 'school',
+  // Einzelne Seiten (z. B. die temporaere Mitgliedererfassung) sollen nicht
+  // in den Suchindex — daher ueberschreibbar statt fest verdrahtet.
+  robots = 'index, follow',
+} = Astro.props;
 const fullTitle = title === SITE.name ? title : `${title} · ${SITE.shortName}`;
 ---
 <!doctype html>
@@ -14,8 +21,10 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.shortName}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <title>{fullTitle}</title>
-    <meta name="robots" content="index, follow" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="robots" content={robots} />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" href="/favicon-192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body class={variant === 'verein' ? 'bg-navy-900 text-white' : 'bg-cream-50 text-navy-900'}>
     <Header variant={variant} />

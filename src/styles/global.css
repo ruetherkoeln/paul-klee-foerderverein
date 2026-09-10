@@ -40,6 +40,16 @@
   .card {
     @apply bg-white p-6 rounded-sm shadow-sm border border-navy-900/5;
   }
+  /* Aktionsfarbe der befristeten Mitgliedererfassung. Bewusst ausserhalb der
+     Markenpalette, damit der Hinweis sich abhebt und nach der Aktion
+     rueckstandslos entfernt werden kann. Kontrast zu Weiss: 6,4:1 (AA). */
+  .btn-pink {
+    @apply btn text-white;
+    background-color: #c2185b;
+  }
+  .btn-pink:hover {
+    background-color: #9e1250;
+  }
 }
 
 /* Webfonts — Montserrat in einer Familie, mehrere Gewichte */
