@@ -38,7 +38,7 @@ export const ARTIKEL: Artikel[] = [
   },
   {
     name: 'Poloshirt',
-    preis: '29,99 €',
+    preis: '20,00 €',
     beschreibung: 'Offizielle Schulkleidung: hellblaues Poloshirt mit Schul-Logo. Bitte gewünschte Größe wählen.',
     bild: '/img/shop/poloshirt.jpg',
     groessen: [
