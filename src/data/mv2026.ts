@@ -29,18 +29,28 @@ export const UNTERLAGEN: Unterlage[] = [
     hinweis: 'Einladung des Vorstands vom 30.09.2026 zur außerordentlichen Mitgliederversammlung, mit der vollständigen Tagesordnung und den Hinweisen zum Ablauf.',
   },
   {
-    datei: '02-anlage-1-uebersicht-aenderungen.pdf',
+    datei: '02-vollmacht.pdf',
+    titel: 'Vollmacht zur Vertretung',
+    hinweis: 'Für Mitglieder, die nicht teilnehmen können. Die bevollmächtigte Person muss ebenfalls Mitglied sein. Wählbar: Stimmabgabe nach freiem Ermessen oder nach Ihren Weisungen. Ausgefüllt und unterschrieben mitgeben oder vorab an den Vorstand senden.',
+  },
+  {
+    datei: '03-anlage-1-uebersicht-aenderungen.pdf',
     titel: 'Anlage 1 · Übersicht der vorgesehenen Änderungen',
     hinweis: 'Gegenüberstellung der geltenden und der vorgeschlagenen Satzung, Paragraph für Paragraph, mit einer kurzen Begründung je Änderung.',
   },
   {
-    datei: '03-anlage-2-satzung-neufassung.pdf',
+    datei: '04-anlage-2-satzung-neufassung.pdf',
     titel: 'Anlage 2 · Satzung in der Neufassung (Entwurf)',
     hinweis: 'Der vollständige Text, über den abgestimmt wird — zwölf Paragraphen statt bisher dreizehn.',
   },
   {
-    datei: '04-anlage-3-gewinnermittlung.pdf',
+    datei: '05-anlage-3-gewinnermittlung.pdf',
     titel: 'Anlage 3 · Gewinnermittlung 2024/2025 bis Juli',
     hinweis: 'Erstellt durch die beauftragte Kanzlei. Einnahmen 22.377,87 EUR, Ausgaben 24.133,32 EUR.',
+  },
+  {
+    datei: '06-elternbrief-mitgliedschaft.pdf',
+    titel: 'Elternbrief zur Mitgliedschaft',
+    hinweis: 'Anschreiben an die Elternschaft: Aufruf zur digitalen Erfassung bestehender Mitgliedschaften und Einladung zum Beitritt. Nicht Gegenstand der Versammlung, hier zur Kenntnis.',
   },
 ];
