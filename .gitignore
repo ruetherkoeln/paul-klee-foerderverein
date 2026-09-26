@@ -23,3 +23,6 @@ yarn-error.log*
 
 # Mirror snapshot is on legacy-mirror branch only
 legacy-mirror/
+
+# Arbeitsverzeichnis von Claude Code — gehoert nicht ins Repository
+.claude/
