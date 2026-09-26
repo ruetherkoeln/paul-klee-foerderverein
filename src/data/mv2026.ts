@@ -10,11 +10,10 @@
 export const VERSAMMLUNG = {
   titel: 'Außerordentliche Mitgliederversammlung 2026',
   kurz: 'AO Mitgliederversammlung 2026',
-  // Sobald Datum, Uhrzeit und Ort feststehen, hier eintragen — sie erscheinen
-  // dann im Kopf der Seite. Leer lassen heißt: wird nicht angezeigt.
-  datum: '',
-  uhrzeit: '',
-  ort: '',
+  // Übernommen aus der Einladung vom 30.09.2026.
+  datum: 'Montag, 9. November 2026',
+  uhrzeit: '18:30 Uhr',
+  ort: 'Paul-Klee-Schule, Raum gemäß Aushang, Gerresheimer Straße, Düsseldorf',
 };
 
 export interface Unterlage {
@@ -25,13 +24,23 @@ export interface Unterlage {
 
 export const UNTERLAGEN: Unterlage[] = [
   {
-    datei: 'einladung-tagesordnung.pdf',
+    datei: '01-einladung-tagesordnung.pdf',
     titel: 'Einladung mit Tagesordnung',
-    hinweis: 'Fristgerechte Einladung des Vorstands samt Tagesordnung der Versammlung.',
+    hinweis: 'Einladung des Vorstands vom 30.09.2026 zur außerordentlichen Mitgliederversammlung, mit der vollständigen Tagesordnung und den Hinweisen zum Ablauf.',
   },
   {
-    datei: 'vollmacht.pdf',
-    titel: 'Vollmachtsformular',
-    hinweis: 'Für Mitglieder, die nicht teilnehmen können und sich vertreten lassen möchten. Ausgefüllt und unterschrieben mitgeben oder vorab an den Vorstand senden.',
+    datei: '02-anlage-1-uebersicht-aenderungen.pdf',
+    titel: 'Anlage 1 · Übersicht der vorgesehenen Änderungen',
+    hinweis: 'Gegenüberstellung der geltenden und der vorgeschlagenen Satzung, Paragraph für Paragraph, mit einer kurzen Begründung je Änderung.',
+  },
+  {
+    datei: '03-anlage-2-satzung-neufassung.pdf',
+    titel: 'Anlage 2 · Satzung in der Neufassung (Entwurf)',
+    hinweis: 'Der vollständige Text, über den abgestimmt wird — zwölf Paragraphen statt bisher dreizehn.',
+  },
+  {
+    datei: '04-anlage-3-gewinnermittlung.pdf',
+    titel: 'Anlage 3 · Gewinnermittlung 2024/2025 bis Juli',
+    hinweis: 'Erstellt durch die beauftragte Kanzlei. Einnahmen 22.377,87 EUR, Ausgaben 24.133,32 EUR.',
   },
 ];

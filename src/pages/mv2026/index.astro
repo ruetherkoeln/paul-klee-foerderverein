@@ -22,18 +22,25 @@ if (Astro.request.method === 'POST') {
   if (formular.get('abmelden')) {
     Astro.cookies.delete(COOKIE, { path: '/' });
     abgemeldet = true;
-  } else {
-    const eingabe = String(formular.get('passwort') ?? '');
-    if (passwortStimmt(eingabe)) {
+  } else if (passwortStimmt(String(formular.get('passwort') ?? ''))) {
+    // Fehlt der Signierschlüssel, wirft das Erzeugen. Ohne diesen Fang stünde
+    // hier eine nackte Fehlerseite — ausgerechnet für jemanden, der das
+    // richtige Passwort eingegeben hat.
+    try {
       Astro.cookies.set(COOKIE, merkmalErzeugen(), COOKIE_OPTIONEN);
       // Nach dem Anmelden umleiten, damit ein Neuladen die Eingabe nicht
-      // erneut abschickt und das Passwort nicht im Verlauf haengen bleibt.
+      // erneut abschickt und das Passwort nicht im Verlauf hängen bleibt.
       return Astro.redirect('/mv2026/', 303);
+    } catch (e) {
+      console.error('MV2026: Zugang nicht eingerichtet —', (e as Error).message);
+      fehler = 'Der Zugang ist gerade nicht eingerichtet. Bitte melden Sie sich '
+        + 'kurz unter info@pks-foerderverein.de, wir kümmern uns sofort darum.';
     }
-    // Kurz bremsen: macht das Durchprobieren spuerbar langsamer, ohne dass
+  } else {
+    // Kurz bremsen: macht das Durchprobieren spürbar langsamer, ohne dass
     // jemand mit dem richtigen Passwort etwas merkt.
     await new Promise((f) => setTimeout(f, 600));
-    fehler = eingabe.trim()
+    fehler = String(formular.get('passwort') ?? '').trim()
       ? 'Das Passwort stimmt nicht. Bitte prüfen Sie Gross- und Kleinschreibung.'
       : 'Bitte geben Sie das Passwort ein.';
   }
