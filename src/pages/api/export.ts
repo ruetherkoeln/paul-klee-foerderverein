@@ -11,10 +11,19 @@ export const prerender = false;
 // der bestehenden Serienbriefliste zusammenführen lässt — die kennt keine
 // getrennten Vor-/Nachnamen, sondern nur ein Feld "Empfaenger".
 const KOPF = [
-  'Vorname', 'Nachname', 'Strasse', 'PLZ', 'Ort', 'Kind', 'Klasse', 'Beitrag',
+  'Herkunft', 'Vorname', 'Nachname', 'Strasse', 'PLZ', 'Ort', 'Kind', 'Klasse', 'Beitrag',
   'Zahlweise', 'Mandatsreferenz', 'Einwilligung_Speicherung',
   'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger',
 ];
+
+// Seit dem Mitgliedsantrag schreiben zwei Wege in dieselbe Tabelle. Ohne diese
+// Spalte liesse sich in der Liste nicht erkennen, ob jemand neu beitreten will
+// oder ob ein Bestandsmitglied nur seine Angaben nachgetragen hat — und nur im
+// ersten Fall muss der Vorstand ueber eine Aufnahme entscheiden.
+const HERKUNFT: Record<string, string> = {
+  mitgliedsantrag: 'Mitgliedsantrag',
+  'mitgliedererfassung-2026': 'Bestandserfassung',
+};
 
 const ZAHLWEISE: Record<string, string> = {
   sepa: 'SEPA-Lastschrift',
@@ -38,6 +47,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const zeilen = rows.map((r) => [
+    HERKUNFT[r.quelle] ?? (r.quelle ?? ''),
     r.vorname,
     r.nachname,
     r.strasse,

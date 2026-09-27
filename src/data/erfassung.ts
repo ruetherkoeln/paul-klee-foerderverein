@@ -78,6 +78,8 @@ export const FEHLERTEXT: Record<string, string> = {
   kontoinhaber: 'Bitte geben Sie den Namen des Kontoinhabers an.',
   signatur: 'Bitte unterschreiben Sie das Mandat im dafür vorgesehenen Feld.',
   mandat: 'Bitte bestätigen Sie das SEPA-Lastschriftmandat.',
+  rechtsverbindlich:
+    'Bitte bestätigen Sie, dass Sie den Mitgliedsantrag verbindlich stellen.',
   einwilligung:
     'Bitte erteilen Sie beide Einwilligungen, sonst können wir die Daten nicht speichern.',
   limit: 'Es wurden zu viele Anfragen von diesem Anschluss gesendet. Bitte versuchen Sie es später erneut.',

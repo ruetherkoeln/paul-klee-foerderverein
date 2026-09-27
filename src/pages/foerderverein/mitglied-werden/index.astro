@@ -1,0 +1,442 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { SITE } from '../../../data/site.ts';
+import { ERFASSUNG, FEHLERTEXT, GLAEUBIGER_ID } from '../../../data/erfassung.ts';
+import { mandatstext } from '../../../lib/mandat-text.ts';
+
+// Serverseitig gerendert, weil die Seite nach einem abgelehnten Absenden den
+// Grund anzeigen muss. Die Route dahinter leitet mit ?fehler=… hierher zurück.
+export const prerender = false;
+
+const fehlerCode = Astro.url.searchParams.get('fehler') ?? '';
+const fehler = fehlerCode ? (FEHLERTEXT[fehlerCode] ?? FEHLERTEXT.technik) : '';
+
+const v = ERFASSUNG.verein;
+const feld = 'w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500';
+const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
+---
+<Base title="Mitglied werden" description="Mitglied im Förderverein Paul-Klee-Schule Düsseldorf e. V. werden — Mitgliedsantrag online ausfüllen.">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c">
+      <div class="eyebrow mb-4">Mitgliedschaft</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold">Mitglied werden.</h1>
+      <p class="mt-6 max-w-2xl text-lg leading-relaxed text-navy-900/80">
+        Eine Mitgliedschaft im Förderverein ist die verlässlichste Form der Unterstützung —
+        planbar für unsere Arbeit und gestaltend für Sie. Mitglieder haben Stimmrecht in der
+        Mitgliederversammlung und entscheiden mit, welche Projekte gefördert werden.
+      </p>
+    </div>
+  </section>
+
+  {/* Ablauf & Hinweise — über dem Formular */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">So funktioniert es</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">Vom Antrag zur Mitgliedschaft.</h2>
+      <ol class="mt-8 space-y-3 leading-relaxed">
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-yellow flex gap-4">
+          <span class="font-display font-bold text-pk-yellow text-xl flex-shrink-0">1.</span>
+          <span>Formular unten ausfüllen und absenden.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-orange flex gap-4">
+          <span class="font-display font-bold text-pk-orange text-xl flex-shrink-0">2.</span>
+          <span>Wir bestätigen den Eingang per E-Mail — bei Lastschrift mit Ihrem Mandat als PDF.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-red flex gap-4">
+          <span class="font-display font-bold text-pk-red text-xl flex-shrink-0">3.</span>
+          <span>Der Vorstand entscheidet über die Aufnahme gemäß Vereinssatzung.</span>
+        </li>
+        <li class="bg-white p-4 border border-navy-900/10 border-l-4 border-l-pk-blue flex gap-4">
+          <span class="font-display font-bold text-pk-blue text-xl flex-shrink-0">4.</span>
+          <span>Sie erhalten die Aufnahmebestätigung und sind ab sofort stimmberechtigtes Mitglied.</span>
+        </li>
+      </ol>
+
+      <div class="mt-10 grid sm:grid-cols-2 gap-4">
+        <div class="bg-white p-5 border border-navy-900/10">
+          <div class="eyebrow mb-2">Per Post oder E-Mail</div>
+          <p class="text-sm leading-relaxed">
+            Wir wollen komplett digital arbeiten. Wenn Ihnen dies nicht möglich ist,
+            können Sie ausnahmsweise auch den Antrag per Post oder E-Mail an
+            <a href={`mailto:${SITE.email}?subject=Mitgliedsantrag`} class="text-pk-red hover:underline">{SITE.email}</a>,
+            oder im Schulsekretariat abgeben.
+          </p>
+        </div>
+        <div class="bg-white p-5 border border-navy-900/10">
+          <div class="eyebrow mb-2">Beitragszahlung</div>
+          <p class="text-sm leading-relaxed">
+            Der Jahresbeitrag wird per SEPA-Lastschrift eingezogen — das Mandat erteilen
+            Sie gleich im Formular mit Ihrer Unterschrift. Wenn Sie das nicht möchten,
+            können Sie stattdessen selbst überweisen.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* FORMULAR */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Online-Antrag</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold mb-8">Mitgliedsantrag.</h2>
+
+      {fehler && (
+        <div role="alert" class="mb-6 bg-white border-2 p-5" style="border-color:#c2185b">
+          <p class="font-semibold" style="color:#c2185b">Der Antrag wurde noch nicht abgeschickt.</p>
+          <p class="mt-1 text-sm leading-relaxed">{fehler}</p>
+        </div>
+      )}
+
+      <form
+        method="POST"
+        action="/api/mitgliedsantrag"
+        id="mitgliedsantrag"
+        novalidate
+        class="bg-white p-6 md:p-8 border border-navy-900/10 space-y-5"
+      >
+        {/* Honeypot — fuer Menschen unsichtbar, Bots fuellen ihn aus */}
+        <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+          <label for="botcheck">Dieses Feld bitte frei lassen</label>
+          <input id="botcheck" type="text" name="botcheck" tabindex="-1" autocomplete="off" />
+        </div>
+
+        {/* ── Person ─────────────────────────────────────────────────────── */}
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="vorname" class={label}>Vorname *</label>
+            <input id="vorname" name="vorname" required autocomplete="given-name" class={feld} />
+          </div>
+          <div>
+            <label for="nachname" class={label}>Name *</label>
+            <input id="nachname" name="nachname" required autocomplete="family-name" class={feld} />
+          </div>
+        </div>
+
+        <div>
+          <label for="strasse" class={label}>Straße und Hausnummer *</label>
+          <input id="strasse" name="strasse" required autocomplete="street-address" class={feld} />
+        </div>
+
+        <div class="grid grid-cols-[120px_1fr] gap-3">
+          <div>
+            <label for="plz" class={label}>PLZ *</label>
+            <input id="plz" name="plz" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" class={feld} />
+          </div>
+          <div>
+            <label for="ort" class={label}>Ort *</label>
+            <input id="ort" name="ort" required autocomplete="address-level2" class={feld} />
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+          <div>
+            <label for="email" class={label}>E-Mail-Adresse *</label>
+            <input id="email" name="email" type="email" required inputmode="email" autocomplete="email" class={feld} />
+          </div>
+          <div>
+            <label for="telefon" class={label}>Telefon</label>
+            <input id="telefon" name="telefon" type="tel" inputmode="tel" autocomplete="tel" class={feld} />
+          </div>
+        </div>
+
+        <div class="grid sm:grid-cols-[1fr_120px] gap-3">
+          <div>
+            <label for="kind_name" class={label}>Kind an der Schule</label>
+            <input id="kind_name" name="kind_name" class={feld} />
+          </div>
+          <div>
+            <label for="klasse" class={label}>Klasse</label>
+            <input id="klasse" name="klasse" class={feld} />
+          </div>
+        </div>
+
+        {/* ── Beitrag ────────────────────────────────────────────────────── */}
+        <fieldset class="border-t border-navy-900/10 pt-5">
+          <legend class="text-sm font-semibold mb-3">
+            Ich möchte Mitglied im {v.name} werden und unterstütze den Verein mit einem
+            Jahresbeitrag von: *
+          </legend>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+            {ERFASSUNG.STUFEN.map((betrag) => (
+              <label class="cursor-pointer border-2 border-navy-900/15 rounded-sm px-3 py-3 text-center font-semibold hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+                <input type="radio" name="beitrag" value={String(betrag)} class="sr-only" />
+                {betrag} €
+              </label>
+            ))}
+          </div>
+
+          <label class="flex items-center gap-3 border-2 border-navy-900/15 rounded-sm px-3 py-2 hover:border-gold-500 transition-colors has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+            <input type="radio" name="beitrag" value="frei" id="beitrag-frei" class="shrink-0 w-5 h-5" />
+            <span class="text-sm font-semibold whitespace-nowrap">Eigener Betrag:</span>
+            <input
+              type="number" name="beitrag_frei" id="beitrag_frei"
+              min={ERFASSUNG.MIN_EUR} max={ERFASSUNG.MAX_EUR} step="1"
+              placeholder="€ / Jahr" aria-label="Eigener Jahresbeitrag in Euro"
+              class="w-full px-3 py-2 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500"
+            />
+          </label>
+          <p class="mt-2 text-xs text-navy-900/60">
+            Mindestbeitrag laut Satzung: {ERFASSUNG.MIN_EUR} € im Jahr.
+          </p>
+        </fieldset>
+
+        {/* ── Zahlungsweise ──────────────────────────────────────────────── */}
+        <fieldset class="border-t border-navy-900/10 pt-5">
+          <legend class="text-sm font-semibold mb-3">Wie möchten Sie den Beitrag zahlen? *</legend>
+
+          <label class="flex items-start gap-3 cursor-pointer text-sm leading-relaxed border-2 border-navy-900/15 rounded-sm p-4 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+            <input type="radio" name="zahlweise" value="sepa" id="zw-sepa" checked class="mt-0.5 shrink-0 w-5 h-5" />
+            <span>
+              <strong>SEPA-Lastschrift</strong> — empfohlen.<br />
+              <span class="text-navy-900/70">Wir ziehen den Jahresbeitrag ein. Das Mandat erteilen Sie
+              gleich hier mit Ihrer Unterschrift und erhalten es als PDF.</span>
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3 mt-3 cursor-pointer text-sm leading-relaxed border-2 border-navy-900/15 rounded-sm p-4 has-[:checked]:border-gold-500 has-[:checked]:bg-gold-500/10">
+            <input type="radio" name="zahlweise" value="ueberweisung" id="zw-ueberweisung" class="mt-0.5 shrink-0 w-5 h-5" />
+            <span>
+              <strong>Überweisung</strong> — wenn Sie kein Lastschriftverfahren möchten.<br />
+              <span class="text-navy-900/70">Sie überweisen den Beitrag selbst, einmal im Jahr.</span>
+            </span>
+          </label>
+
+          {/* SEPA-Block */}
+          <div id="sepa-block" class="mt-6 pt-6 border-t border-navy-900/10">
+            <div>
+              <label class={label} for="kontoinhaber">Kontoinhaber *</label>
+              <input id="kontoinhaber" name="kontoinhaber" autocomplete="name" class={feld} />
+            </div>
+            <div class="mt-4">
+              <label class={label} for="iban">IBAN *</label>
+              <input
+                id="iban" name="iban" inputmode="text" autocapitalize="characters" spellcheck="false"
+                placeholder="DE00 0000 0000 0000 0000 00"
+                class={`${feld} font-mono tracking-wider`}
+              />
+            </div>
+
+            <div class="mt-6 p-4 bg-cream-100 rounded-sm text-sm leading-relaxed space-y-3">
+              {mandatstext({ glaeubigerId: GLAEUBIGER_ID }).map((t) => <p>{t}</p>)}
+              <p class="text-navy-900/60">
+                Die Mandatsreferenz vergeben wir beim Absenden. Sie erscheint auf der
+                Bestätigungsseite, in Ihrer Bestätigungsmail und im PDF.
+              </p>
+            </div>
+
+            <div class="mt-6">
+              <span class={label}>Ihre Unterschrift *</span>
+              <p class="text-sm text-navy-900/60 mb-2">
+                Zeichnen Sie mit dem Finger oder der Maus in das Feld.
+              </p>
+              <div class="border-2 border-dashed border-navy-900/25 rounded-sm bg-white">
+                <canvas id="signatur-canvas" class="w-full block touch-none" style="height:170px"></canvas>
+              </div>
+              <div class="flex justify-end mt-2">
+                <button type="button" id="signatur-loeschen" class="text-sm font-semibold text-gold-600 hover:underline">
+                  Unterschrift löschen
+                </button>
+              </div>
+              <input type="hidden" name="signatur" id="signatur" />
+            </div>
+
+            <label class="flex items-start gap-3 mt-5 cursor-pointer text-sm leading-relaxed">
+              <input type="checkbox" name="mandat_bestaetigt" value="ja" id="mandat_bestaetigt" class="mt-1 shrink-0 w-5 h-5" />
+              <span>Ich erteile das oben stehende SEPA-Lastschriftmandat. *</span>
+            </label>
+          </div>
+
+          {/* Überweisungs-Block */}
+          <div id="ueberweisung-block" class="hidden mt-6 pt-6 border-t border-navy-900/10">
+            <p class="text-sm mb-3">Bitte überweisen Sie den Jahresbeitrag auf dieses Konto:</p>
+            <div class="p-4 bg-cream-100 rounded-sm text-sm leading-relaxed">
+              <p><strong>{v.name}</strong></p>
+              <p>{ERFASSUNG.bank.institut}</p>
+              <p class="font-mono">IBAN: {ERFASSUNG.bank.iban}</p>
+              <p class="font-mono">BIC: {ERFASSUNG.bank.bic}</p>
+              <p class="mt-2">Verwendungszweck: <strong>Mitgliedsbeitrag, Ihr Name</strong></p>
+            </div>
+          </div>
+        </fieldset>
+
+        {/* ── Erklärungen ────────────────────────────────────────────────── */}
+        <fieldset class="border-t border-navy-900/10 pt-5 space-y-4">
+          <label class="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+            <input type="checkbox" name="rechtsverbindlich" value="ja" class="mt-1 shrink-0 w-5 h-5" />
+            <span>
+              Mit dem Absenden gebe ich einen <strong>rechtsverbindlichen Mitgliedsantrag</strong>
+              gemäß der Vereinssatzung ab. Die Aufnahme erfolgt nach Vorstandsbeschluss. Ich
+              verpflichte mich zur Zahlung des gewählten Jahresbeitrags ab dem auf die Aufnahme
+              folgenden Monat. *
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+            <input type="checkbox" name="einwilligung_speicherung" value="ja" class="mt-1 shrink-0 w-5 h-5" />
+            <span>
+              Ich willige ein, dass meine Angaben zum Zweck der Mitgliederverwaltung
+              gespeichert und verarbeitet werden.
+              <a href={v.datenschutzUrl} class="text-gold-600 hover:underline"> Datenschutzerklärung</a> *
+            </span>
+          </label>
+
+          <label class="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+            <input type="checkbox" name="einwilligung_ansprache" value="ja" class="mt-1 shrink-0 w-5 h-5" />
+            <span>
+              Der Verein darf mich per E-Mail über seine Arbeit und Veranstaltungen
+              informieren. <span class="text-navy-900/60">(freiwillig)</span>
+            </span>
+          </label>
+        </fieldset>
+
+        <button type="submit" class="btn-gold w-full justify-center">Antrag absenden</button>
+
+        <p class="text-xs text-navy-900/50 text-center">Felder mit * sind Pflichtangaben.</p>
+      </form>
+    </div>
+  </section>
+
+<script>
+  // Unterschriftenfeld, IBAN-Formatierung und Umschaltung der Zahlungsweise.
+  //
+  // Die Prüfungen hier sind Bequemlichkeit, keine Absicherung — verbindlich
+  // prüft die Route serverseitig noch einmal alles.
+  import { formatiereIban, normalisiereIban, pruefeIban } from '../../../lib/iban.ts';
+
+  const form = document.getElementById('mitgliedsantrag') as HTMLFormElement | null;
+  if (form) {
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    // ── Zahlungsweise ─────────────────────────────────────────────────────
+    const sepaBlock = el('sepa-block');
+    const uebBlock = el('ueberweisung-block');
+    function umschalten() {
+      const zw = (form!.querySelector('input[name="zahlweise"]:checked') as HTMLInputElement | null)?.value;
+      sepaBlock.classList.toggle('hidden', zw !== 'sepa');
+      uebBlock.classList.toggle('hidden', zw !== 'ueberweisung');
+    }
+    form.querySelectorAll('input[name="zahlweise"]').forEach((r) =>
+      r.addEventListener('change', umschalten),
+    );
+    umschalten();
+
+    // ── Freier Betrag wählt die zugehörige Option mit aus ─────────────────
+    const freiFeld = el<HTMLInputElement>('beitrag_frei');
+    const freiRadio = el<HTMLInputElement>('beitrag-frei');
+    freiFeld.addEventListener('focus', () => { freiRadio.checked = true; });
+    freiFeld.addEventListener('input', () => { freiRadio.checked = true; });
+
+    // ── IBAN in Vierergruppen ─────────────────────────────────────────────
+    const ibanFeld = el<HTMLInputElement>('iban');
+    ibanFeld.addEventListener('input', () => {
+      const pos = ibanFeld.selectionStart ?? 0;
+      const amEnde = pos >= ibanFeld.value.length;
+      ibanFeld.value = formatiereIban(ibanFeld.value);
+      if (!amEnde) ibanFeld.setSelectionRange(pos, pos);
+      ibanFeld.setCustomValidity('');
+    });
+    ibanFeld.addEventListener('blur', () => {
+      if (!normalisiereIban(ibanFeld.value)) return;
+      const m = pruefeIban(ibanFeld.value);
+      ibanFeld.setCustomValidity(m ?? '');
+      if (m) ibanFeld.reportValidity();
+    });
+
+    // ── Unterschrift ──────────────────────────────────────────────────────
+    const canvas = el<HTMLCanvasElement>('signatur-canvas');
+    const ctx = canvas.getContext('2d')!;
+    let zeichnet = false;
+    let etwasGezeichnet = false;
+
+    function skalieren() {
+      const dpr = window.devicePixelRatio || 1;
+      const breite = canvas.clientWidth;
+      const hoehe = canvas.clientHeight;
+      if (!breite || !hoehe) return;
+      // Vorhandenes vor dem Umbau sichern — sonst waere die Unterschrift beim
+      // Drehen des Geraets weg.
+      const alt = etwasGezeichnet ? canvas.toDataURL('image/png') : null;
+      canvas.width = breite * dpr;
+      canvas.height = hoehe * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0e1424';
+      if (alt) {
+        const bild = new Image();
+        bild.onload = () => ctx.drawImage(bild, 0, 0, breite, hoehe);
+        bild.src = alt;
+      }
+    }
+    skalieren();
+    window.addEventListener('resize', skalieren);
+
+    const punkt = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+
+    canvas.addEventListener('pointerdown', (e) => {
+      zeichnet = true;
+      canvas.setPointerCapture(e.pointerId);
+      const p = punkt(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!zeichnet) return;
+      const p = punkt(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      etwasGezeichnet = true;
+      e.preventDefault();
+    });
+    function beenden() {
+      if (!zeichnet) return;
+      zeichnet = false;
+      if (etwasGezeichnet) el<HTMLInputElement>('signatur').value = canvas.toDataURL('image/png');
+    }
+    canvas.addEventListener('pointerup', beenden);
+    canvas.addEventListener('pointerleave', beenden);
+    canvas.addEventListener('pointercancel', beenden);
+
+    el('signatur-loeschen').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      etwasGezeichnet = false;
+      el<HTMLInputElement>('signatur').value = '';
+    });
+
+    // ── Absenden: prüfen, was der Browser nicht selbst prüft ──────────────
+    form.addEventListener('submit', (e) => {
+      const zw = (form.querySelector('input[name="zahlweise"]:checked') as HTMLInputElement | null)?.value;
+      const melden = (feld: HTMLElement, text: string) => {
+        e.preventDefault();
+        feld.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (feld instanceof HTMLInputElement) {
+          feld.setCustomValidity(text);
+          feld.reportValidity();
+        } else {
+          alert(text);
+        }
+      };
+      if (!form.querySelector('input[name="beitrag"]:checked')) {
+        return melden(el('beitrag-frei'), 'Bitte wählen Sie einen Jahresbeitrag.');
+      }
+      if (zw === 'sepa') {
+        const inhaber = el<HTMLInputElement>('kontoinhaber');
+        if (!inhaber.value.trim()) return melden(inhaber, 'Bitte geben Sie den Kontoinhaber an.');
+        const m = pruefeIban(ibanFeld.value);
+        if (m) return melden(ibanFeld, m);
+        if (!el<HTMLInputElement>('signatur').value) {
+          return melden(canvas, 'Bitte unterschreiben Sie das Mandat im dafür vorgesehenen Feld.');
+        }
+        const best = el<HTMLInputElement>('mandat_bestaetigt');
+        if (!best.checked) return melden(best, 'Bitte bestätigen Sie das SEPA-Lastschriftmandat.');
+      }
+    });
+  }
+</script>
+</Base>

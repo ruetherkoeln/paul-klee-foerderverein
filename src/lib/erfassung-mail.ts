@@ -22,6 +22,11 @@ export interface MailDaten {
   iban: string | null;
   einwilligungAnsprache: boolean;
   pdfUrl: string | null;
+  /** Woher der Datensatz stammt. Bestimmt Betreff und Anschreiben: Der
+   *  Mitgliedsantrag ist ein Aufnahmeantrag, über den der Vorstand erst noch
+   *  entscheidet — die Erfassung ändert nur vorhandene Angaben. Beides mit
+   *  demselben Text zu bestätigen wäre irreführend. */
+  art?: 'erfassung' | 'antrag';
 }
 
 const esc = (s: string) =>
@@ -90,10 +95,20 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
            <span style="color:#5b6070;font-size:12px">Der Link ist 30 Tage gültig.</span></p>`
       : '';
 
+  const istAntrag = d.art === 'antrag';
+
   const anPerson = huelle(
-    'Vielen Dank — Ihre Angaben sind bei uns eingegangen',
+    istAntrag
+      ? 'Ihr Mitgliedsantrag ist bei uns eingegangen'
+      : 'Vielen Dank — Ihre Angaben sind bei uns eingegangen',
     `<p style="font-size:14px">Guten Tag ${esc(d.vorname)} ${esc(d.nachname)},</p>
-     <p style="font-size:14px">wir haben Ihre Mitgliedsdaten erfasst. Hier Ihre Angaben zur Kontrolle:</p>
+     <p style="font-size:14px">${
+       istAntrag
+         ? 'vielen Dank für Ihren Mitgliedsantrag. Über die Aufnahme entscheidet der '
+           + 'Vorstand gemäß Vereinssatzung; Sie hören anschließend von uns. Hier Ihre '
+           + 'Angaben zur Kontrolle:'
+         : 'wir haben Ihre Mitgliedsdaten erfasst. Hier Ihre Angaben zur Kontrolle:'
+     }</p>
      ${zusammenfassung(d)}
      ${pdfBlock}
      <p style="font-size:13px;color:#5b6070">Sie können Ihre Einwilligung jederzeit formlos
@@ -107,7 +122,9 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
     const { error } = await resend.emails.send({
       from,
       to: d.email,
-      subject: 'Ihre Mitgliedsdaten beim Förderverein Paul-Klee-Schule',
+      subject: istAntrag
+        ? 'Ihr Mitgliedsantrag beim Förderverein Paul-Klee-Schule'
+        : 'Ihre Mitgliedsdaten beim Förderverein Paul-Klee-Schule',
       html: anPerson,
     });
     if (error) {
@@ -124,8 +141,12 @@ export async function sendeBestaetigung(d: MailDaten): Promise<{ ok: boolean; fe
       const { error } = await resend.emails.send({
         from,
         to: kopie,
-        subject: `Neue Eintragung: ${d.vorname} ${d.nachname} (${d.beitragEur} €, ${d.zahlweise})`,
-        html: huelle('Neue Eintragung in der Mitgliedererfassung', zusammenfassung(d)),
+        subject: `${istAntrag ? 'Neuer Mitgliedsantrag' : 'Neue Eintragung'}: `
+          + `${d.vorname} ${d.nachname} (${d.beitragEur} €, ${d.zahlweise})`,
+        html: huelle(
+          istAntrag ? 'Neuer Mitgliedsantrag' : 'Neue Eintragung in der Mitgliedererfassung',
+          zusammenfassung(d),
+        ),
       });
       if (error) return { ok: true, fehler: `Kopie an den Verein abgelehnt: ${error.name} — ${error.message}` };
     } catch {
