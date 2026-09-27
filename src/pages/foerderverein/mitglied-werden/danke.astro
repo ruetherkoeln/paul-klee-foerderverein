@@ -1,0 +1,103 @@
+---
+// Bestätigung nach einem eingegangenen Mitgliedsantrag.
+// Serverseitig, weil hier der signierte Token geprüft und der Eintrag
+// nachgeladen wird — nur so kennen wir die Mandatsreferenz.
+export const prerender = false;
+
+import Base from '../../../layouts/Base.astro';
+import { ERFASSUNG } from '../../../data/erfassung.ts';
+import { verifyId } from '../../../lib/erfassung-crypto.ts';
+import { ladeEintrag } from '../../../lib/erfassung-db.ts';
+
+const token = Astro.url.searchParams.get('t') ?? '';
+const id = token ? verifyId(token) : null;
+
+let eintrag: Record<string, any> | null = null;
+if (id !== null) {
+  try {
+    eintrag = await ladeEintrag(id);
+  } catch {
+    eintrag = null;
+  }
+}
+
+const istSepa = eintrag?.zahlweise === 'sepa';
+const pdfUrl = istSepa ? `/api/mitglieder-mandat?t=${encodeURIComponent(token)}` : null;
+const v = ERFASSUNG.verein;
+---
+<Base title="Antrag eingegangen" robots="noindex, nofollow" description="Bestätigung des Mitgliedsantrags">
+
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-2xl">
+      <div class="eyebrow mb-4">Eingegangen</div>
+      <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">
+        Vielen Dank — Ihr Mitgliedsantrag liegt uns vor.
+      </h1>
+      <p class="mt-6 leading-relaxed text-navy-900/80">
+        Eine Bestätigung ist unterwegs zu Ihnen. Über die Aufnahme entscheidet der
+        Vorstand gemäß Vereinssatzung; anschließend hören Sie von uns.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-2xl">
+
+      {eintrag?.mandatsreferenz && (
+        <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+          <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-2">
+            Ihre Mandatsreferenz
+          </div>
+          <div class="font-mono text-lg">{eintrag.mandatsreferenz}</div>
+          <p class="mt-2 text-sm leading-relaxed text-navy-900/70">
+            Bitte bewahren Sie sie auf. Sie erscheint bei jeder Abbuchung auf Ihrem
+            Kontoauszug.
+          </p>
+        </div>
+      )}
+
+      {pdfUrl && (
+        <div class="mt-6">
+          <a href={pdfUrl} class="btn-gold w-full justify-center">SEPA-Mandat als PDF laden</a>
+          <p class="mt-3 text-sm leading-relaxed text-navy-900/70">
+            Enthält den Mandatstext, Ihre Unterschrift, das Datum, die
+            Gläubiger-Identifikationsnummer und die Mandatsreferenz. Der Link ist
+            30 Tage gültig und steht auch in Ihrer Bestätigungsmail.
+          </p>
+        </div>
+      )}
+
+      {eintrag && !istSepa && (
+        <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-blue">
+          <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-2">
+            Ihre Überweisung
+          </div>
+          <div class="text-sm leading-relaxed">
+            <p><strong>{v.name}</strong></p>
+            <p>{ERFASSUNG.bank.institut}</p>
+            <p class="font-mono">IBAN: {ERFASSUNG.bank.iban}</p>
+            <p class="font-mono">BIC: {ERFASSUNG.bank.bic}</p>
+            <p class="mt-2">Verwendungszweck: <strong>Mitgliedsbeitrag, Ihr Name</strong></p>
+          </div>
+        </div>
+      )}
+
+      {!eintrag && (
+        <p class="leading-relaxed text-navy-900/80">
+          Ihr Antrag ist bei uns eingegangen. Die Einzelheiten stehen in der
+          Bestätigungsmail, die wir Ihnen gerade geschickt haben.
+        </p>
+      )}
+
+      <div class="mt-10 border-t border-navy-900/10 pt-6 flex flex-wrap gap-3">
+        <a href="/" class="btn-ghost">Zur Startseite</a>
+        <a href="/foerderverein/" class="btn-ghost">Über den Verein</a>
+      </div>
+
+      <p class="mt-8 text-sm leading-relaxed text-navy-900/60">
+        Fragen zum Antrag? Schreiben Sie uns an
+        <a href={`mailto:${v.email}`} class="text-gold-600 font-semibold hover:underline">{v.email}</a>.
+      </p>
+    </div>
+  </section>
+</Base>
