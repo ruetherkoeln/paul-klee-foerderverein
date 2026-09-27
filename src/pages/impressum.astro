@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { VORSTAND, VORSTAND_GEWAEHLT } from '../data/vorstand.ts';
 import { SITE } from '../data/site.ts';
 ---
 <Base title="Impressum">
@@ -25,13 +26,10 @@ import { SITE } from '../data/site.ts';
         <div>
           <h3 class="font-display font-semibold text-lg">Vertreten durch den Vorstand</h3>
           <p class="mt-1 text-sm text-navy-900/70">
-            (gem. Beschluss der Mitgliederversammlung vom 21. April 2026)
+            (gem. Beschluss der {VORSTAND_GEWAEHLT})
           </p>
           <ul class="mt-2 leading-relaxed text-sm text-navy-900/80 list-disc pl-5 space-y-1">
-            <li>A. Ruether – 1. Vorsitzender</li>
-            <li>S. Buchwald – 2. Vorsitzende</li>
-            <li>P. Müller – Kassenwartin</li>
-            <li>H. Bassit – Beisitzerin</li>
+            {VORSTAND.map((m) => <li>{m.name} – {m.funktion}</li>)}
           </ul>
         </div>
 

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { SITE } from '../data/site.ts';
+import { VORSTAND, VORSTAND_GEWAEHLT } from '../data/vorstand.ts';
 ---
 <Base title="Kontakt" description="Kontakt zum Förderverein Paul-Klee-Schule Düsseldorf e. V.">
 
@@ -47,6 +48,33 @@ import { SITE } from '../data/site.ts';
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  {/* VORSTAND */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-12 max-w-3xl">
+      <div class="eyebrow mb-3">Wer dahintersteht</div>
+      <h2 class="text-2xl md:text-3xl font-display font-bold">Der Vorstand</h2>
+      <p class="mt-6 leading-relaxed text-navy-900/80">
+        Der Verein wird ehrenamtlich geführt. Gewählt wurde der Vorstand in der
+        {' '}{VORSTAND_GEWAEHLT}. Schreiben Sie uns gern an
+        {' '}<a href={`mailto:${SITE.email}`} class="text-gold-600 font-semibold hover:underline">{SITE.email}</a>{' '}—
+        wir leiten Ihr Anliegen intern an die richtige Stelle weiter.
+      </p>
+
+      <ul class="mt-8 grid sm:grid-cols-2 gap-3">
+        {VORSTAND.map((m, i) => (
+          <li class={`bg-white p-5 border border-navy-900/10 border-l-4 ${
+            ['border-l-pk-yellow', 'border-l-pk-orange', 'border-l-pk-red', 'border-l-pk-blue'][i % 4]
+          }`}>
+            <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-2">
+              {m.funktion}
+            </div>
+            <div class="font-display font-semibold">{m.name}</div>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 
