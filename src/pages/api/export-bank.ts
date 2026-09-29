@@ -5,6 +5,11 @@ import type { APIRoute } from 'astro';
 import { pruefeBasicAuth, entschluesseln } from '../../lib/erfassung-crypto.ts';
 import { alleEintraege, schemaSicherstellen } from '../../lib/erfassung-db.ts';
 import { csvDokument, deDatum } from '../../lib/csv.ts';
+import { GESCHUETZT_KOPFZEILEN } from '../../lib/sicherheit.ts';
+import {
+  bremsen, fehlversuchZaehlen, gesperrt, herkunft, versucheLoeschen,
+} from '../../lib/login-schutz.ts';
+import { SICHERHEIT } from '../../data/sicherheit.ts';
 import { formatiereIban } from '../../lib/iban.ts';
 
 export const prerender = false;
@@ -15,12 +20,37 @@ const KOPF = [
 ];
 
 export const GET: APIRoute = async ({ request }) => {
-  if (!pruefeBasicAuth(request, 'EXPORT_BANK_USER', 'EXPORT_BANK_PASSWORT')) {
-    return new Response('Zugang erforderlich', {
-      status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="SEPA-Mandate"' },
+  // Durchprobieren der Zugangsdaten begrenzen. Gezaehlt wird nur, wenn
+  // ueberhaupt Zugangsdaten mitkamen: Der Browser schickt die erste Anfrage
+  // grundsaetzlich ohne, und die ist kein Fehlversuch, sondern der normale
+  // Auftakt des Dialogs.
+  const spur = herkunft('export-bank', request);
+  const mitZugangsdaten = Boolean(request.headers.get('authorization'));
+
+  if (mitZugangsdaten && (await gesperrt(spur))) {
+    return new Response('Zu viele Fehlversuche. Bitte spaeter erneut versuchen.', {
+      status: 429,
+      headers: {
+        'retry-after': String(SICHERHEIT.LOGIN_FENSTER_MIN * 60),
+        ...GESCHUETZT_KOPFZEILEN,
+      },
     });
   }
+
+  if (!pruefeBasicAuth(request, 'EXPORT_BANK_USER', 'EXPORT_BANK_PASSWORT')) {
+    if (mitZugangsdaten) {
+      await fehlversuchZaehlen(spur);
+      await bremsen();
+    }
+    return new Response('Zugang erforderlich', {
+      status: 401,
+      headers: {
+        'WWW-Authenticate': 'Basic realm="SEPA-Mandate"',
+        ...GESCHUETZT_KOPFZEILEN,
+      },
+    });
+  }
+  await versucheLoeschen(spur);
 
   let rows: Record<string, any>[];
   try {
@@ -63,7 +93,8 @@ export const GET: APIRoute = async ({ request }) => {
     headers: {
       'content-type': 'text/csv; charset=utf-8',
       'content-disposition': `attachment; filename="sepa-mandate-${heute}.csv"`,
-      'cache-control': 'private, no-store',
+      'x-content-type-options': 'nosniff',
+      ...GESCHUETZT_KOPFZEILEN,
     },
   });
 };
