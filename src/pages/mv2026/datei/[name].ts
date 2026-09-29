@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { COOKIE, merkmalGueltig } from '../../../lib/mv2026.ts';
 import { datei, inhaltstyp } from '../../../lib/mv2026-unterlagen.ts';
+import { GESCHUETZT_KOPFZEILEN } from '../../../lib/sicherheit.ts';
 
 export const prerender = false;
 
@@ -27,11 +28,14 @@ export const GET: APIRoute = async ({ params, cookies, redirect }) => {
     headers: {
       'content-type': inhaltstyp(name),
       'content-length': String(inhalt.length),
-      'content-disposition': `inline; filename="${name.replace(/"/g, '')}"`,
-      // Nicht zwischenspeichern — sonst laege die Unterlage im Cache eines
-      // geteilten Rechners oder eines Proxys, an der Anmeldung vorbei.
-      'cache-control': 'private, no-store',
-      'x-robots-tag': 'noindex, nofollow',
+      // Der Dateiname geht in die Kopfzeile ein. Neben dem Anfuehrungszeichen
+      // muessen auch Zeilenumbrueche raus, sonst liesse sich ueber einen
+      // praeparierten Dateinamen eine weitere Kopfzeile einschleusen.
+      'content-disposition': `inline; filename="${name.replace(/["\r\n]/g, '')}"`,
+      // Der Typ steht fest, der Browser soll nicht daran herumraten.
+      'x-content-type-options': 'nosniff',
+      // Nicht zwischenspeichern, nicht indexieren, keinen Referrer verraten.
+      ...GESCHUETZT_KOPFZEILEN,
     },
   });
 };

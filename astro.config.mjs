@@ -54,5 +54,15 @@ export default defineConfig({
   // mit 403 abweisen. Absicherung erfolgt hier über Honeypot + die
   // signierte Vorstands-Freigabe (Token), daher Check aus.
   security: { checkOrigin: false },
-  vite: { plugins: [mvUnterlagen()] },
+  vite: {
+    plugins: [mvUnterlagen()],
+    build: {
+      // Astro bettet kleine gebuendelte Skripte direkt in die Seite ein. Mit
+      // der Content-Security-Policy aus vercel.json (script-src 'self') wuerden
+      // sie dort vom Browser verworfen — Hamburger-Menue, Shop-Knoepfe und das
+      // mehrstufige Antragsformular waeren tot. Mit 0 wird nichts eingebettet,
+      // jedes Skript bekommt eine eigene Datei.
+      assetsInlineLimit: 0,
+    },
+  },
 });
