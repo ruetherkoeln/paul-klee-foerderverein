@@ -170,3 +170,34 @@ ohne diese Spalte gäbe es keinen Schlüssel zum Zusammenführen.
    befristete Aktion kommentiert
 3. Bankdaten exportieren, bei der Bank einreichen und anschließend überlegen,
    ob die verschlüsselten Spalten in der Datenbank noch gebraucht werden
+
+## Austritt über die Website (seit Oktober 2026)
+
+Seite `/mitgliedschaft-kuendigen/`, verlinkt aus dem Bereich „Mitgliedschaft kündigen“ auf
+`/foerderverein/mitglied-werden/` (Menüpunkt „Mitgliedschaft“) und aus `/mitglied-werden/`.
+
+Ablauf:
+1. Text, der zum Bleiben einlädt → „OK, ich habe das gelesen“ (`?schritt=2`).
+2. Vorname, Nachname, E-Mail → „Ich habe das gelesen und möchte trotzdem austreten“
+   → `POST /api/austritt-anfordern`. Schickt einen signierten Link (7 Tage gültig,
+   HMAC mit `ERFASSUNG_SIGNING_SECRET`, eigener Zweck „austritt:“) an die angegebene
+   Adresse. Die Antwort ist immer gleich — das Formular verrät nicht, wer Mitglied ist.
+3. Link → `/mitgliedschaft-kuendigen/bestaetigen/` zeigt Name und Adresse und verlangt
+   einen letzten Klick (`POST /api/austritt-bestaetigen`). Der Aufruf des Links allein
+   ändert nichts, weil Virenscanner Links in Mails automatisch öffnen.
+4. Erst Mail an den Verein (`VEREIN_KOPIE_EMAIL`, sonst info@…), dann
+   `ausgetreten_am = now()` für alle aktiven Einträge mit gleichem Namen und gleicher
+   E-Mail, dann Bestätigung an das Mitglied. Scheitert die Vereinsmail, bleibt alles
+   unverändert und der Link funktioniert weiter.
+
+Gelöscht wird nichts. Die Spalte `ausgetreten_am` legt `schemaSicherstellen()` selbst an.
+`/api/export` zeigt sie als „Ausgetreten_am“, **`/api/export-bank` lässt Ausgetretene
+weg**, damit nicht weiter abgebucht wird.
+
+Ältere Mitglieder, die nur in der Excel-Liste stehen, können den Weg ebenfalls nutzen:
+Dann meldet die Vereinsmail „kein passender Eintrag in der Online-Liste“, und der
+Vorstand trägt sie von Hand aus.
+
+Satzung § 4: Die Mitgliedschaft endet durch schriftliche Austrittserklärung gegenüber dem
+Vorstand — und automatisch mit dem Abgang des Kindes von der Schule, sofern nichts
+anderes erklärt wird.

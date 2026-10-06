@@ -1,10 +1,10 @@
 // Top-Navigation des Fördervereins (gewünschte Struktur 2026-06)
-// Labels gewünscht: Der Verein · Mitglied werden · Spenden · Kontakt
+// Labels gewünscht: Der Verein · Mitgliedschaft · Spenden · Kontakt (2026-10: „Mitglied werden“ → „Mitgliedschaft“)
 // URLs: vorerst auf bestehende /foerderverein/-Routen verlinkt
 //       (Umzug auf /verein/ in Folge-PR, sobald Inhalte stabil)
 export const MAIN_NAV = [
   { label: 'Der Verein', href: '/foerderverein/' },
-  { label: 'Mitglied werden', href: '/foerderverein/mitglied-werden/' },
+  { label: 'Mitgliedschaft', href: '/foerderverein/mitglied-werden/' },
   { label: 'Shop', href: '/shop/' },
   { label: 'Spenden', href: '/foerderverein/#spenden' },
   { label: 'Kontakt', href: '/kontakt/' }
