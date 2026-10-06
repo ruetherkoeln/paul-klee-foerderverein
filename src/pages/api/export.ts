@@ -13,7 +13,7 @@ export const prerender = false;
 const KOPF = [
   'Herkunft', 'Vorname', 'Nachname', 'Strasse', 'PLZ', 'Ort', 'Kind', 'Klasse', 'Beitrag',
   'Zahlweise', 'Mandatsreferenz', 'Einwilligung_Speicherung',
-  'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger',
+  'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger', 'Ausgetreten_am',
 ];
 
 // Seit dem Mitgliedsantrag schreiben zwei Wege in dieselbe Tabelle. Ohne diese
@@ -62,6 +62,7 @@ export const GET: APIRoute = async ({ request }) => {
     r.einwilligung_ansprache ? 'Ja' : 'Nein',
     deDatum(r.erstellt_am),
     `${r.vorname} ${r.nachname}`,
+    r.ausgetreten_am ? deDatum(r.ausgetreten_am) : '',
   ]);
 
   const heute = new Date().toISOString().slice(0, 10);

@@ -29,7 +29,7 @@ export interface MailDaten {
   art?: 'erfassung' | 'antrag';
 }
 
-const esc = (s: string) =>
+export const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 function zusammenfassung(d: MailDaten): string {
@@ -73,7 +73,7 @@ function zusammenfassung(d: MailDaten): string {
     </p>`;
 }
 
-function huelle(titel: string, innen: string): string {
+export function huelle(titel: string, innen: string): string {
   return `<div style="font-family:Helvetica,Arial,sans-serif;color:#0e1424;max-width:560px">
     <h2 style="font-size:19px;margin:0 0 16px">${esc(titel)}</h2>${innen}</div>`;
 }

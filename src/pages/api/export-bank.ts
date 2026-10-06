@@ -31,7 +31,8 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   const zeilen = rows
-    .filter((r) => r.zahlweise === 'sepa' && r.iban_verschluesselt)
+    // Ausgetretene nicht mehr einziehen — siehe /mitgliedschaft-kuendigen/
+    .filter((r) => r.zahlweise === 'sepa' && r.iban_verschluesselt && !r.ausgetreten_am)
     .map((r) => {
       let iban = '';
       let inhaber = '';
