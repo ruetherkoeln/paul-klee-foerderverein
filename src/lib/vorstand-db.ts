@@ -166,3 +166,65 @@ export async function dokumentLoeschen(id: number): Promise<void> {
   await dokumenteSchema();
   await sql()`DELETE FROM vorstand_dokumente WHERE id = ${id}`;
 }
+
+// ── Termine ─────────────────────────────────────────────────────────────────
+// Vorstandssitzungen, Fristen, Veranstaltungen. Datum als DATE, Uhrzeit als
+// freier Text („18:30“), weil nicht jeder Termin eine hat.
+let termineGeprueft = false;
+async function termineSchema(): Promise<void> {
+  if (termineGeprueft) return;
+  await sql()`
+    CREATE TABLE IF NOT EXISTS vorstand_termine (
+      id           SERIAL PRIMARY KEY,
+      erstellt_am  TIMESTAMPTZ NOT NULL DEFAULT now(),
+      datum        DATE        NOT NULL,
+      uhrzeit      TEXT,
+      titel        TEXT        NOT NULL,
+      ort          TEXT,
+      notiz        TEXT
+    )`;
+  termineGeprueft = true;
+}
+
+export interface Termin {
+  id: number;
+  datum: string;          // YYYY-MM-DD
+  uhrzeit: string | null;
+  titel: string;
+  ort: string | null;
+  notiz: string | null;
+}
+
+/** Kommende Termine (ab heute, Berliner Zeit), früheste zuerst. */
+export async function kommendeTermine(anzahl = 100): Promise<Termin[]> {
+  await termineSchema();
+  return (await sql()`
+    SELECT id, to_char(datum, 'YYYY-MM-DD') AS datum, uhrzeit, titel, ort, notiz
+      FROM vorstand_termine
+     WHERE datum >= (now() AT TIME ZONE 'Europe/Berlin')::date
+     ORDER BY datum, uhrzeit NULLS FIRST, id
+     LIMIT ${anzahl}`) as Termin[];
+}
+
+/** Vergangene Termine, jüngste zuerst. */
+export async function vergangeneTermine(anzahl = 20): Promise<Termin[]> {
+  await termineSchema();
+  return (await sql()`
+    SELECT id, to_char(datum, 'YYYY-MM-DD') AS datum, uhrzeit, titel, ort, notiz
+      FROM vorstand_termine
+     WHERE datum < (now() AT TIME ZONE 'Europe/Berlin')::date
+     ORDER BY datum DESC, uhrzeit DESC NULLS LAST, id DESC
+     LIMIT ${anzahl}`) as Termin[];
+}
+
+export async function terminSpeichern(t: Omit<Termin, 'id'>): Promise<void> {
+  await termineSchema();
+  await sql()`
+    INSERT INTO vorstand_termine (datum, uhrzeit, titel, ort, notiz)
+    VALUES (${t.datum}, ${t.uhrzeit}, ${t.titel}, ${t.ort}, ${t.notiz})`;
+}
+
+export async function terminLoeschen(id: number): Promise<void> {
+  await termineSchema();
+  await sql()`DELETE FROM vorstand_termine WHERE id = ${id}`;
+}

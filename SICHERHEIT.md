@@ -44,6 +44,7 @@ Signierschlüssel — das MV-Passwort öffnet hier nichts.
   Mandats-Unterschrift gelangen nicht in die Seite.
 - **SEPA-Export** verlangt zusätzlich das Bank-Passwort und ist ein POST,
   kein Link. Die Trennung Mitgliederliste ↔ Bankdaten bleibt so erhalten.
+- **Termine** (`/vorstand/termine/`) in `vorstand_termine`; Löschen wie bei Dokumenten nur mit Häkchen.
 - **Dokumente liegen in der Datenbank** (`vorstand_dokumente`), nicht im
   Repository — das Repository ist öffentlich. Nur Büroformate und Bilder,
   höchstens 4 MB (Vercel nimmt je Anfrage 4,5 MB an). Löschen braucht ein

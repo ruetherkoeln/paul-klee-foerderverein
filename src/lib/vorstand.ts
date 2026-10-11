@@ -31,3 +31,11 @@ export function groesse(bytes: number): string {
   if (bytes >= mb) return `${(bytes / mb).toFixed(1).replace('.', ',')} MB`;
   return `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
+
+/** „2026-11-09“ → „Mo., 9. November 2026“ */
+export function terminDatum(iso: string): string {
+  const [j, m, t] = iso.split('-').map(Number);
+  return new Date(Date.UTC(j!, m! - 1, t!)).toLocaleDateString('de-DE', {
+    timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
+  });
+}

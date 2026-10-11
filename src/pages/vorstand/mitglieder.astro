@@ -5,6 +5,7 @@
 // Server ausgewertet: Das funktioniert ohne JavaScript und verträgt sich mit
 // der Content-Security-Policy. Bankdaten werden gar nicht erst geladen.
 import Base from '../../layouts/Base.astro';
+import VorstandNav from '../../components/VorstandNav.astro';
 import { VORSTAND, START } from '../../lib/vorstand.ts';
 import { geschuetzt } from '../../lib/zugang.ts';
 import { mitglieder } from '../../lib/vorstand-db.ts';
@@ -53,8 +54,9 @@ const link = (s: Status) => `?${new URLSearchParams({ ...(q ? { q } : {}), statu
 <Base title="Mitgliederliste · Vorstand" robots="noindex, nofollow" description="Interner Bereich des Vorstands.">
   <section class="bg-cream-50 pt-16 pb-16">
     <div class="container-c">
-      <a href="/vorstand/" class="text-sm underline text-navy-900/60 hover:text-navy-900">← Vorstandsbereich</a>
-      <h1 class="mt-4 text-3xl md:text-4xl font-display font-bold">Mitgliederliste</h1>
+      <div class="eyebrow mb-4">Nur für den Vorstand</div>
+      <h1 class="text-3xl md:text-4xl font-display font-bold">Mitgliederliste</h1>
+      <VorstandNav aktiv="mitglieder" />
 
       <form method="GET" class="mt-8 flex flex-wrap gap-3 items-end">
         <div class="flex-1 min-w-[14rem]">

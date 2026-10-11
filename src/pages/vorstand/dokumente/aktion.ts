@@ -1,19 +1,19 @@
-// POST /vorstand/dokumente — Dokument hochladen oder löschen.
+// POST /vorstand/dokumente/aktion — Dokument hochladen oder löschen.
 //
 // Die Dateien landen in der Datenbank (siehe lib/vorstand-db.ts), nicht im
 // öffentlichen Repository. Erlaubt sind nur übliche Büroformate; was hier
 // hochgeladen wird, geht später mit genau diesem Typ wieder hinaus.
 import type { APIRoute } from 'astro';
-import { VORSTAND, START, zurAnmeldung } from '../../lib/vorstand.ts';
-import { fremdeAnfrage } from '../../lib/zugang.ts';
-import { originErlaubt } from '../../lib/sicherheit.ts';
-import { dokumentSpeichern, dokumentLoeschen } from '../../lib/vorstand-db.ts';
-import { DOKUMENT_TYPEN, MAX_BYTES } from '../../data/vorstand-bereich.ts';
+import { VORSTAND, START, zurAnmeldung } from '../../../lib/vorstand.ts';
+import { fremdeAnfrage } from '../../../lib/zugang.ts';
+import { originErlaubt } from '../../../lib/sicherheit.ts';
+import { dokumentSpeichern, dokumentLoeschen } from '../../../lib/vorstand-db.ts';
+import { DOKUMENT_TYPEN, MAX_BYTES } from '../../../data/vorstand-bereich.ts';
 
 export const prerender = false;
 
 const zurueck = (hinweis: string) =>
-  new Response(null, { status: 303, headers: { Location: `${START}?hinweis=${hinweis}#dokumente` } });
+  new Response(null, { status: 303, headers: { Location: `${START}dokumente/?hinweis=${hinweis}` } });
 
 export const GET: APIRoute = () => zurueck('');
 
