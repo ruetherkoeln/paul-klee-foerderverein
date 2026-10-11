@@ -1,11 +1,16 @@
 ---
-// Vorstandsbereich — Termine: Sitzungen, Fristen, Veranstaltungen.
+// Vorstandsbereich — Termine: eigene Einträge (Sitzungen, Fristen) und die
+// Termine der Schulwebsite, die wöchentlich übernommen werden
+// (lib/schul-termine.ts, Vercel Cron montags).
 import Base from '../../../layouts/Base.astro';
 import VorstandNav from '../../../components/VorstandNav.astro';
 import { VORSTAND, START, KONTAKT, terminDatum } from '../../../lib/vorstand.ts';
 import { geschuetzt } from '../../../lib/zugang.ts';
 import { kommendeTermine, vergangeneTermine } from '../../../lib/vorstand-db.ts';
 import type { Termin } from '../../../lib/vorstand-db.ts';
+import { schulStand, SCHUL_TERMINE_URL } from '../../../lib/schul-termine.ts';
+import type { SchulStand } from '../../../lib/schul-termine.ts';
+import { deDatum } from '../../../lib/csv.ts';
 
 export const prerender = false;
 
@@ -19,11 +24,25 @@ const HINWEISE: Record<string, { text: string; gut?: boolean }> = {
   angaben: { text: 'Bitte mindestens Datum und Titel angeben.' },
   technik: { text: `Das hat technisch nicht geklappt. Bitte später noch einmal versuchen oder an ${KONTAKT} schreiben.` },
 };
-const hinweis = HINWEISE[Astro.url.searchParams.get('hinweis') ?? ''];
+const code = Astro.url.searchParams.get('hinweis') ?? '';
+const neuAnzahl = code.match(/^schule-neu-(\d+)$/)?.[1];
+const hinweis = neuAnzahl
+  ? { text: `Von der Schulseite übernommen: ${neuAnzahl} neue${neuAnzahl === '1' ? 'r' : ''} Termin${neuAnzahl === '1' ? '' : 'e'}.`, gut: true }
+  : ({
+      ...HINWEISE,
+      'schule-unveraendert': { text: 'Die Terminseite der Schule ist unverändert.', gut: true },
+      'schule-keine': { text: 'Geprüft: Auf der Terminseite der Schule stehen derzeit keine Termine.', gut: true },
+      'schule-geaendert': { text: 'Die Terminseite der Schule hat sich geändert, neue Termine wurden aber nicht erkannt. Bitte unten den Seitentext prüfen.' },
+      'schule-fehler': { text: 'Die Terminseite der Schule war gerade nicht erreichbar.' },
+    } as Record<string, { text: string; gut?: boolean }>)[code];
 
 let kommend: Termin[] = [];
 let vergangen: Termin[] = [];
 let datenFehler = false;
+let schule: SchulStand | null = null;
+try {
+  schule = await schulStand();
+} catch { /* Anzeige des Stands ist verzichtbar */ }
 try {
   [kommend, vergangen] = await Promise.all([kommendeTermine(), vergangeneTermine(10)]);
 } catch (e) {
@@ -31,6 +50,9 @@ try {
   datenFehler = true;
 }
 
+// „neu“: Schultermin, der in den letzten 8 Tagen übernommen wurde
+const istNeu = (t: Termin) => t.quelle === 'schule' && Date.now() - new Date(t.erstellt_am).getTime() < 8 * 864e5;
+const zeit = (w: string) => new Date(w).toLocaleString('de-DE', { timeZone: 'Europe/Berlin', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const feld = 'w-full border border-navy-900/20 px-4 py-3 bg-white focus:outline-none focus:border-navy-900';
 const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
 ---
@@ -58,27 +80,31 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
         {kommend.map((t) => (
           <li class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow flex flex-wrap gap-4 items-start">
             <div class="flex-1 min-w-[14rem]">
-              <div class="text-sm font-semibold text-gold-600">
-                {terminDatum(t.datum)}{t.uhrzeit && `, ${t.uhrzeit} Uhr`}
+              <div class="text-sm font-semibold text-gold-600 flex flex-wrap items-center gap-2">
+                <span>{terminDatum(t.datum)}{t.uhrzeit && `, ${t.uhrzeit} Uhr`}</span>
+                <span class={`text-[10px] uppercase tracking-wider px-2 py-0.5 ${t.quelle === 'schule' ? 'bg-navy-900 text-white' : 'bg-gold-500 text-navy-900'}`}>
+                  {t.quelle === 'schule' ? 'Schule' : 'Vorstand'}
+                </span>
+                {istNeu(t) && <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 text-white" style="background:#c2185b">neu</span>}
               </div>
               <div class="mt-1 text-lg font-semibold">{t.titel}</div>
               {t.ort && <div class="mt-1 text-sm text-navy-900/70">{t.ort}</div>}
               {t.notiz && <p class="mt-2 text-sm leading-relaxed text-navy-900/80 whitespace-pre-line">{t.notiz}</p>}
             </div>
-            <form method="POST" action="/vorstand/termine/aktion" class="flex items-center gap-3 text-sm">
+            {t.quelle === 'vorstand' && <form method="POST" action="/vorstand/termine/aktion" class="flex items-center gap-3 text-sm">
               <input type="hidden" name="aktion" value="loeschen" />
               <input type="hidden" name="id" value={t.id} />
               <label class="flex items-center gap-1 text-navy-900/70">
                 <input type="checkbox" name="sicher" value="ja" /> Ja, löschen
               </label>
               <button type="submit" class="underline text-navy-900/60 hover:text-navy-900">Löschen</button>
-            </form>
+            </form>}
           </li>
         ))}
       </ul>
 
-      <form method="POST" action="/vorstand/termine/aktion" class="mt-10 bg-white p-6 border border-navy-900/10 space-y-4">
-        <h3 class="font-semibold">Termin eintragen</h3>
+      <form method="POST" action="/vorstand/termine/aktion" class="mt-10 bg-white p-6 border border-navy-900/10 border-l-4 border-l-pk-yellow space-y-4">
+        <h3 class="font-semibold">Eigenen Termin eintragen</h3>
         <div class="grid sm:grid-cols-3 gap-3">
           <div>
             <label for="datum" class={label}>Datum *</label>
@@ -103,6 +129,31 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
         </div>
         <button type="submit" class="btn-dark">Eintragen</button>
       </form>
+
+      <div class="mt-14 bg-white p-6 border border-navy-900/10">
+        <h2 class="font-semibold">Termine der Schule</h2>
+        <p class="mt-2 text-sm leading-relaxed text-navy-900/70">
+          Jeden Montag früh wird die <a href={SCHUL_TERMINE_URL} class="underline" rel="noopener">Terminseite der Schule</a> gelesen.
+          Neue Termine erscheinen oben mit dem Zeichen „Schule“. Nimmt die Schule einen Termin von ihrer Seite,
+          verschwindet er hier ebenfalls.
+        </p>
+        <p class="mt-3 text-xs text-navy-900/60">
+          {schule
+            ? <>Zuletzt geprüft {zeit(schule.geprueft_am)} Uhr{schule.geaendert_am && <> · Seite zuletzt geändert {deDatum(schule.geaendert_am)}</>}</>
+            : 'Noch nicht geprüft.'}
+          {schule?.fehler && <span class="block mt-1" style="color:#c2185b">Letzter Versuch fehlgeschlagen: {schule.fehler}</span>}
+        </p>
+        <form method="POST" action="/vorstand/termine/aktion" class="mt-4">
+          <input type="hidden" name="aktion" value="schule-pruefen" />
+          <button type="submit" class="btn-ghost">Jetzt prüfen</button>
+        </form>
+        {schule?.inhalt_text && (
+          <details class="mt-4 text-sm">
+            <summary class="cursor-pointer text-navy-900/70">Text der Schulseite ansehen</summary>
+            <pre class="mt-3 whitespace-pre-wrap font-sans text-xs leading-relaxed text-navy-900/80 bg-cream-50 p-4 border border-navy-900/10">{schule.inhalt_text}</pre>
+          </details>
+        )}
+      </div>
 
       {vergangen.length > 0 && (
         <div class="mt-14">

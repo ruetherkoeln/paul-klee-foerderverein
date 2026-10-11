@@ -1,9 +1,10 @@
-// POST /vorstand/termine/aktion — Termin anlegen oder löschen.
+// POST /vorstand/termine/aktion — Termin anlegen oder löschen, Schulseite jetzt prüfen.
 import type { APIRoute } from 'astro';
 import { VORSTAND, START, zurAnmeldung } from '../../../lib/vorstand.ts';
 import { fremdeAnfrage } from '../../../lib/zugang.ts';
 import { originErlaubt } from '../../../lib/sicherheit.ts';
 import { terminSpeichern, terminLoeschen } from '../../../lib/vorstand-db.ts';
+import { schulTerminePruefen } from '../../../lib/schul-termine.ts';
 
 export const prerender = false;
 
@@ -23,6 +24,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   try {
     const f = await request.formData();
+
+    if (f.get('aktion') === 'schule-pruefen') {
+      const e = await schulTerminePruefen();
+      if (e.status === 'fehler') return zurueck('schule-fehler');
+      if (e.status === 'unveraendert') return zurueck('schule-unveraendert');
+      if (!e.erkannt) return zurueck('schule-keine');
+      return zurueck(e.neu ? `schule-neu-${e.neu}` : 'schule-geaendert');
+    }
 
     if (f.get('aktion') === 'loeschen') {
       const id = Number(f.get('id'));
