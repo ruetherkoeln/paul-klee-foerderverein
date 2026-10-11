@@ -223,10 +223,11 @@ export async function schulTerminePruefen(): Promise<PruefErgebnis> {
     const veraendert = alt?.inhalt_hash !== hash;
     await db`
       INSERT INTO schul_termine_stand (id, geprueft_am, geaendert_am, inhalt_hash, inhalt_text, fehler)
-      VALUES (1, now(), now(), ${hash}, ${text}, NULL)
+      VALUES (1, now(), NULL, ${hash}, ${text}, NULL)  -- erster Abruf ist keine Änderung
       ON CONFLICT (id) DO UPDATE SET
         geprueft_am = now(),
-        geaendert_am = CASE WHEN ${veraendert} THEN now() ELSE schul_termine_stand.geaendert_am END,
+        geaendert_am = CASE WHEN ${veraendert} AND schul_termine_stand.inhalt_hash IS NOT NULL
+          THEN now() ELSE schul_termine_stand.geaendert_am END,
         inhalt_hash = EXCLUDED.inhalt_hash,
         inhalt_text = EXCLUDED.inhalt_text,
         fehler = NULL`;
