@@ -4,7 +4,7 @@
 // (lib/schul-termine.ts, Vercel Cron montags).
 import Base from '../../../layouts/Base.astro';
 import VorstandNav from '../../../components/VorstandNav.astro';
-import { VORSTAND, START, KONTAKT, terminDatum } from '../../../lib/vorstand.ts';
+import { VORSTAND, START, KONTAKT, terminDatum, zeitText } from '../../../lib/vorstand.ts';
 import { geschuetzt } from '../../../lib/zugang.ts';
 import { kommendeTermine, vergangeneTermine } from '../../../lib/vorstand-db.ts';
 import type { Termin } from '../../../lib/vorstand-db.ts';
@@ -81,7 +81,7 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
           <li class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow flex flex-wrap gap-4 items-start">
             <div class="flex-1 min-w-[14rem]">
               <div class="text-sm font-semibold text-gold-600 flex flex-wrap items-center gap-2">
-                <span>{terminDatum(t.datum)}{t.uhrzeit && `, ${t.uhrzeit} Uhr`}</span>
+                <span>{terminDatum(t.datum)}{t.uhrzeit && `, ${zeitText(t.uhrzeit)}`}</span>
                 <span class={`text-[10px] uppercase tracking-wider px-2 py-0.5 ${t.quelle === 'schule' ? 'bg-navy-900 text-white' : 'bg-gold-500 text-navy-900'}`}>
                   {t.quelle === 'schule' ? 'Schule' : 'Vorstand'}
                 </span>
