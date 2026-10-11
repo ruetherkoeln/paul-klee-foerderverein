@@ -1,0 +1,148 @@
+---
+// Mitgliedschaft kündigen — Schritt für Schritt:
+//   (ohne Parameter)  1. Ein Text, der zum Bleiben einlädt, mit „OK, gelesen“
+//   ?schritt=2        2. Name + E-Mail, Knopf „… trotzdem austreten“
+//   ?gesendet=1       3. Hinweis auf die Bestätigungsmail
+// Wirksam wird der Austritt erst über den Link in der Mail (siehe
+// lib/austritt.ts). Die Schritte hängen an der Adresse, damit alles auch
+// ohne JavaScript funktioniert.
+export const prerender = false;
+
+import Base from '../../layouts/Base.astro';
+import { ERFASSUNG } from '../../data/erfassung.ts';
+
+const q = Astro.url.searchParams;
+const fehlerCode = q.get('fehler') ?? '';
+const FEHLER: Record<string, string> = {
+  angaben: 'Bitte geben Sie Vorname, Nachname und eine gültige E-Mail-Adresse an.',
+  limit: 'Zu viele Versuche in kurzer Zeit. Bitte versuchen Sie es in einer Stunde noch einmal.',
+  link: 'Der Bestätigungslink ist ungültig oder älter als sieben Tage. Bitte fordern Sie einen neuen an.',
+  technik: 'Das hat gerade technisch nicht geklappt. Bitte versuchen Sie es später noch einmal oder schreiben Sie uns.',
+};
+const fehler = fehlerCode ? (FEHLER[fehlerCode] ?? FEHLER.technik) : '';
+const schritt = q.get('gesendet') ? 3 : (q.get('schritt') === '2' || fehlerCode) ? 2 : 1;
+
+const v = ERFASSUNG.verein;
+const feld = 'w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500';
+const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
+---
+<Base title="Mitgliedschaft kündigen" robots="noindex, nofollow" description="Austritt aus dem Förderverein Paul-Klee-Schule Düsseldorf e. V.">
+
+  {schritt === 1 && (
+    <section class="bg-cream-50 pt-16 pb-16">
+      <div class="container-c max-w-2xl">
+        <div class="eyebrow mb-4">Mitgliedschaft kündigen</div>
+        <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">
+          Bevor Sie gehen — ein Moment für die Kinder.
+        </h1>
+
+        <div class="mt-8 space-y-5 text-lg leading-relaxed text-navy-900/85">
+          <p>
+            Vielleicht hat Ihr Kind die Paul-Klee-Schule inzwischen verlassen. Vielleicht fragen
+            Sie sich, warum Sie noch Mitglied bleiben sollten. Diese Frage ist verständlich — und
+            wir bitten Sie trotzdem, einen Augenblick innezuhalten.
+          </p>
+          <p>
+            Dieser Verein ist kein Club, in dem man Mitglied ist, solange man selbst etwas davon
+            hat. Er ist ein Versprechen: dass Kinder gut durch ihre Schulzeit kommen. Mit
+            Ausflügen, die sonst ausfallen würden. Mit Büchern, Spielgeräten und Projekten. Mit
+            Hilfe, wenn es zu Hause gerade knapp ist.
+          </p>
+          <p class="font-semibold text-navy-900">
+            Kinder sind das Wertvollste, was wir haben. Nicht nur unsere eigenen — alle.
+          </p>
+          <p>
+            Wie gut Kinder lernen, wie sicher sie sich fühlen, wie viel Zutrauen sie in sich
+            entwickeln: Das entscheidet darüber, wie unsere Gesellschaft morgen aussieht. Jeder
+            Beitrag, auch ein kleiner, sagt: Es ist mir nicht gleichgültig, wie es den Kindern nach
+            uns geht.
+          </p>
+          <p>
+            Ihre Familie hat vielleicht selbst von dieser Unterstützung profitiert. Heute sitzen
+            andere Kinder auf diesen Stühlen. Wenn Sie bleiben, geben Sie weiter, was Ihre Familie
+            bekommen hat — für {ERFASSUNG.MIN_EUR} € im Jahr, einen Euro im Monat.
+          </p>
+          <p>
+            Wenn Sie bleiben: von Herzen danke. Und wenn Sie gehen möchten, respektieren wir das
+            — und danken Ihnen für alles, was Sie bisher mitgetragen haben.
+          </p>
+        </div>
+
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="/mitgliedschaft-kuendigen/?schritt=2" class="btn-dark">OK, ich habe das gelesen</a>
+          <a href="/foerderverein/" class="btn-ghost">Ich bleibe Mitglied</a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {schritt === 2 && (
+    <section class="bg-cream-50 pt-16 pb-16">
+      <div class="container-c max-w-2xl">
+        <div class="eyebrow mb-4">Mitgliedschaft kündigen</div>
+        <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">Austritt erklären</h1>
+        <p class="mt-6 leading-relaxed text-navy-900/80">
+          Bitte geben Sie Ihren Namen und die E-Mail-Adresse an, die Sie beim Verein angegeben
+          haben. Wir schicken Ihnen einen Bestätigungslink. Erst wenn Sie diesen öffnen und
+          bestätigen, ist der Austritt erklärt und geht an den Vorstand — so kann niemand Sie
+          ohne Ihr Wissen austragen.
+        </p>
+
+        {fehler && (
+          <div class="mt-6 bg-white border-2 border-pk-red p-5">
+            <div class="font-semibold">Bitte prüfen</div>
+            <p class="mt-1 text-sm leading-relaxed">{fehler}</p>
+          </div>
+        )}
+
+        <form method="post" action="/api/austritt-anfordern" class="mt-8 bg-white p-6 md:p-8 border border-navy-900/10 space-y-5">
+          <div class="hidden" aria-hidden="true">
+            <label>Bitte leer lassen <input type="text" name="botcheck" tabindex="-1" autocomplete="off" /></label>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label for="vorname" class={label}>Vorname *</label>
+              <input id="vorname" name="vorname" required autocomplete="given-name" class={feld} />
+            </div>
+            <div>
+              <label for="nachname" class={label}>Nachname *</label>
+              <input id="nachname" name="nachname" required autocomplete="family-name" class={feld} />
+            </div>
+          </div>
+          <div>
+            <label for="email" class={label}>E-Mail-Adresse *</label>
+            <input id="email" name="email" type="email" required autocomplete="email" class={feld} />
+          </div>
+          <button type="submit" class="btn-dark w-full">
+            Ich habe das gelesen und möchte trotzdem austreten
+          </button>
+          <p class="text-xs leading-relaxed text-navy-900/60">
+            Die Mitgliedschaft endet nach § 4 der Satzung durch schriftliche Austrittserklärung
+            gegenüber dem Vorstand. Ihre Angaben verwenden wir nur, um den Austritt zu bearbeiten.
+          </p>
+        </form>
+      </div>
+    </section>
+  )}
+
+  {schritt === 3 && (
+    <section class="bg-cream-50 pt-16 pb-16">
+      <div class="container-c max-w-2xl">
+        <div class="eyebrow mb-4">Fast geschafft</div>
+        <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">Bitte prüfen Sie Ihr Postfach.</h1>
+        <p class="mt-6 leading-relaxed text-navy-900/80">
+          Wir haben Ihnen eine E-Mail mit einem Bestätigungslink geschickt. Erst wenn Sie den
+          Austritt dort bestätigen, ist er erklärt. Der Link ist sieben Tage gültig.
+        </p>
+        <p class="mt-4 leading-relaxed text-navy-900/80">
+          Keine Mail bekommen? Bitte schauen Sie auch im Spam-Ordner nach — oder schreiben Sie uns an
+          <a href={`mailto:${v.email}`} class="underline">{v.email}</a>.
+        </p>
+        <p class="mt-8 text-navy-900/80">
+          Und falls Sie es sich anders überlegen: Ignorieren Sie die Mail einfach. Dann bleibt alles,
+          wie es ist.
+        </p>
+      </div>
+    </section>
+  )}
+</Base>

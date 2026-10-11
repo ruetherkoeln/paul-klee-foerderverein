@@ -55,6 +55,9 @@ export async function schemaSicherstellen(): Promise<void> {
       fenster_start TIMESTAMPTZ NOT NULL,
       anzahl        INTEGER     NOT NULL
     )`;
+  // Austritt (seit 2026-10): Datum, an dem das Mitglied den Austritt per
+  // Bestätigungslink erklärt hat. NULL = Mitglied.
+  await db`ALTER TABLE mitglieder_erfassung ADD COLUMN IF NOT EXISTS ausgetreten_am TIMESTAMPTZ`;
   schemaGeprueft = true;
 }
 
@@ -149,4 +152,44 @@ export async function alleEintraege(): Promise<Record<string, any>[]> {
   const db = sql();
   return (await db`
     SELECT * FROM mitglieder_erfassung ORDER BY id`) as Record<string, any>[];
+}
+
+// ── Austritt ────────────────────────────────────────────────────────────────
+// Markiert alle noch aktiven Einträge mit genau diesem Namen und dieser
+// E-Mail-Adresse als ausgetreten. Gelöscht wird nichts: Der Vorstand braucht
+// den Datensatz noch, um z. B. den SEPA-Einzug zu beenden, und die
+// Aufbewahrungsfristen der Buchhaltung gelten weiter.
+// Rückgabe: die betroffenen Einträge (leer, wenn niemand passt oder der
+// Austritt schon eingetragen war).
+export async function austrittEintragen(
+  vorname: string,
+  nachname: string,
+  email: string,
+): Promise<{ id: number; quelle: string | null; zahlweise: string; mandatsreferenz: string | null }[]> {
+  const db = sql();
+  return (await db`
+    UPDATE mitglieder_erfassung
+       SET ausgetreten_am = now()
+     WHERE lower(trim(vorname))  = lower(trim(${vorname}))
+       AND lower(trim(nachname)) = lower(trim(${nachname}))
+       AND lower(trim(email))    = lower(trim(${email}))
+       AND ausgetreten_am IS NULL
+    RETURNING id, quelle, zahlweise, mandatsreferenz`) as any[];
+}
+
+// Die noch aktiven Einträge zu Name + E-Mail, ohne etwas zu ändern. Für die
+// Meldung an den Vorstand, die vor dem Eintragen verschickt wird.
+export async function aktiveEintraegeZu(
+  vorname: string,
+  nachname: string,
+  email: string,
+): Promise<{ id: number; quelle: string | null; zahlweise: string; mandatsreferenz: string | null }[]> {
+  const db = sql();
+  return (await db`
+    SELECT id, quelle, zahlweise, mandatsreferenz FROM mitglieder_erfassung
+     WHERE lower(trim(vorname))  = lower(trim(${vorname}))
+       AND lower(trim(nachname)) = lower(trim(${nachname}))
+       AND lower(trim(email))    = lower(trim(${email}))
+       AND ausgetreten_am IS NULL
+     ORDER BY id`) as any[];
 }

@@ -1,0 +1,53 @@
+---
+// Ziel des Links aus der Bestätigungsmail. Zeigt, wer austreten möchte, und
+// verlangt einen letzten Klick — der Aufruf des Links allein ändert nichts
+// (Virenscanner öffnen Links in Mails oft automatisch).
+export const prerender = false;
+
+import Base from '../../../layouts/Base.astro';
+import { austrittPruefen } from '../../../lib/austritt.ts';
+
+const token = Astro.url.searchParams.get('t') ?? '';
+const fehler = Astro.url.searchParams.get('fehler') === 'technik';
+let d: ReturnType<typeof austrittPruefen> = null;
+try { d = austrittPruefen(token); } catch { d = null; }
+---
+<Base title="Austritt bestätigen" robots="noindex, nofollow" description="Austritt aus dem Förderverein bestätigen">
+  <section class="bg-cream-50 pt-16 pb-16">
+    <div class="container-c max-w-2xl">
+      <div class="eyebrow mb-4">Mitgliedschaft kündigen</div>
+      {d ? (
+        <>
+          <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">Austritt bestätigen</h1>
+          <p class="mt-6 leading-relaxed text-navy-900/80">
+            Sie erklären hiermit Ihren Austritt aus dem Förderverein Paul-Klee-Schule
+            Düsseldorf e. V.
+          </p>
+          <div class="mt-6 bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+            <div class="font-semibold">{d.vorname} {d.nachname}</div>
+            <div class="text-sm text-navy-900/70">{d.email}</div>
+          </div>
+          {fehler && (
+            <div class="mt-6 bg-white border-2 border-pk-red p-5 text-sm leading-relaxed">
+              Das hat gerade technisch nicht geklappt — es wurde noch nichts geändert. Bitte versuchen
+              Sie es in einigen Minuten noch einmal.
+            </div>
+          )}
+          <form method="post" action="/api/austritt-bestaetigen" class="mt-8 flex flex-wrap gap-3">
+            <input type="hidden" name="t" value={token} />
+            <button type="submit" class="btn-dark">Austritt jetzt verbindlich erklären</button>
+            <a href="/foerderverein/" class="btn-ghost">Doch nicht — ich bleibe</a>
+          </form>
+        </>
+      ) : (
+        <>
+          <h1 class="text-3xl md:text-4xl font-display font-bold leading-tight">Link ungültig</h1>
+          <p class="mt-6 leading-relaxed text-navy-900/80">
+            Der Bestätigungslink ist ungültig oder älter als sieben Tage. Bitte fordern Sie
+            <a href="/mitgliedschaft-kuendigen/?schritt=2" class="underline">einen neuen Link</a> an.
+          </p>
+        </>
+      )}
+    </div>
+  </section>
+</Base>
