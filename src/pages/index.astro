@@ -87,28 +87,19 @@ const kennzahlen = [
         </div>
       </div>
       <a href="/schule/" class="block bg-white p-8 border border-navy-900/10 hover:border-navy-900/30 transition-colors text-center">
-        {/* Logo und Schulgebäude im selben Hochformat (762 × 1114) und
-            gleich breit, damit beide als Paar wirken. */}
-        <div class="flex justify-center items-end gap-6">
+        {/* Nur noch die Zeichnung des Schulgebaeudes. Das Logo daneben ist
+            entfallen; die Zeichnung steht jetzt allein und breiter. */}
+        <picture class="block mx-auto w-[72%] max-w-[240px]">
+          <source srcset="/img/paul-klee-schule-gebaeude.webp" type="image/webp" />
           <img
-            src="/img/paul-klee-schule-viadukt.png"
-            alt="Logo der Paul-Klee-Schule Düsseldorf"
-            class="w-[42%] max-w-[140px] h-auto"
-            width="140"
-            height="205"
+            src="/img/paul-klee-schule-gebaeude.png"
+            alt="Zeichnung des Schulgebäudes der Paul-Klee-Schule an der Gerresheimer Straße"
+            class="w-full h-auto"
+            width="240"
+            height="351"
+            loading="eager"
           />
-          <picture class="w-[42%] max-w-[140px]">
-            <source srcset="/img/paul-klee-schule-gebaeude.webp" type="image/webp" />
-            <img
-              src="/img/paul-klee-schule-gebaeude.png"
-              alt="Zeichnung des Schulgebäudes der Paul-Klee-Schule an der Gerresheimer Straße"
-              class="w-full h-auto"
-              width="140"
-              height="205"
-              loading="eager"
-            />
-          </picture>
-        </div>
+        </picture>
         <div class="mt-5 text-xs uppercase tracking-wider text-navy-900/60">
           Die Schule, die wir unterstützen
         </div>
