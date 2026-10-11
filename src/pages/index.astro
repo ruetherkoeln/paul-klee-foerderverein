@@ -87,17 +87,33 @@ const kennzahlen = [
         </div>
       </div>
       <a href="/schule/" class="block bg-white p-8 border border-navy-900/10 hover:border-navy-900/30 transition-colors text-center">
-        <img
-          src="/img/paul-klee-schule-viadukt.png"
-          alt="Logo der Paul-Klee-Schule Düsseldorf"
-          class="max-w-[140px] mx-auto h-auto"
-          width="140"
-        />
+        {/* Logo und Schulgebäude im selben Hochformat (762 × 1114) und
+            gleich breit, damit beide als Paar wirken. */}
+        <div class="flex justify-center items-end gap-6">
+          <img
+            src="/img/paul-klee-schule-viadukt.png"
+            alt="Logo der Paul-Klee-Schule Düsseldorf"
+            class="w-[42%] max-w-[140px] h-auto"
+            width="140"
+            height="205"
+          />
+          <picture class="w-[42%] max-w-[140px]">
+            <source srcset="/img/paul-klee-schule-gebaeude.webp" type="image/webp" />
+            <img
+              src="/img/paul-klee-schule-gebaeude.png"
+              alt="Das Schulgebäude der Paul-Klee-Schule an der Gerresheimer Straße"
+              class="w-full h-auto"
+              width="140"
+              height="205"
+              loading="eager"
+            />
+          </picture>
+        </div>
         <div class="mt-5 text-xs uppercase tracking-wider text-navy-900/60">
           Die Schule, die wir unterstützen
         </div>
         <div class="mt-1 font-display font-semibold text-navy-900">
-          Paul-Klee-Schule
+          Paul-Klee-Schule Düsseldorf
         </div>
       </a>
     </div>
