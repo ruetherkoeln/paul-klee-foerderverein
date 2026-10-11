@@ -1,15 +1,16 @@
 # Zugangsbereiche und ihre Absicherung
 
-Diese Site hat drei Bereiche, die nicht für die Allgemeinheit bestimmt sind.
+Diese Site hat vier Bereiche, die nicht für die Allgemeinheit bestimmt sind.
 Was sie schützt und woran zu denken ist, wenn daran gearbeitet wird.
 
-## Die drei Bereiche
+## Die vier Bereiche
 
 | Bereich | Adresse | Wer | Zugang über |
 |---|---|---|---|
 | Unterlagen der Mitgliederversammlung | `/mv2026/` | Mitglieder | Formular + Cookie (`MV_PASSWORT`) |
 | Mitgliederliste als CSV | `/api/export` | Vorstand | Basic Auth (`EXPORT_USER` / `EXPORT_PASSWORT`) |
 | SEPA-Mandate im Klartext | `/api/export-bank` | Vorstand / Bank | Basic Auth (`EXPORT_BANK_USER` / `EXPORT_BANK_PASSWORT`) |
+| Vorstandsbereich | `/vorstand/` | Vorstand | Formular + Cookie (`VORSTAND_PASSWORT`); SEPA-Export dort zusätzlich `EXPORT_BANK_PASSWORT` |
 
 Getrennte Zugangsdaten für die beiden Exporte sind Absicht: Die Bankdaten
 sind die empfindlichste Sammlung, die dieser Verein hat. Wer die
@@ -28,6 +29,25 @@ der eingebetteten Dateien nachschlägt — Pfade werden nirgends zusammengesetzt
 
 **Eine neue Unterlage gehört in `src/dokumente/mv2026/`, niemals nach
 `public/`.**
+
+## Vorstandsbereich `/vorstand/`
+
+Übersicht (Kennzahlen, neue Anträge und Austritte der letzten 90 Tage),
+Mitgliederliste mit Suche (`/vorstand/mitglieder/`), die beiden Exporte als
+Knöpfe und eine Dokumentenablage. Die Mechanik der Anmeldung teilt er sich mit
+`/mv2026/` (`src/lib/zugang.ts`), aber mit eigenem Cookie
+(`__Host-vorstand`, `SameSite=Strict`), eigenem Passwort und eigenem
+Signierschlüssel — das MV-Passwort öffnet hier nichts.
+
+- **Mitgliederliste ohne Bankdaten:** `lib/vorstand-db.ts` liest mit
+  ausdrücklich genannten Spalten, nie `SELECT *`. IBAN, Kontoinhaber und
+  Mandats-Unterschrift gelangen nicht in die Seite.
+- **SEPA-Export** verlangt zusätzlich das Bank-Passwort und ist ein POST,
+  kein Link. Die Trennung Mitgliederliste ↔ Bankdaten bleibt so erhalten.
+- **Dokumente liegen in der Datenbank** (`vorstand_dokumente`), nicht im
+  Repository — das Repository ist öffentlich. Nur Büroformate und Bilder,
+  höchstens 4 MB (Vercel nimmt je Anfrage 4,5 MB an). Löschen braucht ein
+  gesetztes Häkchen.
 
 ## Was gegen Angriffe eingebaut ist
 
@@ -69,9 +89,11 @@ bei diesem ersten Klick nicht mit.
 
 **Zwischenspeichern.** Alles hinter dem Passwort trägt
 `cache-control: private, no-store`, `x-robots-tag: noindex` und
-`referrer-policy: no-referrer` (`GESCHUETZT_KOPFZEILEN`). Ohne das no-store
+`referrer-policy: same-origin` (`GESCHUETZT_KOPFZEILEN`). Ohne das no-store
 läge eine Unterlage im Cache eines geteilten Rechners oder eines Proxys — an
-der Anmeldung vorbei.
+der Anmeldung vorbei. **Nicht `no-referrer`:** Dann schickt der Browser beim
+Absenden des Anmeldeformulars `Origin: null`, die Herkunftsprüfung lehnt ab
+und niemand kommt mehr hinein (mit curl fällt das nicht auf).
 
 ## Kopfzeilen für die ganze Site
 
@@ -103,6 +125,8 @@ Repository — es ist öffentlich.
 |---|---|
 | `MV_PASSWORT` | Zugang zu `/mv2026/` |
 | `MV_SIGNING_SECRET` | optional; fehlt es, wird aus `ERFASSUNG_SIGNING_SECRET` abgeleitet |
+| `VORSTAND_PASSWORT` | Zugang zu `/vorstand/` |
+| `VORSTAND_SIGNING_SECRET` | optional, wie `MV_SIGNING_SECRET` |
 | `EXPORT_USER`, `EXPORT_PASSWORT` | Mitgliederliste |
 | `EXPORT_BANK_USER`, `EXPORT_BANK_PASSWORT` | SEPA-Mandate |
 | `ERFASSUNG_SIGNING_SECRET` | signierte Links, IP-Hash, abgeleitete Schlüssel |
@@ -116,6 +140,11 @@ node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"
 ```
 
 ## Offen
+
+- **Die Unterlagen unter `src/dokumente/mv2026/`** stehen im öffentlichen
+  Repository und sind dort ohne Passwort lesbar. Das Passwort schützt nur die
+  Website. Wenn die Unterlagen nicht öffentlich sein sollen: in die
+  Datenbank verlegen wie die Vorstandsdokumente.
 
 - **Das Passwort der Mitgliederversammlung** sollte lang und zufällig sein,
   nicht `MV2026`. Es steht in der Einladung; wer es errät, braucht keinen

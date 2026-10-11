@@ -2,8 +2,7 @@
 // Zugang über Basic Auth (EXPORT_USER / EXPORT_PASSWORT).
 import type { APIRoute } from 'astro';
 import { pruefeBasicAuth } from '../../lib/erfassung-crypto.ts';
-import { alleEintraege, schemaSicherstellen } from '../../lib/erfassung-db.ts';
-import { csvDokument, deDatum } from '../../lib/csv.ts';
+import { mitgliederCsv, csvAntwort } from '../../lib/export-listen.ts';
 import { GESCHUETZT_KOPFZEILEN } from '../../lib/sicherheit.ts';
 import {
   bremsen, fehlversuchZaehlen, gesperrt, herkunft, versucheLoeschen,
@@ -11,29 +10,6 @@ import {
 import { SICHERHEIT } from '../../data/sicherheit.ts';
 
 export const prerender = false;
-
-// Spalten nach Vorgabe; "Empfaenger" ist angehängt, damit sich der Export mit
-// der bestehenden Serienbriefliste zusammenführen lässt — die kennt keine
-// getrennten Vor-/Nachnamen, sondern nur ein Feld "Empfaenger".
-const KOPF = [
-  'Herkunft', 'Vorname', 'Nachname', 'Strasse', 'PLZ', 'Ort', 'Kind', 'Klasse', 'Beitrag',
-  'Zahlweise', 'Mandatsreferenz', 'Einwilligung_Speicherung',
-  'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger', 'Ausgetreten_am',
-];
-
-// Seit dem Mitgliedsantrag schreiben zwei Wege in dieselbe Tabelle. Ohne diese
-// Spalte liesse sich in der Liste nicht erkennen, ob jemand neu beitreten will
-// oder ob ein Bestandsmitglied nur seine Angaben nachgetragen hat — und nur im
-// ersten Fall muss der Vorstand ueber eine Aufnahme entscheiden.
-const HERKUNFT: Record<string, string> = {
-  mitgliedsantrag: 'Mitgliedsantrag',
-  'mitgliedererfassung-2026': 'Bestandserfassung',
-};
-
-const ZAHLWEISE: Record<string, string> = {
-  sepa: 'SEPA-Lastschrift',
-  ueberweisung: 'Überweisung',
-};
 
 export const GET: APIRoute = async ({ request }) => {
   // Durchprobieren der Zugangsdaten begrenzen. Gezaehlt wird nur, wenn
@@ -68,40 +44,9 @@ export const GET: APIRoute = async ({ request }) => {
   }
   await versucheLoeschen(spur);
 
-  let rows: Record<string, any>[];
   try {
-    await schemaSicherstellen();
-    rows = await alleEintraege();
+    return csvAntwort(await mitgliederCsv(), 'mitglieder');
   } catch {
     return new Response('Export zurzeit nicht möglich', { status: 500 });
   }
-
-  const zeilen = rows.map((r) => [
-    HERKUNFT[r.quelle] ?? (r.quelle ?? ''),
-    r.vorname,
-    r.nachname,
-    r.strasse,
-    r.plz,
-    r.ort,
-    r.kind_name ?? '',
-    r.klasse ?? '',
-    r.beitrag_eur,
-    ZAHLWEISE[r.zahlweise] ?? r.zahlweise,
-    r.mandatsreferenz ?? '',
-    r.einwilligung_speicherung ? 'Ja' : 'Nein',
-    r.einwilligung_ansprache ? 'Ja' : 'Nein',
-    deDatum(r.erstellt_am),
-    `${r.vorname} ${r.nachname}`,
-    r.ausgetreten_am ? deDatum(r.ausgetreten_am) : '',
-  ]);
-
-  const heute = new Date().toISOString().slice(0, 10);
-  return new Response(csvDokument(KOPF, zeilen), {
-    headers: {
-      'content-type': 'text/csv; charset=utf-8',
-      'content-disposition': `attachment; filename="mitglieder-${heute}.csv"`,
-      'x-content-type-options': 'nosniff',
-      ...GESCHUETZT_KOPFZEILEN,
-    },
-  });
 };

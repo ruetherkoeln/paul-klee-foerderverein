@@ -1,0 +1,145 @@
+---
+// Vorstandsbereich — Mitgliederliste mit Suche und Filter.
+//
+// Suche und Filter laufen über die Adresse (?q=…&status=…) und werden auf dem
+// Server ausgewertet: Das funktioniert ohne JavaScript und verträgt sich mit
+// der Content-Security-Policy. Bankdaten werden gar nicht erst geladen.
+import Base from '../../layouts/Base.astro';
+import { VORSTAND, START } from '../../lib/vorstand.ts';
+import { geschuetzt } from '../../lib/zugang.ts';
+import { mitglieder } from '../../lib/vorstand-db.ts';
+import type { Mitglied } from '../../lib/vorstand-db.ts';
+import { HERKUNFT, ZAHLWEISE } from '../../lib/export-listen.ts';
+import { deDatum } from '../../lib/csv.ts';
+
+export const prerender = false;
+
+geschuetzt(Astro.response.headers);
+if (!VORSTAND.angemeldet(Astro.cookies)) return Astro.redirect(START, 303);
+
+const q = (Astro.url.searchParams.get('q') ?? '').trim().slice(0, 80);
+const STATUS = { aktiv: 'Aktive', ausgetreten: 'Ausgetretene', alle: 'Alle' } as const;
+type Status = keyof typeof STATUS;
+const roh = Astro.url.searchParams.get('status') ?? 'aktiv';
+const status: Status = roh in STATUS ? (roh as Status) : 'aktiv';
+
+let alle: Mitglied[] = [];
+let datenFehler = false;
+try {
+  alle = await mitglieder();
+} catch (e) {
+  console.error('Vorstand: Mitgliederliste nicht ladbar —', (e as Error).message);
+  datenFehler = true;
+}
+
+// Gross-/Kleinschreibung und Akzente ignorieren: „muller“ findet „Müller“.
+const norm = (s: unknown) =>
+  String(s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const suchbegriffe = norm(q).split(/\s+/).filter(Boolean);
+
+const liste = alle
+  .filter((m) => status === 'alle' || (status === 'aktiv' ? !m.ausgetreten_am : Boolean(m.ausgetreten_am)))
+  .filter((m) => {
+    if (!suchbegriffe.length) return true;
+    const text = norm([
+      m.vorname, m.nachname, m.email, m.kind_name, m.klasse, m.ort, m.strasse, m.mandatsreferenz,
+    ].join(' '));
+    return suchbegriffe.every((w) => text.includes(w));
+  });
+
+const link = (s: Status) => `?${new URLSearchParams({ ...(q ? { q } : {}), status: s })}`;
+---
+
+<Base title="Mitgliederliste · Vorstand" robots="noindex, nofollow" description="Interner Bereich des Vorstands.">
+  <section class="bg-cream-50 pt-16 pb-16">
+    <div class="container-c">
+      <a href="/vorstand/" class="text-sm underline text-navy-900/60 hover:text-navy-900">← Vorstandsbereich</a>
+      <h1 class="mt-4 text-3xl md:text-4xl font-display font-bold">Mitgliederliste</h1>
+
+      <form method="GET" class="mt-8 flex flex-wrap gap-3 items-end">
+        <div class="flex-1 min-w-[14rem]">
+          <label for="q" class="block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1">
+            Suche (Name, E-Mail, Kind, Klasse, Ort, Mandatsreferenz)
+          </label>
+          <input id="q" name="q" type="search" value={q}
+            class="w-full border border-navy-900/20 px-4 py-3 bg-white focus:outline-none focus:border-navy-900" />
+        </div>
+        <input type="hidden" name="status" value={status} />
+        <button type="submit" class="btn-dark">Suchen</button>
+        {q && <a href={`?status=${status}`} class="btn-ghost">Zurücksetzen</a>}
+      </form>
+
+      <div class="mt-6 flex flex-wrap items-center gap-2 text-sm">
+        {(Object.keys(STATUS) as Status[]).map((s) => (
+          <a href={link(s)} aria-current={s === status ? 'page' : undefined}
+            class={`px-3 py-1.5 border ${s === status ? 'bg-navy-900 text-white border-navy-900' : 'bg-white border-navy-900/20 hover:border-navy-900'}`}>
+            {STATUS[s]}
+          </a>
+        ))}
+        <span class="ml-auto text-navy-900/60">{liste.length} von {alle.length} Einträgen</span>
+      </div>
+
+      {datenFehler && (
+        <div role="alert" class="mt-6 bg-white border-2 border-pk-red p-5 text-sm">
+          Die Liste konnte gerade nicht geladen werden. Bitte die Seite in einer Minute neu laden.
+        </div>
+      )}
+
+      {!datenFehler && liste.length === 0 && (
+        <p class="mt-8 text-navy-900/70">Keine Einträge gefunden.</p>
+      )}
+
+      {liste.length > 0 && (
+        <div class="mt-6 overflow-x-auto bg-white border border-navy-900/10">
+          <table class="w-full text-sm">
+            <thead class="text-left text-xs uppercase tracking-wider text-navy-900/60 border-b border-navy-900/10">
+              <tr>
+                <th class="p-3">Name</th>
+                <th class="p-3">Kind / Klasse</th>
+                <th class="p-3">Kontakt</th>
+                <th class="p-3">Adresse</th>
+                <th class="p-3 text-right">Beitrag</th>
+                <th class="p-3">Zahlweise</th>
+                <th class="p-3">Herkunft</th>
+                <th class="p-3">Erfasst</th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.map((m) => (
+                <tr class={`border-b border-navy-900/5 align-top ${m.ausgetreten_am ? 'text-navy-900/50' : ''}`}>
+                  <td class="p-3">
+                    <span class="font-semibold">{m.nachname}, {m.vorname}</span>
+                    {m.ausgetreten_am && (
+                      <span class="block mt-1 text-xs font-semibold" style="color:#c2185b">
+                        ausgetreten {deDatum(m.ausgetreten_am)}
+                      </span>
+                    )}
+                  </td>
+                  <td class="p-3">{m.kind_name ?? '–'}{m.klasse && <span class="block text-navy-900/60">{m.klasse}</span>}</td>
+                  <td class="p-3">
+                    <a href={`mailto:${m.email}`} class="underline break-all">{m.email}</a>
+                    {m.telefon && <span class="block">{m.telefon}</span>}
+                    {!m.einwilligung_ansprache && <span class="block text-xs text-navy-900/60">keine Ansprache gewünscht</span>}
+                  </td>
+                  <td class="p-3 whitespace-nowrap">{m.strasse}<span class="block">{m.plz} {m.ort}</span></td>
+                  <td class="p-3 text-right whitespace-nowrap">{m.beitrag_eur} €</td>
+                  <td class="p-3">
+                    {ZAHLWEISE[m.zahlweise] ?? m.zahlweise}
+                    {m.mandatsreferenz && <span class="block text-xs text-navy-900/60 whitespace-nowrap">{m.mandatsreferenz}</span>}
+                  </td>
+                  <td class="p-3">{HERKUNFT[m.quelle ?? ''] ?? (m.quelle ?? '–')}</td>
+                  <td class="p-3 whitespace-nowrap">{deDatum(m.erstellt_am)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <p class="mt-4 text-xs leading-relaxed text-navy-900/60">
+        Enthält nur Einträge aus der Online-Erfassung und den Online-Anträgen — nicht die
+        bisherige Excel-Liste. IBAN und Kontoinhaber stehen nur im SEPA-Export.
+      </p>
+    </div>
+  </section>
+</Base>
