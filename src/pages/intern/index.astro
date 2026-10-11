@@ -1,0 +1,50 @@
+---
+// Einstieg in die geschützten Bereiche. Die Seite selbst ist öffentlich und
+// verrät nichts; die Passwortprüfung findet jeweils hinter den Links statt.
+import Base from '../../layouts/Base.astro';
+import { VERSAMMLUNG } from '../../data/mv2026.ts';
+
+const bereiche = [
+  {
+    fuer: 'Für Mitglieder',
+    titel: VERSAMMLUNG.titel,
+    text: 'Einladung, Tagesordnung, Vollmacht und alle Unterlagen zur Versammlung. Das Passwort steht in Ihrer Einladung.',
+    href: '/mv2026/',
+    knopf: 'Zu den Unterlagen',
+  },
+  {
+    fuer: 'Für den Vorstand',
+    titel: 'Vorstandsbereich',
+    text: 'Mitgliederliste, neue Anträge und Austritte, Exporte und die Unterlagen des Vorstands.',
+    href: '/vorstand/',
+    knopf: 'Zum Vorstandsbereich',
+  },
+];
+---
+<Base title="Intern" robots="noindex, nofollow" description="Geschützte Bereiche für Mitglieder und Vorstand des Fördervereins.">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-4xl">
+      <div class="eyebrow mb-4">Intern</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">Geschützte Bereiche</h1>
+      <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+        Diese Bereiche sind mit einem Passwort geschützt. Bitte wählen Sie, wohin Sie möchten.
+      </p>
+    </div>
+  </section>
+  <section class="bg-cream-50 pb-20">
+    <div class="container-c max-w-4xl grid md:grid-cols-2 gap-6">
+      {bereiche.map((b) => (
+        <a href={b.href} class="group bg-white p-6 md:p-8 border border-navy-900/10 border-l-4 border-l-pk-yellow hover:border-navy-900/40 transition-colors flex flex-col">
+          <span class="eyebrow">{b.fuer}</span>
+          <span class="mt-3 text-xl font-display font-bold group-hover:text-gold-600 transition-colors">{b.titel}</span>
+          <span class="mt-3 text-sm leading-relaxed text-navy-900/70 flex-1">{b.text}</span>
+          <span class="btn-dark mt-6 self-start">{b.knopf}</span>
+        </a>
+      ))}
+    </div>
+    <p class="container-c max-w-4xl mt-8 text-sm text-navy-900/60">
+      Passwort vergessen? Schreiben Sie an
+      <a href="mailto:info@pks-foerderverein.de" class="underline hover:text-navy-900">info@pks-foerderverein.de</a>.
+    </p>
+  </section>
+</Base>

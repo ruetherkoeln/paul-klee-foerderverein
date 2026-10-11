@@ -24,7 +24,7 @@ const isVerein = variant === 'verein';
         <div class="text-xs opacity-70">der Paul-Klee-Schule · Düsseldorf</div>
       </div>
     </a>
-    <nav class="hidden md:flex items-center gap-7 text-sm font-semibold uppercase tracking-wider">
+    <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold uppercase tracking-wider">
       {MAIN_NAV.filter(item => item.label !== 'Spenden').map(item => (
         <a href={item.href} class="hover:text-gold-500 transition-colors">{item.label}</a>
       ))}
@@ -32,7 +32,7 @@ const isVerein = variant === 'verein';
     </nav>
     <button
       id="hamburger"
-      class="md:hidden text-3xl leading-none w-10 h-10 grid place-items-center"
+      class="lg:hidden text-3xl leading-none w-10 h-10 grid place-items-center"
       aria-label="Menü öffnen"
       aria-expanded="false"
       aria-controls="mobile-menu"
@@ -43,7 +43,7 @@ const isVerein = variant === 'verein';
 {/* Mobile menu — hidden by default, JS toggles .hidden */}
 <div
   id="mobile-menu"
-  class={`hidden md:hidden border-b ${isVerein ? 'bg-navy-900 text-white border-navy-700' : 'bg-white text-navy-900 border-navy-900/10'}`}
+  class={`hidden lg:hidden border-b ${isVerein ? 'bg-navy-900 text-white border-navy-700' : 'bg-white text-navy-900 border-navy-900/10'}`}
 >
   <nav class="container-c py-4 flex flex-col text-sm font-semibold uppercase tracking-wider">
     {MAIN_NAV.filter(item => item.label !== 'Spenden').map(item => (
