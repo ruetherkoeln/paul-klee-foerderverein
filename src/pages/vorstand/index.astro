@@ -14,6 +14,9 @@ import { ZAHLWEISE } from '../../lib/export-listen.ts';
 import { deDatum } from '../../lib/csv.ts';
 import { BEWEGUNGEN_TAGE, DOKUMENT_TYPEN, MAX_BYTES } from '../../data/vorstand-bereich.ts';
 import { getEnv } from '../../lib/zuwendung.ts';
+import { uebersicht as kontoUebersicht } from '../../lib/kontostand.ts';
+import type { Uebersicht as KontoUebersicht } from '../../lib/kontostand.ts';
+import { BANK } from '../../data/bank.ts';
 
 export const prerender = false;
 
@@ -46,7 +49,13 @@ let zahlen: Kennzahlen | null = null;
 let neu: Bewegung[] = [];
 let ablage: Dokument[] = [];
 let datenFehler = false;
+let konto: KontoUebersicht | null = null;
 if (offen) {
+  try {
+    konto = await kontoUebersicht();
+  } catch (e) {
+    console.error('Vorstand: Kontostand nicht ladbar —', (e as Error).message);
+  }
   try {
     [zahlen, neu, ablage] = await Promise.all([
       kennzahlen(), bewegungen(BEWEGUNGEN_TAGE), dokumente(),
@@ -59,6 +68,20 @@ if (offen) {
 const antraege = neu.filter((b) => b.art === 'antrag');
 const austritte = neu.filter((b) => b.art === 'austritt');
 const bankBereit = Boolean(getEnv('EXPORT_BANK_PASSWORT'));
+
+// Rückmeldung nach „Jetzt abrufen“
+const KONTO_HINWEISE: Record<string, { text: string; gut?: boolean }> = {
+  ok: { text: 'Der Kontostand ist aktualisiert.', gut: true },
+  'freigabe-noetig': { text: 'Die Freigabe in der S-pushTAN-App kam nicht rechtzeitig. Bitte erneut auf „Jetzt abrufen“ klicken und die Push-Nachricht innerhalb von 45 Sekunden bestätigen.' },
+  'konto-fehlt': { text: 'Das Vereinskonto (FINTS_IBAN) ist in diesem Online-Banking-Zugang nicht zu finden.' },
+  'nicht-eingerichtet': { text: 'Der Bankzugang ist noch nicht eingerichtet.' },
+  fehler: { text: 'Die Bank hat den Abruf abgelehnt. Details stehen unten im Kasten.' },
+};
+const kontoHinweis = offen ? KONTO_HINWEISE[Astro.url.searchParams.get('konto') ?? ''] : undefined;
+const zeit = (w: string) => new Date(w).toLocaleString('de-DE', {
+  timeZone: 'Europe/Berlin', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+});
+const betrag = (n: number, w: string) => n.toLocaleString('de-DE', { style: 'currency', currency: w || 'EUR' });
 
 const euro = (n: number) => `${n.toLocaleString('de-DE')} €`;
 const annehmen = Object.keys(DOKUMENT_TYPEN).map((e) => `.${e}`).join(',');
@@ -82,6 +105,7 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
       )}
       {offen && (
         <nav class="mt-6 flex flex-wrap gap-3 text-sm">
+          <a href="#kontostand" class="btn-ghost">Kontostand</a>
           <a href="#neu" class="btn-ghost">Neu &amp; ausgetreten</a>
           <a href="/vorstand/mitglieder/" class="btn-ghost">Mitgliederliste</a>
           <a href="#exporte" class="btn-ghost">Exporte</a>
@@ -163,6 +187,56 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
             Mitglieder, die nur in der bisherigen Excel-Liste stehen, fehlen hier.
           </p>
         )}
+
+        <div id="kontostand" class="scroll-mt-24">
+          <h2 class="text-2xl font-display font-bold">Kontostand</h2>
+          <p class="mt-2 text-sm text-navy-900/60">Vereinskonto bei der {BANK.name}, täglich morgens automatisch abgerufen.</p>
+
+          {kontoHinweis && (
+            <div role="status" class={`mt-6 bg-white border border-navy-900/10 border-l-4 p-5 ${kontoHinweis.gut ? 'border-l-pk-yellow' : 'border-l-pk-red'}`}>
+              <p class="text-sm leading-relaxed">{kontoHinweis.text}</p>
+            </div>
+          )}
+
+          <div class="mt-6 bg-white p-6 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+            {konto?.stand ? (
+              <>
+                <div class="text-4xl font-display font-bold">{betrag(konto.stand.saldo, konto.stand.waehrung)}</div>
+                <div class="mt-2 text-sm text-navy-900/70">
+                  {konto.stand.buchungsdatum && <>Buchungsstand {deDatum(konto.stand.buchungsdatum)} · </>}
+                  abgerufen {zeit(konto.stand.abgerufen_am)} Uhr
+                  {konto.stand.verfuegbar !== null && konto.stand.verfuegbar !== konto.stand.saldo && (
+                    <> · verfügbar {betrag(konto.stand.verfuegbar, konto.stand.waehrung)}</>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p class="text-sm text-navy-900/70">
+                {konto?.eingerichtet ? 'Noch kein Kontostand abgerufen.' : 'Der Bankzugang ist noch nicht eingerichtet (Zugangsdaten fehlen in Vercel).'}
+              </p>
+            )}
+
+            {konto?.freigabeNoetigSeit && (
+              <p class="mt-4 text-sm leading-relaxed font-semibold" style="color:#c2185b">
+                Die Bank verlangt eine neue Freigabe (seit {deDatum(konto.freigabeNoetigSeit)}). Der tägliche Abruf
+                pausiert, bis jemand mit Zugang zur S-pushTAN-App auf „Jetzt abrufen“ klickt und bestätigt.
+              </p>
+            )}
+            {konto?.letzterFehler && (
+              <p class="mt-4 text-xs leading-relaxed text-navy-900/60 break-words">Letzte Meldung der Bank: {konto.letzterFehler}</p>
+            )}
+
+            {konto?.eingerichtet && (
+              <form method="POST" action="/vorstand/kontostand" class="mt-6 flex flex-wrap items-center gap-4">
+                <button type="submit" class="btn-dark">Jetzt abrufen</button>
+                <span class="text-xs leading-relaxed text-navy-900/60 max-w-md">
+                  Verlangt die Bank eine Freigabe (etwa alle 90 Tage), kommt eine Push-Nachricht in die
+                  S-pushTAN-App. Bitte dort bestätigen — die Seite wartet bis zu 45 Sekunden.
+                </span>
+              </form>
+            )}
+          </div>
+        </div>
 
         <div id="neu" class="scroll-mt-24">
           <h2 class="text-2xl font-display font-bold">Neue Anträge &amp; Austritte</h2>

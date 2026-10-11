@@ -49,6 +49,24 @@ Signierschlüssel — das MV-Passwort öffnet hier nichts.
   höchstens 4 MB (Vercel nimmt je Anfrage 4,5 MB an). Löschen braucht ein
   gesetztes Häkchen.
 
+## Kontostand (FinTS)
+
+Der Vorstandsbereich zeigt den Stand des Vereinskontos, abgerufen per FinTS
+direkt bei der Sparkasse (`src/lib/kontostand.ts`, Bibliothek `lib-fints`).
+
+- **Anmeldename und PIN** des Online-Bankings stehen nur in Vercel
+  (`FINTS_BENUTZER`, `FINTS_PIN`). Die Bibliothek kann keine Überweisungen;
+  jede Zahlung bräuchte ohnehin eine TAN. Wer die PIN hat, kann aber Umsätze
+  lesen — deshalb Vercel-Zugang eng halten.
+- **Bankparameter** (inkl. System-ID, an der die 90-Tage-Freigabe hängt)
+  liegen verschlüsselt (`ERFASSUNG_CRYPTO_KEY`) in `bank_verbindung`.
+- **Freigabe:** Etwa alle 90 Tage verlangt die Bank eine Bestätigung per
+  S-pushTAN. „Jetzt abrufen“ wartet bis zu 50 s darauf; die Serverfunktion
+  darf deshalb 60 s laufen (`maxDuration` in `astro.config.mjs`).
+- **Täglicher Abruf** über Vercel Cron (`vercel.json`) an
+  `/api/kontostand-cron`, geschützt durch `CRON_SECRET`. Steht eine Freigabe
+  aus, setzt er aus, statt täglich eine unerwartete Push-Nachricht auszulösen.
+
 ## Was gegen Angriffe eingebaut ist
 
 **Durchprobieren von Passwörtern.** `src/lib/login-schutz.ts` zählt
@@ -127,6 +145,11 @@ Repository — es ist öffentlich.
 | `MV_SIGNING_SECRET` | optional; fehlt es, wird aus `ERFASSUNG_SIGNING_SECRET` abgeleitet |
 | `VORSTAND_PASSWORT` | Zugang zu `/vorstand/` |
 | `VORSTAND_SIGNING_SECRET` | optional, wie `MV_SIGNING_SECRET` |
+| `FINTS_PRODUKT_ID` | FinTS-Produktregistrierung der Deutschen Kreditwirtschaft |
+| `FINTS_URL` | FinTS-Adresse der Sparkasse (aus der Institutsliste) |
+| `FINTS_BENUTZER`, `FINTS_PIN` | Online-Banking-Zugang für den Kontostand |
+| `FINTS_IBAN` | das Vereinskonto, dessen Stand gezeigt wird |
+| `CRON_SECRET` | schützt den täglichen Abruf |
 | `EXPORT_USER`, `EXPORT_PASSWORT` | Mitgliederliste |
 | `EXPORT_BANK_USER`, `EXPORT_BANK_PASSWORT` | SEPA-Mandate |
 | `ERFASSUNG_SIGNING_SECRET` | signierte Links, IP-Hash, abgeleitete Schlüssel |
