@@ -1,0 +1,106 @@
+---
+// Vorstandsbereich — Dokumente: Protokolle, Bescheide, Verträge.
+// Die Dateien liegen in der Datenbank, nicht im öffentlichen Repository.
+import Base from '../../../layouts/Base.astro';
+import VorstandNav from '../../../components/VorstandNav.astro';
+import { VORSTAND, START, KONTAKT, groesse } from '../../../lib/vorstand.ts';
+import { geschuetzt } from '../../../lib/zugang.ts';
+import { dokumente } from '../../../lib/vorstand-db.ts';
+import type { Dokument } from '../../../lib/vorstand-db.ts';
+import { deDatum } from '../../../lib/csv.ts';
+import { DOKUMENT_TYPEN, MAX_BYTES } from '../../../data/vorstand-bereich.ts';
+
+export const prerender = false;
+
+geschuetzt(Astro.response.headers);
+if (!VORSTAND.angemeldet(Astro.cookies)) return Astro.redirect(START, 303);
+
+const HINWEISE: Record<string, { text: string; gut?: boolean }> = {
+  hochgeladen: { text: 'Das Dokument ist hochgeladen.', gut: true },
+  geloescht: { text: 'Das Dokument ist gelöscht.', gut: true },
+  'nicht-bestaetigt': { text: 'Zum Löschen bitte zuerst das Häkchen „Ja, löschen“ setzen.' },
+  'keine-datei': { text: 'Bitte wählen Sie eine Datei aus.' },
+  'zu-gross': { text: `Die Datei ist zu groß. Erlaubt sind höchstens ${MAX_BYTES / 1024 / 1024} MB.` },
+  typ: { text: 'Dieser Dateityp ist nicht erlaubt. Möglich sind PDF, Word, Excel, OpenDocument, CSV, Text und Bilder (JPG, PNG).' },
+  technik: { text: `Das hat technisch nicht geklappt. Bitte später noch einmal versuchen oder an ${KONTAKT} schreiben.` },
+};
+const hinweis = HINWEISE[Astro.url.searchParams.get('hinweis') ?? ''];
+
+let ablage: Dokument[] = [];
+let datenFehler = false;
+try {
+  ablage = await dokumente();
+} catch (e) {
+  console.error('Vorstand: Dokumente nicht ladbar —', (e as Error).message);
+  datenFehler = true;
+}
+
+const annehmen = Object.keys(DOKUMENT_TYPEN).map((e) => `.${e}`).join(',');
+const feld = 'w-full border border-navy-900/20 px-4 py-3 focus:outline-none focus:border-navy-900';
+const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
+---
+<Base title="Dokumente · Vorstand" robots="noindex, nofollow" description="Interner Bereich des Vorstands.">
+  <section class="bg-cream-50 pt-16 pb-16">
+    <div class="container-c max-w-4xl">
+      <div class="eyebrow mb-4">Nur für den Vorstand</div>
+      <h1 class="text-3xl md:text-4xl font-display font-bold">Dokumente</h1>
+      <VorstandNav aktiv="dokumente" />
+      <p class="mt-6 text-sm text-navy-900/60">Protokolle, Bescheide, Verträge. Nur für den Vorstand sichtbar.</p>
+
+      {hinweis && (
+        <div role="status" class={`mt-8 bg-white border border-navy-900/10 border-l-4 p-5 ${hinweis.gut ? 'border-l-pk-yellow' : 'border-l-pk-red'}`}>
+          <p class="text-sm leading-relaxed">{hinweis.text}</p>
+        </div>
+      )}
+      {datenFehler && (
+        <div role="alert" class="mt-8 bg-white border-2 border-pk-red p-5 text-sm">
+          Die Dokumente konnten gerade nicht geladen werden. Bitte die Seite in einer Minute neu laden.
+        </div>
+      )}
+
+      {ablage.length === 0 && !datenFehler && (
+        <p class="mt-8 text-sm text-navy-900/70">Noch keine Dokumente hochgeladen.</p>
+      )}
+      {ablage.length > 0 && (
+        <ul class="mt-8 space-y-3">
+          {ablage.map((d) => (
+            <li class="bg-white p-5 border border-navy-900/10 flex flex-wrap items-start gap-4">
+              <a href={`/vorstand/datei/${d.id}`} class="group flex-1 min-w-[12rem]">
+                <span class="block font-semibold group-hover:text-gold-600 transition-colors">{d.titel}</span>
+                <span class="block mt-1 text-xs uppercase tracking-wider text-navy-900/50">
+                  {d.dateiname.split('.').pop()?.toUpperCase()} · {groesse(d.groesse)} · hochgeladen {deDatum(d.hochgeladen_am)}
+                </span>
+              </a>
+              <form method="POST" action="/vorstand/dokumente/aktion" class="flex items-center gap-3 text-sm">
+                <input type="hidden" name="aktion" value="loeschen" />
+                <input type="hidden" name="id" value={d.id} />
+                <label class="flex items-center gap-1 text-navy-900/70">
+                  <input type="checkbox" name="sicher" value="ja" /> Ja, löschen
+                </label>
+                <button type="submit" class="underline text-navy-900/60 hover:text-navy-900">Löschen</button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <form method="POST" action="/vorstand/dokumente/aktion" enctype="multipart/form-data"
+        class="mt-10 bg-white p-6 border border-navy-900/10 space-y-4">
+        <h2 class="font-semibold">Dokument hochladen</h2>
+        <div>
+          <label for="titel" class={label}>Titel (optional)</label>
+          <input id="titel" name="titel" maxlength="160" class={feld}
+            placeholder="z. B. Protokoll Vorstandssitzung 14.10.2026" />
+        </div>
+        <div>
+          <label for="datei" class={label}>Datei *</label>
+          <input id="datei" name="datei" type="file" required accept={annehmen} class="block w-full text-sm" />
+          <p class="mt-2 text-xs text-navy-900/60">
+            PDF, Word, Excel, OpenDocument, CSV, Text oder Bild, höchstens {MAX_BYTES / 1024 / 1024} MB.
+          </p>
+        </div>
+        <button type="submit" class="btn-dark">Hochladen</button>
+      </form>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,19 @@
+---
+// Navigation innerhalb des Vorstandsbereichs — auf jeder Unterseite gleich.
+interface Props { aktiv: 'start' | 'mitglieder' | 'termine' | 'dokumente' }
+const { aktiv } = Astro.props;
+const punkte = [
+  { id: 'start', label: 'Übersicht', href: '/vorstand/' },
+  { id: 'mitglieder', label: 'Mitgliederliste', href: '/vorstand/mitglieder/' },
+  { id: 'termine', label: 'Termine', href: '/vorstand/termine/' },
+  { id: 'dokumente', label: 'Dokumente', href: '/vorstand/dokumente/' },
+];
+---
+<nav aria-label="Vorstandsbereich" class="mt-6 flex flex-wrap gap-2 text-sm">
+  {punkte.map((p) => (
+    <a href={p.href} aria-current={p.id === aktiv ? 'page' : undefined}
+      class={`px-4 py-2 font-semibold uppercase tracking-wider text-xs border-2 transition-colors ${p.id === aktiv ? 'bg-navy-900 text-white border-navy-900' : 'border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white'}`}>
+      {p.label}
+    </a>
+  ))}
+</nav>

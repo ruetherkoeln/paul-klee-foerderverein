@@ -166,3 +166,108 @@ export async function dokumentLoeschen(id: number): Promise<void> {
   await dokumenteSchema();
   await sql()`DELETE FROM vorstand_dokumente WHERE id = ${id}`;
 }
+
+// ── Termine ─────────────────────────────────────────────────────────────────
+// Vorstandssitzungen, Fristen, Veranstaltungen. Datum als DATE, Uhrzeit als
+// freier Text („18:30“), weil nicht jeder Termin eine hat.
+let termineGeprueft = false;
+async function termineSchema(): Promise<void> {
+  if (termineGeprueft) return;
+  await sql()`
+    CREATE TABLE IF NOT EXISTS vorstand_termine (
+      id           SERIAL PRIMARY KEY,
+      erstellt_am  TIMESTAMPTZ NOT NULL DEFAULT now(),
+      datum        DATE        NOT NULL,
+      uhrzeit      TEXT,
+      titel        TEXT        NOT NULL,
+      ort          TEXT,
+      notiz        TEXT
+    )`;
+  // Seit 2026-10: Termine der Schulwebsite werden wöchentlich übernommen
+  // (lib/schul-termine.ts). quelle unterscheidet sie von eigenen Einträgen,
+  // schluessel erkennt beim nächsten Abgleich denselben Termin wieder.
+  await sql()`ALTER TABLE vorstand_termine ADD COLUMN IF NOT EXISTS quelle TEXT NOT NULL DEFAULT 'vorstand'`;
+  await sql()`ALTER TABLE vorstand_termine ADD COLUMN IF NOT EXISTS schluessel TEXT`;
+  termineGeprueft = true;
+}
+
+export interface Termin {
+  id: number;
+  datum: string;          // YYYY-MM-DD
+  uhrzeit: string | null;
+  titel: string;
+  ort: string | null;
+  notiz: string | null;
+  quelle: 'vorstand' | 'schule';
+  erstellt_am: string;
+}
+
+/** Kommende Termine (ab heute, Berliner Zeit), früheste zuerst. */
+export async function kommendeTermine(anzahl = 100): Promise<Termin[]> {
+  await termineSchema();
+  return (await sql()`
+    SELECT id, to_char(datum, 'YYYY-MM-DD') AS datum, uhrzeit, titel, ort, notiz, quelle, erstellt_am
+      FROM vorstand_termine
+     WHERE datum >= (now() AT TIME ZONE 'Europe/Berlin')::date
+     ORDER BY datum, uhrzeit NULLS FIRST, id
+     LIMIT ${anzahl}`) as Termin[];
+}
+
+/** Vergangene Termine, jüngste zuerst. */
+export async function vergangeneTermine(anzahl = 20): Promise<Termin[]> {
+  await termineSchema();
+  return (await sql()`
+    SELECT id, to_char(datum, 'YYYY-MM-DD') AS datum, uhrzeit, titel, ort, notiz, quelle, erstellt_am
+      FROM vorstand_termine
+     WHERE datum < (now() AT TIME ZONE 'Europe/Berlin')::date
+     ORDER BY datum DESC, uhrzeit DESC NULLS LAST, id DESC
+     LIMIT ${anzahl}`) as Termin[];
+}
+
+export async function terminSpeichern(t: Omit<Termin, 'id' | 'quelle' | 'erstellt_am'>): Promise<void> {
+  await termineSchema();
+  await sql()`
+    INSERT INTO vorstand_termine (datum, uhrzeit, titel, ort, notiz)
+    VALUES (${t.datum}, ${t.uhrzeit}, ${t.titel}, ${t.ort}, ${t.notiz})`;
+}
+
+export async function terminLoeschen(id: number): Promise<void> {
+  await termineSchema();
+  // Nur eigene Einträge: Ein Schultermin käme beim nächsten Abgleich ohnehin
+  // wieder; er verschwindet, wenn die Schule ihn von ihrer Seite nimmt.
+  await sql()`DELETE FROM vorstand_termine WHERE id = ${id} AND quelle = 'vorstand'`;
+}
+
+export interface SchulTermin {
+  schluessel: string;
+  datum: string;
+  uhrzeit: string | null;
+  titel: string;
+}
+
+/**
+ * Gleicht die Schultermine ab: neue anlegen, verschwundene löschen,
+ * unveränderte stehen lassen (damit ihr erstellt_am — „neu seit“ — bleibt).
+ * Rückgabe: Anzahl neu angelegter Termine.
+ */
+export async function schulTermineAbgleichen(liste: SchulTermin[]): Promise<number> {
+  await termineSchema();
+  const db = sql();
+  const vorhanden = (await db`
+    SELECT schluessel FROM vorstand_termine WHERE quelle = 'schule'`) as { schluessel: string }[];
+  const alt = new Set(vorhanden.map((r) => r.schluessel));
+  const neuSet = new Set(liste.map((t) => t.schluessel));
+  const weg = [...alt].filter((k) => !neuSet.has(k));
+  if (weg.length) {
+    await db`DELETE FROM vorstand_termine WHERE quelle = 'schule' AND schluessel = ANY(${weg})`;
+  }
+  let neu = 0;
+  for (const t of liste) {
+    if (alt.has(t.schluessel)) continue;
+    await db`
+      INSERT INTO vorstand_termine (datum, uhrzeit, titel, quelle, schluessel)
+      VALUES (${t.datum}, ${t.uhrzeit}, ${t.titel}, 'schule', ${t.schluessel})`;
+    neu++;
+  }
+  return neu;
+}
