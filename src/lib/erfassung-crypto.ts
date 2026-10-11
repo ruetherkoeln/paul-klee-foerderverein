@@ -2,6 +2,7 @@
 // Nur serverseitig importieren — nutzt node:crypto.
 import crypto from 'node:crypto';
 import { getEnv } from './zuwendung.ts';
+import { gleichSicher } from './sicherheit.ts';
 
 // ── Schlüssel ───────────────────────────────────────────────────────────────
 // ERFASSUNG_CRYPTO_KEY: 32 Byte, base64-kodiert. Erzeugen mit
@@ -104,8 +105,7 @@ export function pruefeBasicAuth(
   }
   const trenner = dekodiert.indexOf(':');
   if (trenner < 0) return false;
-  const erwartet = `${user}:${pass}`;
-  const a = Buffer.from(dekodiert);
-  const b = Buffer.from(erwartet);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+  // Ueber den Hash vergleichen: sonst verraet allein die Frage, ob ueberhaupt
+  // verglichen wurde, die Laenge der hinterlegten Zugangsdaten.
+  return gleichSicher(dekodiert, `${user}:${pass}`);
 }

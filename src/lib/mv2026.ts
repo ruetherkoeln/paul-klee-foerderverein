@@ -7,11 +7,17 @@
 // und ein signiertes Merkmal im Cookie.
 //
 // Das Merkmal ist bewusst kein Sitzungs-Schlüssel in einer Datenbank: Es gibt
-// nichts Benutzerbezogenes zu speichern. Signiert wird allein der Ablaufpunkt.
+// nichts Benutzerbezogenes zu speichern. Signiert werden allein der
+// Ablaufpunkt und ein Abdruck des geltenden Passworts.
 import crypto from 'node:crypto';
 import { getEnv } from './zuwendung.ts';
+import { gleichSicher } from './sicherheit.ts';
 
-export const COOKIE = 'mv2026';
+// Der Präfix __Host- ist kein Schmuck: Der Browser nimmt ein so benanntes
+// Cookie nur an, wenn es über HTTPS gesetzt wurde, für den ganzen Pfad gilt
+// und keine Domain trägt. Damit kann keine Nachbar-Subdomain ein Cookie
+// dieses Namens unterschieben.
+export const COOKIE = '__Host-mv2026';
 const GUELTIG_MS = 1000 * 60 * 60 * 12; // ein Tag Sitzung reicht
 
 function geheimnis(): string {
@@ -26,28 +32,35 @@ function geheimnis(): string {
   return crypto.createHmac('sha256', wurzel).update('mv2026-zugang').digest('base64');
 }
 
+/**
+ * Kurzer Abdruck des geltenden Passworts. Er geht in die Signatur ein, damit
+ * ein Passwortwechsel alle ausgegebenen Merkmale sofort entwertet — sonst
+ * käme jemand, der das alte Passwort kannte, noch zwölf Stunden weiter hinein.
+ */
+function passwortMarke(): string {
+  const soll = getEnv('MV_PASSWORT') ?? '';
+  return crypto.createHash('sha256').update(soll, 'utf8').digest('base64').slice(0, 12);
+}
+
 function b64url(b: Buffer): string {
   return b.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-/** Vergleicht ohne Laufzeitunterschied, damit sich das Passwort nicht Zeichen
- *  für Zeichen erraten lässt. */
-function gleich(a: string, b: string): boolean {
-  const x = Buffer.from(a);
-  const y = Buffer.from(b);
-  return x.length === y.length && crypto.timingSafeEqual(x, y);
+function signatur(ablauf: string): string {
+  return b64url(
+    crypto.createHmac('sha256', geheimnis()).update(`${ablauf}|${passwortMarke()}`).digest(),
+  );
 }
 
 export function passwortStimmt(eingabe: string): boolean {
   const soll = getEnv('MV_PASSWORT');
   if (!soll) return false;
-  return gleich((eingabe || '').trim(), soll);
+  return gleichSicher((eingabe || '').trim(), soll);
 }
 
 export function merkmalErzeugen(): string {
   const ablauf = String(Date.now() + GUELTIG_MS);
-  const sig = b64url(crypto.createHmac('sha256', geheimnis()).update(ablauf).digest());
-  return `${ablauf}.${sig}`;
+  return `${ablauf}.${signatur(ablauf)}`;
 }
 
 export function merkmalGueltig(wert: string | undefined): boolean {
@@ -56,15 +69,19 @@ export function merkmalGueltig(wert: string | undefined): boolean {
   const [ablauf, sig] = teile as [string, string];
   let erwartet: string;
   try {
-    erwartet = b64url(crypto.createHmac('sha256', geheimnis()).update(ablauf).digest());
+    erwartet = signatur(ablauf);
   } catch {
     return false;
   }
-  if (!gleich(sig, erwartet)) return false;
+  if (!gleichSicher(sig, erwartet)) return false;
   const bis = Number(ablauf);
   return Number.isFinite(bis) && Date.now() < bis;
 }
 
+// sameSite bleibt "lax" und wird nicht auf "strict" gezogen: Die Mitglieder
+// kommen über den Link aus der Einladungsmail. Bei "strict" käme das Cookie
+// bei diesem ersten Klick nicht mit und alle stünden erneut vor dem Formular.
+// Für einen Lesezugriff auf Unterlagen ist "lax" der richtige Schnitt.
 export const COOKIE_OPTIONEN = {
   path: '/',
   httpOnly: true,
