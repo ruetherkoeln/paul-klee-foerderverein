@@ -1,0 +1,318 @@
+---
+// Vorstandsbereich — Anmeldung und Übersicht.
+//
+// Hinter einem gemeinsamen Passwort (VORSTAND_PASSWORT): Kennzahlen, neue
+// Anträge und Austritte, die beiden CSV-Exporte und eine Ablage für
+// Vorstandsdokumente. Die Mitgliederliste hat eine eigene Seite.
+// Nicht im Suchindex und nirgends verlinkt.
+import Base from '../../layouts/Base.astro';
+import { VORSTAND, KONTAKT, START, groesse } from '../../lib/vorstand.ts';
+import { anmeldungVerarbeiten, geschuetzt } from '../../lib/zugang.ts';
+import { kennzahlen, bewegungen, dokumente } from '../../lib/vorstand-db.ts';
+import type { Kennzahlen, Bewegung, Dokument } from '../../lib/vorstand-db.ts';
+import { ZAHLWEISE } from '../../lib/export-listen.ts';
+import { deDatum } from '../../lib/csv.ts';
+import { BEWEGUNGEN_TAGE, DOKUMENT_TYPEN, MAX_BYTES } from '../../data/vorstand-bereich.ts';
+import { getEnv } from '../../lib/zuwendung.ts';
+
+export const prerender = false;
+
+// Nichts hiervon darf in einem Zwischenspeicher landen.
+geschuetzt(Astro.response.headers);
+
+const anmeldung = await anmeldungVerarbeiten(
+  Astro.request, Astro.cookies, VORSTAND, 'vorstand', START, KONTAKT,
+);
+if (anmeldung.antwort) return anmeldung.antwort;
+const { fehler, abgemeldet } = anmeldung;
+
+const offen = !abgemeldet && VORSTAND.angemeldet(Astro.cookies);
+
+const HINWEISE: Record<string, { text: string; gut?: boolean }> = {
+  hochgeladen: { text: 'Das Dokument ist hochgeladen.', gut: true },
+  geloescht: { text: 'Das Dokument ist gelöscht.', gut: true },
+  'nicht-bestaetigt': { text: 'Zum Löschen bitte zuerst das Häkchen „Ja, löschen“ setzen.' },
+  'keine-datei': { text: 'Bitte wählen Sie eine Datei aus.' },
+  'zu-gross': { text: `Die Datei ist zu groß. Erlaubt sind höchstens ${MAX_BYTES / 1024 / 1024} MB.` },
+  typ: { text: 'Dieser Dateityp ist nicht erlaubt. Möglich sind PDF, Word, Excel, OpenDocument, CSV, Text und Bilder (JPG, PNG).' },
+  'bank-falsch': { text: 'Das Bank-Passwort stimmt nicht.' },
+  'bank-fehlt': { text: 'Der SEPA-Export ist noch nicht eingerichtet (EXPORT_BANK_PASSWORT fehlt in Vercel).' },
+  gesperrt: { text: 'Zu viele Fehlversuche. Bitte warten Sie 15 Minuten.' },
+  technik: { text: `Das hat technisch nicht geklappt. Bitte später noch einmal versuchen oder an ${KONTAKT} schreiben.` },
+};
+const hinweis = offen ? HINWEISE[Astro.url.searchParams.get('hinweis') ?? ''] : undefined;
+
+let zahlen: Kennzahlen | null = null;
+let neu: Bewegung[] = [];
+let ablage: Dokument[] = [];
+let datenFehler = false;
+if (offen) {
+  try {
+    [zahlen, neu, ablage] = await Promise.all([
+      kennzahlen(), bewegungen(BEWEGUNGEN_TAGE), dokumente(),
+    ]);
+  } catch (e) {
+    console.error('Vorstand: Übersicht nicht ladbar —', (e as Error).message);
+    datenFehler = true;
+  }
+}
+const antraege = neu.filter((b) => b.art === 'antrag');
+const austritte = neu.filter((b) => b.art === 'austritt');
+const bankBereit = Boolean(getEnv('EXPORT_BANK_PASSWORT'));
+
+const euro = (n: number) => `${n.toLocaleString('de-DE')} €`;
+const annehmen = Object.keys(DOKUMENT_TYPEN).map((e) => `.${e}`).join(',');
+
+const kachel = 'bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow';
+const feld = 'w-full border border-navy-900/20 px-4 py-3 focus:outline-none focus:border-navy-900';
+const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
+---
+
+<Base title="Vorstand" robots="noindex, nofollow" description="Interner Bereich des Vorstands.">
+
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-4xl">
+      <div class="eyebrow mb-4">Nur für den Vorstand</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">Vorstandsbereich</h1>
+      {!offen && (
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Mitgliederliste, Exporte und Unterlagen des Vorstands. Bitte melden Sie sich
+          mit dem gemeinsamen Vorstandspasswort an.
+        </p>
+      )}
+      {offen && (
+        <nav class="mt-6 flex flex-wrap gap-3 text-sm">
+          <a href="#neu" class="btn-ghost">Neu &amp; ausgetreten</a>
+          <a href="/vorstand/mitglieder/" class="btn-ghost">Mitgliederliste</a>
+          <a href="#exporte" class="btn-ghost">Exporte</a>
+          <a href="#dokumente" class="btn-ghost">Dokumente</a>
+        </nav>
+      )}
+    </div>
+  </section>
+
+  {!offen && (
+    <section class="bg-cream-50">
+      <div class="container-c border-t border-navy-900/10 py-12 max-w-4xl">
+        {abgemeldet && (
+          <div class="mb-8 bg-white border border-navy-900/10 border-l-4 border-l-pk-yellow p-5 max-w-md">
+            <p class="text-sm leading-relaxed">Sie sind abgemeldet.</p>
+          </div>
+        )}
+        <form method="POST" class="bg-white border border-navy-900/10 p-6 md:p-8 max-w-md">
+          <label for="passwort" class="block text-sm font-semibold uppercase tracking-wider text-navy-900/70">
+            Vorstandspasswort
+          </label>
+          <input
+            id="passwort" name="passwort" type="password" required
+            autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"
+            aria-describedby={fehler ? 'passwort-fehler' : undefined}
+            aria-invalid={fehler ? 'true' : undefined}
+            class={`mt-2 text-lg ${feld}`}
+          />
+          {fehler && (
+            <p id="passwort-fehler" role="alert" class="mt-3 text-sm font-semibold" style="color:#c2185b">{fehler}</p>
+          )}
+          <button type="submit" class="btn-dark mt-6 w-full">Anmelden</button>
+        </form>
+      </div>
+    </section>
+  )}
+
+  {offen && (
+    <section class="bg-cream-50">
+      <div class="container-c border-t border-navy-900/10 py-12 max-w-4xl space-y-16">
+
+        {hinweis && (
+          <div role="status" class={`bg-white border border-navy-900/10 border-l-4 p-5 ${hinweis.gut ? 'border-l-pk-yellow' : 'border-l-pk-red'}`}>
+            <p class="text-sm leading-relaxed">{hinweis.text}</p>
+          </div>
+        )}
+
+        {datenFehler && (
+          <div role="alert" class="bg-white border-2 border-pk-red p-5">
+            <p class="text-sm leading-relaxed">
+              Die Daten konnten gerade nicht geladen werden. Bitte die Seite in einer Minute neu laden.
+            </p>
+          </div>
+        )}
+
+        {zahlen && (
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class={kachel}>
+              <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold">Mitglieder</div>
+              <div class="mt-2 text-3xl font-display font-bold">{zahlen.aktiv}</div>
+            </div>
+            <div class={kachel}>
+              <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold">davon SEPA</div>
+              <div class="mt-2 text-3xl font-display font-bold">{zahlen.sepa}</div>
+            </div>
+            <div class={kachel}>
+              <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold">Beiträge / Jahr</div>
+              <div class="mt-2 text-3xl font-display font-bold">{euro(zahlen.beitraegeJahr)}</div>
+            </div>
+            <div class={kachel}>
+              <div class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold">Ausgetreten</div>
+              <div class="mt-2 text-3xl font-display font-bold">{zahlen.ausgetreten}</div>
+            </div>
+          </div>
+        )}
+        {zahlen && (
+          <p class="-mt-12 text-xs leading-relaxed text-navy-900/60">
+            Gezählt werden nur Einträge aus der Online-Erfassung und den Online-Anträgen.
+            Mitglieder, die nur in der bisherigen Excel-Liste stehen, fehlen hier.
+          </p>
+        )}
+
+        <div id="neu" class="scroll-mt-24">
+          <h2 class="text-2xl font-display font-bold">Neue Anträge &amp; Austritte</h2>
+          <p class="mt-2 text-sm text-navy-900/60">Die letzten {BEWEGUNGEN_TAGE} Tage, neueste zuerst.</p>
+
+          <div class="mt-6 grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-navy-900/70">
+                Mitgliedsanträge ({antraege.length})
+              </h3>
+              {antraege.length === 0 && <p class="mt-3 text-sm text-navy-900/60">Keine neuen Anträge.</p>}
+              <ul class="mt-3 space-y-2">
+                {antraege.map((b) => (
+                  <li class="bg-white p-4 border border-navy-900/10">
+                    <div class="flex justify-between gap-3">
+                      <span class="font-semibold">{b.vorname} {b.nachname}</span>
+                      <span class="text-sm text-navy-900/60 whitespace-nowrap">{deDatum(b.am)}</span>
+                    </div>
+                    <div class="mt-1 text-sm text-navy-900/70">
+                      {b.kind_name && <>Kind: {b.kind_name}{b.klasse && ` (${b.klasse})`} · </>}
+                      {euro(b.beitrag_eur)} · {ZAHLWEISE[b.zahlweise] ?? b.zahlweise}
+                      {b.mandatsreferenz && <> · {b.mandatsreferenz}</>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-navy-900/70">
+                Austritte ({austritte.length})
+              </h3>
+              {austritte.length === 0 && <p class="mt-3 text-sm text-navy-900/60">Keine Austritte.</p>}
+              <ul class="mt-3 space-y-2">
+                {austritte.map((b) => (
+                  <li class="bg-white p-4 border border-navy-900/10">
+                    <div class="flex justify-between gap-3">
+                      <span class="font-semibold">{b.vorname} {b.nachname}</span>
+                      <span class="text-sm text-navy-900/60 whitespace-nowrap">{deDatum(b.am)}</span>
+                    </div>
+                    <div class="mt-1 text-sm text-navy-900/70">
+                      {ZAHLWEISE[b.zahlweise] ?? b.zahlweise}
+                      {b.mandatsreferenz && <> · {b.mandatsreferenz}</>}
+                      {b.zahlweise === 'sepa' && <> · <strong>Einzug beenden</strong></>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p class="mt-3 text-xs leading-relaxed text-navy-900/60">
+                Austritte von Mitgliedern, die nur in der Excel-Liste stehen, erscheinen hier
+                nicht — dazu kommt jeweils eine Mail an den Verein.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div id="exporte" class="scroll-mt-24">
+          <h2 class="text-2xl font-display font-bold">Exporte</h2>
+          <p class="mt-2 text-sm text-navy-900/60">CSV-Dateien für Excel (Semikolon, UTF-8).</p>
+          <div class="mt-6 grid md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 border border-navy-900/10">
+              <h3 class="font-semibold">Mitgliederliste</h3>
+              <p class="mt-2 text-sm leading-relaxed text-navy-900/70">
+                Alle Einträge mit Adresse, Kind, Beitrag und Zahlweise — ohne Bankdaten.
+                Ausgetretene sind mit Datum markiert.
+              </p>
+              <a href="/vorstand/export/mitglieder" class="btn-dark mt-5 w-full" download>Herunterladen</a>
+            </div>
+            <form method="POST" action="/vorstand/export/sepa" class="bg-white p-6 border border-navy-900/10">
+              <h3 class="font-semibold">SEPA-Mandate</h3>
+              <p class="mt-2 text-sm leading-relaxed text-navy-900/70">
+                Kontoinhaber und IBAN im Klartext, nur aktive Mitglieder mit Lastschrift.
+                Braucht zusätzlich das Bank-Passwort.
+              </p>
+              {bankBereit ? (
+                <>
+                  <label for="bankpasswort" class={`${label} mt-4`}>Bank-Passwort</label>
+                  <input id="bankpasswort" name="bankpasswort" type="password" required
+                    autocomplete="off" class={feld} />
+                  <button type="submit" class="btn-dark mt-4 w-full">Herunterladen</button>
+                </>
+              ) : (
+                <p class="mt-4 text-sm font-semibold">Noch nicht eingerichtet.</p>
+              )}
+              <p class="mt-3 text-xs leading-relaxed text-navy-900/60">
+                Die Datei enthält Bankdaten. Bitte nach der Einreichung bei der Bank löschen
+                und nicht per Mail weitergeben.
+              </p>
+            </form>
+          </div>
+        </div>
+
+        <div id="dokumente" class="scroll-mt-24">
+          <h2 class="text-2xl font-display font-bold">Dokumente</h2>
+          <p class="mt-2 text-sm text-navy-900/60">
+            Protokolle, Bescheide, Verträge. Nur für den Vorstand sichtbar.
+          </p>
+
+          {ablage.length === 0 && !datenFehler && (
+            <p class="mt-6 text-sm text-navy-900/70">Noch keine Dokumente hochgeladen.</p>
+          )}
+          {ablage.length > 0 && (
+            <ul class="mt-6 space-y-3">
+              {ablage.map((d) => (
+                <li class="bg-white p-5 border border-navy-900/10 flex flex-wrap items-start gap-4">
+                  <a href={`/vorstand/datei/${d.id}`} class="group flex-1 min-w-[12rem]">
+                    <span class="block font-semibold group-hover:text-gold-600 transition-colors">{d.titel}</span>
+                    <span class="block mt-1 text-xs uppercase tracking-wider text-navy-900/50">
+                      {d.dateiname.split('.').pop()?.toUpperCase()} · {groesse(d.groesse)} · hochgeladen {deDatum(d.hochgeladen_am)}
+                    </span>
+                  </a>
+                  <form method="POST" action="/vorstand/dokumente" class="flex items-center gap-3 text-sm">
+                    <input type="hidden" name="aktion" value="loeschen" />
+                    <input type="hidden" name="id" value={d.id} />
+                    <label class="flex items-center gap-1 text-navy-900/70">
+                      <input type="checkbox" name="sicher" value="ja" /> Ja, löschen
+                    </label>
+                    <button type="submit" class="underline text-navy-900/60 hover:text-navy-900">Löschen</button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <form method="POST" action="/vorstand/dokumente" enctype="multipart/form-data"
+            class="mt-8 bg-white p-6 border border-navy-900/10 space-y-4">
+            <h3 class="font-semibold">Dokument hochladen</h3>
+            <div>
+              <label for="titel" class={label}>Titel (optional)</label>
+              <input id="titel" name="titel" maxlength="160" class={feld}
+                placeholder="z. B. Protokoll Vorstandssitzung 14.10.2026" />
+            </div>
+            <div>
+              <label for="datei" class={label}>Datei *</label>
+              <input id="datei" name="datei" type="file" required accept={annehmen} class="block w-full text-sm" />
+              <p class="mt-2 text-xs text-navy-900/60">
+                PDF, Word, Excel, OpenDocument, CSV, Text oder Bild, höchstens {MAX_BYTES / 1024 / 1024} MB.
+              </p>
+            </div>
+            <button type="submit" class="btn-dark">Hochladen</button>
+          </form>
+        </div>
+
+        <div class="border-t border-navy-900/10 pt-6 flex flex-wrap items-center gap-4">
+          <form method="POST">
+            <input type="hidden" name="abmelden" value="1" />
+            <button type="submit" class="text-sm underline text-navy-900/60 hover:text-navy-900">Abmelden</button>
+          </form>
+          <span class="text-sm text-navy-900/50">Die Anmeldung gilt zwölf Stunden.</span>
+        </div>
+      </div>
+    </section>
+  )}
+</Base>

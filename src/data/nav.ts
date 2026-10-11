@@ -7,7 +7,9 @@ export const MAIN_NAV = [
   { label: 'Mitgliedschaft', href: '/foerderverein/mitglied-werden/' },
   { label: 'Shop', href: '/shop/' },
   { label: 'Spenden', href: '/foerderverein/#spenden' },
-  { label: 'Kontakt', href: '/kontakt/' }
+  { label: 'Kontakt', href: '/kontakt/' },
+  // Einstieg in die passwortgeschützten Bereiche (Mitglieder, Vorstand)
+  { label: 'Intern', href: '/intern/' }
 ];
 
 // Backwards-compat: bestehende Komponenten importieren noch SCHOOL_NAV
