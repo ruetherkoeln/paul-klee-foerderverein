@@ -69,5 +69,9 @@ export function originErlaubt(request: Request): boolean {
 export const GESCHUETZT_KOPFZEILEN: Record<string, string> = {
   'cache-control': 'private, no-store, max-age=0',
   'x-robots-tag': 'noindex, nofollow, noarchive',
-  'referrer-policy': 'no-referrer',
+  // same-origin und nicht no-referrer: Bei no-referrer schickt der Browser
+  // beim Absenden eines Formulars "Origin: null" — originErlaubt() lehnt das
+  // zu Recht ab, und niemand käme mehr durch die Anmeldung. same-origin
+  // verrät fremden Seiten ebenso nichts, lässt die eigene Herkunft aber durch.
+  'referrer-policy': 'same-origin',
 };
