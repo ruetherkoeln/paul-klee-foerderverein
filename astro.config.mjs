@@ -48,7 +48,9 @@ export default defineConfig({
   // Site bleibt statisch; einzelne API-Routen rendern serverseitig
   // (export const prerender = false) — dafür der Vercel-Adapter.
   output: 'static',
-  adapter: vercel(),
+  // maxDuration: „Kontostand jetzt abrufen“ wartet bis zu 50 s auf die
+  // Freigabe in der S-pushTAN-App (siehe src/data/bank.ts).
+  adapter: vercel({ maxDuration: 60 }),
   // Astros CSRF-Origin-Check vergleicht gegen den internen Request-Host
   // (auf Vercel = localhost) und würde dadurch auch echte Formular-POSTs
   // mit 403 abweisen. Absicherung erfolgt hier über Honeypot + die
