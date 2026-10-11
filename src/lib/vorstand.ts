@@ -39,3 +39,10 @@ export function terminDatum(iso: string): string {
     timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
   });
 }
+
+/** Uhrzeit eines Termins zur Anzeige: „18:30“ → „18:30 Uhr“, „18:00–21:00“ →
+ *  „18:00–21:00 Uhr“, „1. Stunde“ bleibt (Schultermine bringen auch solche mit). */
+export function zeitText(uhrzeit: string | null): string {
+  if (!uhrzeit) return '';
+  return /^\d{1,2}:\d{2}/.test(uhrzeit) ? `${uhrzeit} Uhr` : uhrzeit;
+}
