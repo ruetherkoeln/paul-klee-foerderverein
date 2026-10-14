@@ -1,0 +1,266 @@
+---
+// Abstimmungsvollmacht, online auszufüllen und mit dem Finger zu unterschreiben.
+//
+// Liegt hinter demselben Passwort wie der übrige Versammlungsbereich. Wer
+// ohne gültiges Merkmal hierher kommt, landet auf der Anmeldung.
+import Base from '../../../layouts/Base.astro';
+import { COOKIE, merkmalGueltig } from '../../../lib/mv2026.ts';
+import { GESCHUETZT_KOPFZEILEN } from '../../../lib/sicherheit.ts';
+import { VERSAMMLUNG } from '../../../data/mv2026.ts';
+import { BEVOLLMAECHTIGTE, VOLLMACHT_FEHLER } from '../../../data/vollmacht.ts';
+import {
+  erklaerung, hinweise, DATENSCHUTZ_HINWEIS, VOLLMACHT_UNTERTITEL,
+} from '../../../lib/vollmacht-text.ts';
+
+export const prerender = false;
+
+for (const [k, v] of Object.entries(GESCHUETZT_KOPFZEILEN)) {
+  Astro.response.headers.set(k, v);
+}
+
+if (!merkmalGueltig(Astro.cookies.get(COOKIE)?.value)) {
+  return Astro.redirect('/mv2026/', 303);
+}
+
+const fehlerCode = Astro.url.searchParams.get('fehler') ?? '';
+const fehler = fehlerCode ? (VOLLMACHT_FEHLER[fehlerCode] ?? VOLLMACHT_FEHLER.technik) : '';
+
+const feld = 'w-full px-4 py-3 border border-navy-900/15 rounded-sm focus:outline-none focus:border-gold-500';
+const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
+const saetze = erklaerung();
+---
+<Base title="Vollmacht zur Mitgliederversammlung" robots="noindex, nofollow">
+
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-3xl">
+      <a href="/mv2026/" class="text-sm underline text-navy-900/60 hover:text-navy-900">
+        &larr; Zurück zu den Unterlagen
+      </a>
+      <div class="eyebrow mb-4 mt-6" style="color:#b13830">Nur für Mitglieder</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">Vollmacht.</h1>
+      <p class="mt-6 text-lg leading-relaxed text-navy-900/80">{VOLLMACHT_UNTERTITEL}</p>
+      <p class="mt-4 leading-relaxed text-navy-900/70">
+        Wenn Sie nicht teilnehmen können, kann {BEVOLLMAECHTIGTE.anrede}
+        {' '}{BEVOLLMAECHTIGTE.name} Ihre Stimme vertreten. Sie können die Vollmacht
+        hier ausfüllen und mit dem Finger unterschreiben — oder
+        {' '}<a href="/mv2026/vollmacht/formular.pdf" class="underline hover:text-navy-900">das
+        Formular als PDF herunterladen</a>, ausdrucken und von Hand unterschreiben.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t-4 py-12 max-w-3xl" style="border-color:#b13830">
+
+      {fehler && (
+        <div role="alert" class="mb-8 bg-white border border-navy-900/10 border-l-4 p-5" style="border-left-color:#b13830">
+          <p class="text-sm leading-relaxed font-semibold" style="color:#b13830">{fehler}</p>
+        </div>
+      )}
+
+      {/* ── Die Erklärung im Wortlaut ───────────────────────────────────── */}
+      <div class="bg-white border border-navy-900/10 p-6 md:p-8">
+        <h2 class="text-xl font-display font-bold">Das erklären Sie</h2>
+
+        <dl class="mt-6 grid sm:grid-cols-3 gap-3 text-sm">
+          <div class="bg-cream-50 p-4">
+            <dt class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-1">Termin</dt>
+            <dd>{VERSAMMLUNG.datum}, {VERSAMMLUNG.uhrzeit}</dd>
+          </div>
+          <div class="bg-cream-50 p-4">
+            <dt class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-1">Ort</dt>
+            <dd>{VERSAMMLUNG.ort}</dd>
+          </div>
+          <div class="bg-cream-50 p-4">
+            <dt class="text-xs uppercase tracking-wider text-navy-900/60 font-semibold mb-1">Bevollmächtigte</dt>
+            <dd class="font-semibold">{BEVOLLMAECHTIGTE.anrede} {BEVOLLMAECHTIGTE.name}</dd>
+          </div>
+        </dl>
+
+        <div class="mt-6 space-y-3 text-sm leading-relaxed">
+          {saetze.map((t, i) => (
+            i === 3
+              ? <p class="font-semibold p-3 bg-cream-50 border-l-4" style="color:#b13830;border-left-color:#b13830">{t}</p>
+              : <p>{t}</p>
+          ))}
+        </div>
+
+        <ul class="mt-6 space-y-1 text-xs leading-relaxed text-navy-900/60">
+          {hinweise().map((h) => <li>— {h}</li>)}
+        </ul>
+      </div>
+
+      {/* ── Formular ────────────────────────────────────────────────────── */}
+      <form id="vollmacht-form" method="POST" action="/api/vollmacht" class="mt-8 bg-white border border-navy-900/10 p-6 md:p-8">
+        <h2 class="text-xl font-display font-bold">Ihre Angaben</h2>
+
+        {/* Falle für automatische Eintragungen — für Menschen unsichtbar. */}
+        <div class="hidden" aria-hidden="true">
+          <label>Bitte frei lassen<input type="text" name="botcheck" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <div class="mt-6 grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class={label} for="vorname">Vorname *</label>
+            <input id="vorname" name="vorname" type="text" required autocomplete="given-name" class={feld} />
+          </div>
+          <div>
+            <label class={label} for="nachname">Nachname *</label>
+            <input id="nachname" name="nachname" type="text" required autocomplete="family-name" class={feld} />
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class={label} for="strasse">Straße und Hausnummer *</label>
+          <input id="strasse" name="strasse" type="text" required autocomplete="street-address" class={feld} />
+        </div>
+
+        <div class="mt-4 grid sm:grid-cols-3 gap-4">
+          <div>
+            <label class={label} for="plz">Postleitzahl *</label>
+            <input id="plz" name="plz" type="text" required inputmode="numeric" autocomplete="postal-code" class={feld} />
+          </div>
+          <div class="sm:col-span-2">
+            <label class={label} for="ort">Ort *</label>
+            <input id="ort" name="ort" type="text" required autocomplete="address-level2" class={feld} />
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label class={label} for="email">E-Mail *</label>
+          <input id="email" name="email" type="email" required autocomplete="email" class={feld} />
+          <p class="mt-1 text-xs text-navy-900/60">
+            An diese Adresse senden wir Ihnen Ihre unterschriebene Vollmacht als PDF.
+          </p>
+        </div>
+
+        {/* ── Unterschrift ─────────────────────────────────────────────── */}
+        <div class="mt-8 pt-6 border-t border-navy-900/10">
+          <span class={label}>Ihre Unterschrift *</span>
+          <p class="text-sm text-navy-900/60 mb-2">
+            Zeichnen Sie mit dem Finger oder der Maus in das Feld.
+          </p>
+          <div class="border-2 border-dashed border-navy-900/25 rounded-sm bg-white">
+            <canvas id="signatur-canvas" class="w-full block touch-none" style="height:170px"></canvas>
+          </div>
+          <div class="flex justify-end mt-2">
+            <button type="button" id="signatur-loeschen" class="text-sm font-semibold text-gold-600 hover:underline">
+              Unterschrift löschen
+            </button>
+          </div>
+          <input type="hidden" name="signatur" id="signatur" />
+        </div>
+
+        <label class="flex items-start gap-3 mt-6 cursor-pointer text-sm leading-relaxed">
+          <input type="checkbox" name="bestaetigt" value="ja" id="bestaetigt" class="mt-1 shrink-0 w-5 h-5" />
+          <span>
+            Ich erteile die oben stehende Vollmacht an {BEVOLLMAECHTIGTE.anrede}
+            {' '}{BEVOLLMAECHTIGTE.name} — ohne Weisung zum Abstimmungsverhalten. *
+          </span>
+        </label>
+
+        <p class="mt-6 text-xs leading-relaxed text-navy-900/60">{DATENSCHUTZ_HINWEIS}</p>
+
+        <button type="submit" class="btn-dark mt-8 w-full sm:w-auto">Vollmacht erteilen</button>
+      </form>
+
+      <p class="mt-8 text-sm leading-relaxed text-navy-900/60">
+        Lieber auf Papier? <a href="/mv2026/vollmacht/formular.pdf" class="underline hover:text-navy-900">Formular
+        als PDF herunterladen</a> — ausdrucken, ausfüllen, unterschreiben und
+        {BEVOLLMAECHTIGTE.name} mitgeben oder vorab an uns senden.
+      </p>
+    </div>
+  </section>
+
+<script>
+  {
+    const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+    const form = el<HTMLFormElement>('vollmacht-form');
+
+    // ── Unterschrift ──────────────────────────────────────────────────────
+    const canvas = el<HTMLCanvasElement>('signatur-canvas');
+    const ctx = canvas.getContext('2d')!;
+    let zeichnet = false;
+    let etwasGezeichnet = false;
+
+    function skalieren() {
+      const dpr = window.devicePixelRatio || 1;
+      const breite = canvas.clientWidth;
+      const hoehe = canvas.clientHeight;
+      if (!breite || !hoehe) return;
+      // Vorhandenes vor dem Umbau sichern — sonst waere die Unterschrift beim
+      // Drehen des Geraets weg.
+      const alt = etwasGezeichnet ? canvas.toDataURL('image/png') : null;
+      canvas.width = breite * dpr;
+      canvas.height = hoehe * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = '#0e1424';
+      if (alt) {
+        const bild = new Image();
+        bild.onload = () => ctx.drawImage(bild, 0, 0, breite, hoehe);
+        bild.src = alt;
+      }
+    }
+    skalieren();
+    window.addEventListener('resize', skalieren);
+
+    const punkt = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+
+    canvas.addEventListener('pointerdown', (e) => {
+      zeichnet = true;
+      canvas.setPointerCapture(e.pointerId);
+      const p = punkt(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!zeichnet) return;
+      const p = punkt(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      etwasGezeichnet = true;
+      e.preventDefault();
+    });
+    function beenden() {
+      if (!zeichnet) return;
+      zeichnet = false;
+      if (etwasGezeichnet) el<HTMLInputElement>('signatur').value = canvas.toDataURL('image/png');
+    }
+    canvas.addEventListener('pointerup', beenden);
+    canvas.addEventListener('pointerleave', beenden);
+    canvas.addEventListener('pointercancel', beenden);
+
+    el('signatur-loeschen').addEventListener('click', () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      etwasGezeichnet = false;
+      el<HTMLInputElement>('signatur').value = '';
+    });
+
+    // ── Absenden: prüfen, was der Browser nicht selbst prüft ──────────────
+    form.addEventListener('submit', (e) => {
+      const melden = (feld: HTMLElement, text: string) => {
+        e.preventDefault();
+        feld.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (feld instanceof HTMLInputElement) {
+          feld.setCustomValidity(text);
+          feld.reportValidity();
+        } else {
+          alert(text);
+        }
+      };
+      if (!el<HTMLInputElement>('signatur').value) {
+        return melden(canvas, 'Bitte unterschreiben Sie im dafür vorgesehenen Feld.');
+      }
+      const best = el<HTMLInputElement>('bestaetigt');
+      if (!best.checked) return melden(best, 'Bitte bestätigen Sie, dass Sie die Vollmacht erteilen.');
+    });
+  }
+</script>
+</Base>

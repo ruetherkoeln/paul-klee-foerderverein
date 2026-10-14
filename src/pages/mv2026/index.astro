@@ -6,6 +6,7 @@
 // nirgends verlinkt ausser über den Knopf auf der Startseite.
 import Base from '../../layouts/Base.astro';
 import { VERSAMMLUNG } from '../../data/mv2026.ts';
+import { BEVOLLMAECHTIGTE } from '../../data/vollmacht.ts';
 import { eintraege, lesbareGroesse } from '../../lib/mv2026-unterlagen.ts';
 import {
   COOKIE, COOKIE_OPTIONEN, merkmalErzeugen, merkmalGueltig, passwortStimmt,
@@ -184,7 +185,28 @@ const angaben = [
           </div>
         )}
 
-        <h2 class="text-2xl font-display font-bold">Unterlagen</h2>
+        {/* Die Vollmacht steht vor allen anderen Unterlagen und ist rot
+            abgesetzt: Sie ist das einzige Dokument, bei dem die Mitglieder
+            selbst handeln muessen, und sie ist an den Versammlungstermin
+            gebunden. */}
+        <div class="mb-10 bg-white border border-navy-900/10 border-l-4 p-6" style="border-left-color:#b13830">
+          <div class="text-xs font-semibold uppercase tracking-wider mb-2" style="color:#b13830">
+            Wenn Sie nicht teilnehmen können
+          </div>
+          <h2 class="text-2xl font-display font-bold">Vollmacht zur Abstimmung</h2>
+          <p class="mt-3 text-sm leading-relaxed text-navy-900/70">
+            Sie können {BEVOLLMAECHTIGTE.anrede} {BEVOLLMAECHTIGTE.name} bevollmächtigen,
+            Ihre Stimme in der Versammlung zu vertreten — ohne Weisung zum
+            Abstimmungsverhalten, also nach freiem Ermessen. Online ausfüllen und mit
+            dem Finger unterschreiben, oder als PDF ausdrucken und von Hand unterschreiben.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="/mv2026/vollmacht/" class="btn-dark">Online ausfüllen und unterschreiben</a>
+            <a href="/mv2026/vollmacht/formular.pdf" class="btn-ghost">Als PDF herunterladen</a>
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-display font-bold">Weitere Unterlagen</h2>
 
         {bereit.length === 0 && (
           <p class="mt-6 leading-relaxed text-navy-900/80">

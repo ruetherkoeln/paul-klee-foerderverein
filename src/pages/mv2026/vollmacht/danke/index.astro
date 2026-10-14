@@ -1,0 +1,66 @@
+---
+// Bestätigung nach erteilter Online-Vollmacht.
+import Base from '../../../../layouts/Base.astro';
+import { COOKIE, merkmalGueltig } from '../../../../lib/mv2026.ts';
+import { GESCHUETZT_KOPFZEILEN } from '../../../../lib/sicherheit.ts';
+import { VERSAMMLUNG } from '../../../../data/mv2026.ts';
+import { BEVOLLMAECHTIGTE } from '../../../../data/vollmacht.ts';
+import { STEUER } from '../../../../data/verein-steuer.ts';
+
+export const prerender = false;
+
+for (const [k, v] of Object.entries(GESCHUETZT_KOPFZEILEN)) {
+  Astro.response.headers.set(k, v);
+}
+
+if (!merkmalGueltig(Astro.cookies.get(COOKIE)?.value)) {
+  return Astro.redirect('/mv2026/', 303);
+}
+---
+<Base title="Vollmacht erteilt" robots="noindex, nofollow">
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-3xl">
+      <div class="eyebrow mb-4" style="color:#b13830">Mitgliederversammlung</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+        Ihre Vollmacht ist erteilt.
+      </h1>
+      <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+        {BEVOLLMAECHTIGTE.anrede} {BEVOLLMAECHTIGTE.name} kann Sie in der Versammlung
+        am {VERSAMMLUNG.datum} vertreten und stimmt dort nach freiem Ermessen ab.
+      </p>
+    </div>
+  </section>
+
+  <section class="bg-cream-50">
+    <div class="container-c border-t-4 py-12 max-w-3xl" style="border-color:#b13830">
+      <div class="bg-white border border-navy-900/10 p-6 md:p-8">
+        <h2 class="text-xl font-display font-bold">Was jetzt passiert</h2>
+        <ol class="mt-6 space-y-3 leading-relaxed text-sm">
+          <li class="bg-cream-50 p-4 border-l-4 flex gap-4" style="border-left-color:#b13830">
+            <span class="font-display font-bold text-xl flex-shrink-0" style="color:#b13830">1.</span>
+            <span>Ihre unterschriebene Vollmacht liegt dem Vorstand als PDF vor.</span>
+          </li>
+          <li class="bg-cream-50 p-4 border-l-4 flex gap-4" style="border-left-color:#b13830">
+            <span class="font-display font-bold text-xl flex-shrink-0" style="color:#b13830">2.</span>
+            <span>
+              Eine Kopie haben wir an Ihre E-Mail-Adresse gesendet. Bitte bewahren
+              Sie sie auf. Schauen Sie notfalls im Spam-Ordner nach.
+            </span>
+          </li>
+          <li class="bg-cream-50 p-4 border-l-4 flex gap-4" style="border-left-color:#b13830">
+            <span class="font-display font-bold text-xl flex-shrink-0" style="color:#b13830">3.</span>
+            <span>
+              Sie können die Vollmacht jederzeit widerrufen — eine Nachricht an
+              <a href={`mailto:${STEUER.kontakt.email}`} class="underline">{STEUER.kontakt.email}</a>
+              genügt. Nehmen Sie selbst teil, erlischt sie ohnehin.
+            </span>
+          </li>
+        </ol>
+      </div>
+
+      <div class="mt-8">
+        <a href="/mv2026/" class="btn-dark">Zurück zu den Unterlagen</a>
+      </div>
+    </div>
+  </section>
+</Base>
