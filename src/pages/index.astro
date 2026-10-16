@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import IconLaterne from '../components/IconLaterne.astro';
 import { SITE } from '../data/site.ts';
 import { ERFASSUNG } from '../data/erfassung.ts';
 
@@ -79,7 +78,17 @@ const kennzahlen = [
           class="mt-4 flex items-center gap-4 max-w-xl bg-white border border-navy-900/10 border-l-4 p-4 transition-colors hover:border-navy-900/30"
           style="border-left-color:#b13830"
         >
-          <IconLaterne class="w-10 h-12 shrink-0 text-navy-900" />
+          <picture class="block w-24 shrink-0">
+            <source srcset="/img/sankt-martin-laternen.webp" type="image/webp" />
+            <img
+              src="/img/sankt-martin-laternen.png"
+              alt="Sankt Martin an der Paul-Klee-Schule — drei Laternen in den Farben des Schullogos"
+              class="w-full h-auto"
+              width="320"
+              height="345"
+              loading="lazy"
+            />
+          </picture>
           <span class="block">
             <span class="block text-xs font-semibold uppercase tracking-wider" style="color:#b13830">
               Dienstag, 10. November 2026 · 16:30 bis ca. 18:00 Uhr
