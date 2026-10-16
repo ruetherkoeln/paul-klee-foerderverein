@@ -3,11 +3,10 @@
 import { VERSAMMLUNG } from '../data/mv2026.ts';
 import { BEVOLLMAECHTIGTE } from '../data/vollmacht.ts';
 import { STEUER } from '../data/verein-steuer.ts';
+import { SITE } from '../data/site.ts';
 
-// Genitiv des Vereinsnamens. Bewusst von Hand gesetzt: Aus dem Nominativ
-// laesst sich der deutsche Genitiv nicht verlaesslich ableiten, und
-// „des Förderverein …“ waere schlicht falsch.
-export const VEREIN_GENITIV = 'Fördervereins Paul-Klee-Schule Düsseldorf e. V.';
+// Genitiv des Vereinsnamens — eine Quelle fuer alle Seiten, siehe site.ts.
+export const VEREIN_GENITIV = SITE.nameGenitiv;
 
 export const VOLLMACHT_UNTERTITEL =
   `zur Vertretung in der außerordentlichen Mitgliederversammlung 2026 des ${VEREIN_GENITIV}`;

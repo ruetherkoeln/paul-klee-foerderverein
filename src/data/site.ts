@@ -1,6 +1,9 @@
 export const SITE = {
   // Identität: Wir sind der Förderverein, nicht die Schule
   name: 'Förderverein Paul-Klee-Schule Düsseldorf e. V.',
+  // Genitiv von Hand gesetzt: aus dem Nominativ laesst sich der deutsche
+  // Genitiv nicht ableiten, und „des Förderverein …“ waere schlicht falsch.
+  nameGenitiv: 'Fördervereins Paul-Klee-Schule Düsseldorf e. V.',
   shortName: 'Förderverein Paul-Klee-Schule',
   logo: '/img/foerderverein-logo.png',
   url: 'https://www.pks-foerderverein.de',
