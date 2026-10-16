@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import IconLaterne from '../../components/IconLaterne.astro';
 import { SITE } from '../../data/site.ts';
 
 // Sankt Martin 2026.
@@ -96,9 +95,21 @@ const hinweise = [
         </div>
       </div>
 
-      {/* Piktogramm gross, in den Logofarben */}
-      <div class="bg-white p-10 border border-navy-900/10 text-center">
-        <IconLaterne class="w-28 h-32 mx-auto text-navy-900" />
+      {/* Logo der Schule zu Sankt Martin. Traegt den Viaduktbogen des
+          Schullogos in der Mitte und liegt in derselben Palette wie die
+          Marke — darum ohne Rahmen oder Farbfilter, einfach auf Weiss. */}
+      <div class="bg-white p-6 border border-navy-900/10 text-center">
+        <picture class="block">
+          <source srcset="/img/sankt-martin-logo.webp" type="image/webp" />
+          <img
+            src="/img/sankt-martin-logo.jpg"
+            alt="Sankt Martin zu Pferd teilt seinen Mantel mit einem Bettler, dahinter der Viaduktbogen der Paul-Klee-Schule und Kinder mit Laternen"
+            class="w-full h-auto"
+            width="760"
+            height="976"
+            loading="eager"
+          />
+        </picture>
         <div class="mt-5 text-xs uppercase tracking-wider text-navy-900/60">
           Laternenausstellung · Martinslieder · Punsch
         </div>
