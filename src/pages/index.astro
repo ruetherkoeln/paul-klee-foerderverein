@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import IconLaterne from '../components/IconLaterne.astro';
 import { SITE } from '../data/site.ts';
 import { ERFASSUNG } from '../data/erfassung.ts';
 
@@ -68,6 +69,28 @@ const kennzahlen = [
           class="btn-gold mt-6 !py-4 !px-6 text-sm md:text-base text-center leading-snug max-w-full"
         >
           Hier klicken: AO Mitgliederversammlung des Fördervereins 2026
+        </a>
+
+        {/* Sankt Martin 2026 — Laternenzug am 10.11.2026, einen Tag nach der
+            Mitgliederversammlung. Beide Termine stehen bewusst zusammen oben
+            im Hero. Nach dem Fest diesen Block wieder entfernen. */}
+        <a
+          href="/sankt-martin/"
+          class="mt-4 flex items-center gap-4 max-w-xl bg-white border border-navy-900/10 border-l-4 p-4 transition-colors hover:border-navy-900/30"
+          style="border-left-color:#b13830"
+        >
+          <IconLaterne class="w-10 h-12 shrink-0 text-navy-900" />
+          <span class="block">
+            <span class="block text-xs font-semibold uppercase tracking-wider" style="color:#b13830">
+              Dienstag, 10. November 2026 · ab 16:30 Uhr
+            </span>
+            <span class="mt-0.5 block font-display font-bold leading-snug text-navy-900">
+              St. Martin an der Paul-Klee-Schule
+            </span>
+            <span class="mt-0.5 block text-sm text-navy-900/70">
+              Laternenzug, Martinsfeuer und Weckmänner — alle Informationen
+            </span>
+          </span>
         </a>
 
         <p class="mt-6 text-lg leading-relaxed max-w-2xl text-navy-900/80">

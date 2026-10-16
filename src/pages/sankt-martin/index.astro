@@ -1,0 +1,245 @@
+---
+import Base from '../../layouts/Base.astro';
+import IconLaterne from '../../components/IconLaterne.astro';
+import { SITE } from '../../data/site.ts';
+
+// Sankt Martin 2026. Inhalt aus dem Merkblatt des Vorstands.
+//
+// Datum und Uhrzeit stehen fest. Treffpunkt, Route, Begleitung und der Ort
+// des Martinsfeuers waren im Merkblatt noch Platzhalter — die stehen hier
+// deshalb offen als „wird noch bekannt gegeben" und nicht erfunden.
+// Sobald der Vorstand sie kennt: in ABLAUF eintragen.
+const FEST = {
+  datum: 'Dienstag, 10. November 2026',
+  beginn: '16:30 Uhr',
+  gedenktag: '11. November'
+};
+
+// null = noch nicht bekannt. Bewusst so, damit die Seite nicht behauptet,
+// was niemand entschieden hat.
+const ABLAUF: { was: string; wert: string | null }[] = [
+  { was: 'Beginn', wert: `${FEST.beginn}` },
+  { was: 'Treffpunkt', wert: null },
+  { was: 'Auftakt', wert: null },
+  { was: 'Route des Laternenzugs', wert: null },
+  { was: 'Begleitung', wert: null },
+  { was: 'Martinsfeuer', wert: null }
+];
+
+const offenePunkte = ABLAUF.filter((p) => p.wert === null).length;
+
+const hinweise = [
+  'Bitte denken Sie an wetterfeste Kleidung.',
+  'Die Laterne bitte mit LED-Licht, nicht mit einer offenen Kerze.',
+  'Die Kinder bleiben während des Umzugs in der Obhut ihrer Eltern bzw. Begleitpersonen.'
+];
+---
+<Base
+  title="Sankt Martin an der Paul-Klee-Schule"
+  description={`Sankt Martin an der Paul-Klee-Schule Düsseldorf: Laternenzug am ${FEST.datum} ab ${FEST.beginn}. Weckmänner, Kinderpunsch und Kaffee vom Förderverein — der Erlös geht vollständig an die Kinder.`}
+>
+
+  {/* HERO */}
+  <section class="bg-cream-50 pt-16 pb-14">
+    <div class="container-c grid md:grid-cols-[1.5fr_1fr] gap-12 items-start">
+      <div>
+        <div class="eyebrow mb-4">Sankt Martin 2026</div>
+        <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          Wir laufen gemeinsam<br/>mit unseren Laternen.
+        </h1>
+
+        <div
+          class="mt-7 inline-block bg-white border border-navy-900/10 border-l-4 p-5"
+          style="border-left-color:#b13830"
+        >
+          <div class="text-xs font-semibold uppercase tracking-wider" style="color:#b13830">
+            Termin
+          </div>
+          <div class="mt-1 text-xl md:text-2xl font-display font-bold">
+            {FEST.datum}
+          </div>
+          <div class="mt-0.5 text-lg text-navy-900/80">ab {FEST.beginn}</div>
+        </div>
+
+        <p class="mt-7 text-lg leading-relaxed max-w-2xl text-navy-900/80">
+          Die Paul-Klee-Schule feiert Sankt Martin. Alle Kinder, Eltern,
+          Geschwister, Großeltern und Freunde der Schule sind herzlich
+          eingeladen.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#ablauf" class="btn-dark !py-2.5 !px-4 text-xs">Ablauf</a>
+          <a href="#foerderverein" class="btn-ghost !py-2.5 !px-4 text-xs">Weckmänner &amp; Punsch</a>
+          <a href="/kontakt/" class="btn-ghost !py-2.5 !px-4 text-xs">Mithelfen</a>
+        </div>
+      </div>
+
+      {/* Piktogramm gross, in den Logofarben */}
+      <div class="bg-white p-10 border border-navy-900/10 text-center">
+        <IconLaterne class="w-28 h-32 mx-auto text-navy-900" />
+        <div class="mt-5 text-xs uppercase tracking-wider text-navy-900/60">
+          Laternenzug · Martinsfeuer · Weckmänner
+        </div>
+        <div class="mt-1 font-display font-semibold text-navy-900">
+          An der Paul-Klee-Schule
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* WARUM */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Hintergrund</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">
+          Warum wir Sankt Martin feiern
+        </h2>
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Martin von Tours lebte im 4. Jahrhundert und war zunächst Soldat im
+          römischen Heer. Der Legende nach begegnete er an einem kalten
+          Winterabend vor den Toren von Amiens einem frierenden Bettler.
+          Kurzerhand teilte er seinen Mantel mit dem Schwert und schenkte ihm
+          eine Hälfte.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-navy-900/80">
+          Später wurde Martin Mönch und schließlich Bischof von Tours.
+          Beigesetzt wurde er am {FEST.gedenktag} 397 — seitdem ist dieser Tag
+          sein Gedenktag.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-navy-900/80">
+          Mit unseren Laternen, dem Martinsfeuer und den Weckmännern, die wir
+          miteinander teilen, erinnern wir an seine Botschaft: Licht in die
+          Dunkelheit bringen und füreinander da sein.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ABLAUF */}
+  <section class="bg-cream-50" id="ablauf">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Der Abend</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">Ablauf</h2>
+
+        <dl class="mt-8 divide-y divide-navy-900/10 border-y border-navy-900/10">
+          {ABLAUF.map((punkt) => (
+            <div class="py-4 grid sm:grid-cols-[14rem_1fr] gap-1 sm:gap-6">
+              <dt class="text-xs uppercase tracking-wider font-semibold text-navy-900/60 sm:pt-0.5">
+                {punkt.was}
+              </dt>
+              <dd class={punkt.wert ? 'font-display font-semibold' : 'text-navy-900/50 italic'}>
+                {punkt.wert ?? 'wird noch bekannt gegeben'}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        {offenePunkte > 0 && (
+          <div
+            class="mt-8 bg-white border border-navy-900/10 border-l-4 p-5"
+            style="border-left-color:#e0a836"
+          >
+            <div class="text-xs font-semibold uppercase tracking-wider" style="color:#c89010">
+              Noch in Planung
+            </div>
+            <p class="mt-2 text-sm leading-relaxed text-navy-900/80">
+              Treffpunkt, Route und der Ort des Martinsfeuers werden gemeinsam
+              mit der Schule festgelegt. Sobald sie feststehen, finden Sie sie
+              hier und im Elternbrief der Schule.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  {/* FOERDERVEREIN */}
+  <section class="bg-cream-50" id="foerderverein">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Unser Beitrag</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">
+          Der Förderverein ist dabei
+        </h2>
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Wie in jedem Jahr unterstützt der Förderverein die Feier. Wir sorgen
+          für Weckmänner für alle Kinder, Kinderpunsch und Kaffee.
+        </p>
+
+        <div class="mt-8 grid sm:grid-cols-3 gap-3">
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+            <div class="font-display font-semibold">Weckmänner</div>
+            <div class="mt-1 text-sm text-navy-900/70">Für alle Kinder der Schule.</div>
+          </div>
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-orange">
+            <div class="font-display font-semibold">Kinderpunsch</div>
+            <div class="mt-1 text-sm text-navy-900/70">Warm, alkoholfrei, am Stand.</div>
+          </div>
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-red">
+            <div class="font-display font-semibold">Kaffee</div>
+            <div class="mt-1 text-sm text-navy-900/70">Für die Erwachsenen.</div>
+          </div>
+        </div>
+
+        <p class="mt-8 text-lg leading-relaxed text-navy-900/80">
+          Der Erlös aus dem Verkauf kommt vollständig den Kindern der
+          Paul-Klee-Schule zugute und fließt in konkrete Projekte des
+          Fördervereins.
+        </p>
+        <a href="/foerderverein/#projekte" class="mt-6 inline-flex btn-ghost !py-2.5 !px-4 text-xs">
+          Was wir damit finanzieren
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* HELFER */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="bg-white border-2 p-8 md:p-10" style="border-color:#b13830">
+          <div class="text-xs font-semibold uppercase tracking-wider" style="color:#b13830">
+            Eine Stunde Zeit?
+          </div>
+          <h2 class="mt-3 text-2xl md:text-3xl font-display font-bold">
+            Wir freuen uns über Unterstützung
+          </h2>
+          <p class="mt-5 text-lg leading-relaxed text-navy-900/80">
+            Damit der Abend gelingt, brauchen wir Hände beim Aufbau, am
+            Verkaufsstand und beim Abbau. Wer eine Stunde Zeit hat, meldet sich
+            gern über unser Kontaktformular.
+          </p>
+          <a href="/kontakt/" class="mt-7 inline-flex btn-dark">Ich helfe mit</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* HINWEISE */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Praktisches</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">Hinweise für Eltern</h2>
+        <ul class="mt-7 space-y-4">
+          {hinweise.map((h) => (
+            <li class="flex gap-4 items-start">
+              <span class="mt-2 w-2 h-2 shrink-0 bg-pk-red"></span>
+              <span class="text-lg leading-relaxed text-navy-900/80">{h}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-10 text-lg leading-relaxed text-navy-900/80">
+          Sankt Martin steht für Teilen und Zusammenhalt. Genau das wollen wir an
+          diesem Abend gemeinsam erleben. Wir freuen uns auf Sie und Ihre Kinder.
+        </p>
+        <p class="mt-6 font-display font-semibold">
+          Ihr Vorstand des {SITE.nameGenitiv}
+        </p>
+      </div>
+    </div>
+  </section>
+
+</Base>
