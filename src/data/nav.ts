@@ -4,6 +4,9 @@
 //       (Umzug auf /verein/ in Folge-PR, sobald Inhalte stabil)
 export const MAIN_NAV = [
   { label: 'Der Verein', href: '/foerderverein/' },
+  // Der Namenspatron der Schule. Steht bewusst weit vorn: Er erklaert,
+  // woher der Name und die drei Boegen im Logo kommen.
+  { label: 'Paul Klee', href: '/paul-klee/' },
   { label: 'Mitgliedschaft', href: '/foerderverein/mitglied-werden/' },
   { label: 'Shop', href: '/shop/' },
   { label: 'Spenden', href: '/foerderverein/#spenden' },
