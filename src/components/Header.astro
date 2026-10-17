@@ -17,18 +17,18 @@ const isVerein = variant === 'verein';
 </div>
 <header class={`${isVerein ? 'bg-navy-900 text-white' : 'bg-white text-navy-900'} border-b ${isVerein ? 'border-navy-700' : 'border-navy-900/10'}`}>
   <div class="container-c flex items-center justify-between py-5">
-    <a href="/" class="flex items-center gap-3">
+    <a href="/" class="flex items-center gap-3 shrink-0">
       <img src={SITE.logo} alt="Logo des Fördervereins Paul-Klee-Schule" class="w-12 h-auto" width="48" />
       <div class="leading-tight">
         <div class="font-display font-bold text-base">Förderverein</div>
-        <div class="text-xs opacity-70">der Paul-Klee-Schule · Düsseldorf</div>
+        <div class="text-xs opacity-70 whitespace-nowrap">der Paul-Klee-Schule · Düsseldorf</div>
       </div>
     </a>
-    <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold uppercase tracking-wider">
+    <nav class="hidden lg:flex items-center gap-5 xl:gap-7 text-sm font-semibold uppercase tracking-wider">
       {MAIN_NAV.filter(item => item.label !== 'Spenden').map(item => (
-        <a href={item.href} class="hover:text-gold-500 transition-colors">{item.label}</a>
+        <a href={item.href} class="whitespace-nowrap hover:text-gold-500 transition-colors">{item.label}</a>
       ))}
-      <a href="/foerderverein/#spenden" class="btn-dark !py-2 !px-4 text-xs">Spenden</a>
+      <a href="/foerderverein/#spenden" class="btn-dark !py-2 !px-4 text-xs whitespace-nowrap">Spenden</a>
     </nav>
     <button
       id="hamburger"

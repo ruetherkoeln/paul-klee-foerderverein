@@ -1,0 +1,392 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Der Namenspatron der Schule.
+//
+// Die Schule selbst veroeffentlicht keine Erklaerung ihres Logos und keine
+// Seite ueber Paul Klee. Diese Seite fuellt die Luecke — und markiert
+// deshalb sauber, was belegt ist und was unsere Lesart ist:
+//
+//   belegt   Lebensdaten, Duesseldorfer Professur und Entlassung, das
+//            Gemaelde „Revolution des Viadukts“ (1937, Hamburger
+//            Kunsthalle), der Ankauf der 88 Werke 1960 durch das Land NRW.
+//   Lesart   dass die drei Boegen im Schullogo aus genau diesem Gemaelde
+//            stammen. Das Motiv ist unverkennbar, aber niemand hat es
+//            schriftlich bestaetigt. Im Abschnitt „Unser Logo“ steht das so.
+//
+// Preise des K20 stehen hier bewusst nicht: Sie aendern sich. Der Eintritt
+// fuer Kinder und Jugendliche ist Politik des Hauses und aendert sich nicht
+// jedes Jahr — deshalb steht nur der, mit Link auf das Museum.
+const KLEE = { geboren: 1879, gestorben: 1940 };
+
+const LEBEN = [
+  {
+    jahr: '1879',
+    titel: 'Geboren bei Bern',
+    text: 'Paul Klee kommt am 18. Dezember in Münchenbuchsee bei Bern zur Welt. Der Vater, Hans Wilhelm Klee, ist Musiklehrer und Deutscher; die Mutter, Ida Maria Frick, ist Sängerin und Schweizerin. Über den Vater ist Klee deutscher Staatsbürger — ein Detail, das am Ende seines Lebens noch wichtig wird.'
+  },
+  {
+    jahr: 'ab 1898',
+    titel: 'Studium in München',
+    text: 'Zuerst an der privaten Zeichenschule von Heinrich Knirr, dann an der Akademie. Klee zeichnet, radiert und spielt Geige — Musik bleibt sein Leben lang die zweite Sprache seiner Kunst.'
+  },
+  {
+    jahr: '1911',
+    titel: 'Der Blaue Reiter',
+    text: 'Klee findet Anschluss an Wassily Kandinsky, Franz Marc, August Macke und Gabriele Münter. Aus der Zeichnung wird Malerei.'
+  },
+  {
+    jahr: '1914',
+    titel: 'Die Reise nach Tunesien',
+    text: 'Im April fährt Klee mit August Macke und Louis Moilliet nach Tunesien. Das Licht Nordafrikas verändert alles. In Kairouan schreibt er den Satz, der seitdem in jedem Buch über ihn steht.',
+    zitat: 'Die Farbe hat mich. […] Ich und die Farbe sind eins. Ich bin Maler.',
+    quelle: 'Tagebucheintrag, Kairouan, April 1914'
+  },
+  {
+    jahr: '1921–1931',
+    titel: 'Lehrer am Bauhaus',
+    text: 'Zehn Jahre unterrichtet Klee am Bauhaus, erst in Weimar, dann in Dessau. Fast die Hälfte seines Werks von rund 10.000 Arbeiten entsteht in dieser Zeit. Seine Unterrichtsnotizen zur Form- und Farblehre werden selbst zu Kunst.'
+  },
+  {
+    jahr: '1931',
+    titel: 'Professor in Düsseldorf',
+    text: 'Klee verlässt das Bauhaus und nimmt eine Professur an der Kunstakademie Düsseldorf an. Er wohnt und arbeitet in der Stadt, in der heute eine Grundschule seinen Namen trägt.',
+    hervor: true
+  },
+  {
+    jahr: '1933',
+    titel: 'Entlassung und Flucht',
+    text: 'Im April entlassen ihn die Nationalsozialisten fristlos. Seine Kunst gilt als „entartet“, sein Haus wird durchsucht. Ende 1933 verlässt Klee Deutschland und geht zurück nach Bern.',
+    hervor: true
+  },
+  {
+    jahr: '1935',
+    titel: 'Die Krankheit',
+    text: 'Erste Anzeichen der Sklerodermie, einer Erkrankung, die das Bindegewebe verhärtet. Sie wird ihn nicht mehr loslassen.'
+  },
+  {
+    jahr: '1937',
+    titel: '„Revolution des Viadukts“',
+    text: 'Im selben Jahr, in dem die Nationalsozialisten die Ausstellung „Entartete Kunst“ zeigen, malt Klee die Brückenbögen, die aus der Reihe treten. Das Bild wurde zum Zeichen seines Widerspruchs — und zum Motiv unseres Schullogos.'
+  },
+  {
+    jahr: '1939',
+    titel: 'Das größte Jahr',
+    text: 'Schwer krank schafft Klee in einem einzigen Jahr 1253 Werke. Die Hand wird steifer, die Striche werden breiter und zeichenhafter.'
+  },
+  {
+    jahr: '1940',
+    titel: 'Gestorben in Muralto',
+    text: 'Am 29. Juni stirbt Paul Klee in Locarno-Muralto. Sechs Tage später, am 5. Juli, wird sein Antrag auf die Schweizer Staatsbürgerschaft bewilligt. Er erfährt es nicht mehr.'
+  }
+];
+
+const K20 = [
+  {
+    jahr: '1960',
+    titel: 'Das Land kauft 88 Werke',
+    text: 'Nordrhein-Westfalen erwirbt 88 zentrale Arbeiten Paul Klees aus der Sammlung des Stahlindustriellen G. David Thompson in Pittsburgh. Der Ankauf war mehr als eine Erwerbung: Dasselbe Land, aus dessen Hauptstadt Klee 1933 vertrieben worden war, holte sein Werk zurück.'
+  },
+  {
+    jahr: '1961',
+    titel: 'Eine Stiftung entsteht',
+    text: 'Ein Jahr später wird in Düsseldorf die Stiftung Kunstsammlung Nordrhein-Westfalen gegründet. Werner Schmalenbach wird Gründungsdirektor und baut die Sammlung in 28 Jahren auf.'
+  },
+  {
+    jahr: '1986',
+    titel: 'Das Haus am Grabbeplatz',
+    text: 'Das K20 mit seiner schwarzen Granitfassade öffnet am Grabbeplatz. 2010 kommt ein Erweiterungsbau dazu.'
+  },
+  {
+    jahr: 'heute',
+    titel: '135 Werke',
+    text: 'Das K20 bewahrt heute 135 Arbeiten von Paul Klee. Die Inventarnummern beginnen bei 0001 — sie waren der erste Besitz des Hauses. Welche davon gerade hängen, wechselt.'
+  }
+];
+
+const ABSCHNITTE = [
+  { id: 'biografie', label: 'Biografie' },
+  { id: 'logo', label: 'Unser Logo' },
+  { id: 'k20', label: 'Paul Klee im K20' }
+];
+---
+<Base
+  title="Paul Klee"
+  description="Paul Klee (1879–1940), Namenspatron der Paul-Klee-Schule Düsseldorf: eine kurze Biografie, die Bedeutung der drei Bögen in unserem Logo und ein Überblick über die Klee-Sammlung im K20 am Grabbeplatz."
+>
+
+  {/* HERO */}
+  <section class="bg-cream-50 pt-16 pb-14">
+    <div class="container-c grid md:grid-cols-[1.5fr_1fr] gap-12 items-start">
+      <div>
+        <div class="eyebrow mb-4">Der Namenspatron unserer Schule</div>
+        <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">
+          Paul Klee
+        </h1>
+        <div class="mt-3 text-xl text-navy-900/60 font-display">
+          {KLEE.geboren} – {KLEE.gestorben}
+        </div>
+        <p class="mt-7 text-lg leading-relaxed max-w-2xl text-navy-900/80">
+          Maler, Zeichner, Musiker, Lehrer. Einer der wichtigsten Künstler des
+          20. Jahrhunderts — und zwei Jahre lang Professor an der
+          Kunstakademie Düsseldorf, bis die Nationalsozialisten ihn 1933 aus
+          der Stadt vertrieben.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed max-w-2xl text-navy-900/80">
+          Unsere Schule trägt seinen Namen. Die drei bunten Bögen im Schullogo
+          kommen aus einem seiner bekanntesten Bilder. Diese Seite erzählt,
+          wer er war, was das Bild bedeutet und wo man seine Werke in
+          Düsseldorf sehen kann.
+        </p>
+      </div>
+
+      <div class="bg-white p-8 border border-navy-900/10 text-center">
+        <picture class="block mx-auto w-[70%] max-w-[220px]">
+          <source srcset="/img/paul-klee-schule-viadukt.webp" type="image/webp" />
+          <img
+            src="/img/paul-klee-schule-viadukt.png"
+            alt="Drei bunte Brückenbögen in Gelb, Orange und Rot, die auf Beinen aus der Reihe treten — das Motiv aus dem Logo der Paul-Klee-Schule"
+            class="w-full h-auto"
+            width="711"
+            height="1068"
+            loading="eager"
+          />
+        </picture>
+        <div class="mt-5 text-xs uppercase tracking-wider text-navy-900/60">
+          Das Motiv unseres Schullogos
+        </div>
+        <div class="mt-1 font-display font-semibold text-navy-900">
+          Drei Bögen, die gehen
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* SEITENMENUE — klebt oben, sobald der Kopf weggescrollt ist */}
+  <nav
+    class="sticky top-0 z-30 bg-navy-900 text-white border-y border-navy-700"
+    aria-label="Abschnitte dieser Seite"
+  >
+    <div class="container-c flex gap-6 sm:gap-10 overflow-x-auto py-4 text-xs sm:text-sm font-semibold uppercase tracking-wider">
+      {ABSCHNITTE.map((a) => (
+        <a href={`#${a.id}`} class="whitespace-nowrap hover:text-gold-500 transition-colors">
+          {a.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+
+  {/* BIOGRAFIE */}
+  <section class="bg-cream-50 scroll-mt-20" id="biografie">
+    <div class="container-c py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Ein Leben</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">Biografie</h2>
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Paul Klee hat rund 10.000 Werke hinterlassen — Aquarelle,
+          Zeichnungen, Ölbilder, oft klein, oft kaum größer als ein Blatt
+          Papier. Er war zugleich Lehrer und schrieb seine Form- und
+          Farblehre so genau auf, dass sie bis heute unterrichtet wird.
+        </p>
+
+        <ol class="mt-10 space-y-0 divide-y divide-navy-900/10 border-y border-navy-900/10">
+          {LEBEN.map((e) => (
+            <li class="py-6 grid sm:grid-cols-[8rem_1fr] gap-2 sm:gap-8">
+              <div
+                class="text-sm font-display font-bold sm:pt-0.5"
+                style={e.hervor ? 'color:#b13830' : 'color:#c89010'}
+              >
+                {e.jahr}
+              </div>
+              <div>
+                <div class="font-display font-bold text-lg">{e.titel}</div>
+                <p class="mt-2 leading-relaxed text-navy-900/80">{e.text}</p>
+                {e.zitat && (
+                  <figure class="mt-5 border-l-4 pl-5" style="border-left-color:#e0a836">
+                    <blockquote class="text-lg font-display italic leading-relaxed">
+                      „{e.zitat}“
+                    </blockquote>
+                    <figcaption class="mt-2 text-xs uppercase tracking-wider text-navy-900/50">
+                      {e.quelle}
+                    </figcaption>
+                  </figure>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  {/* UNSER LOGO */}
+  <section class="bg-cream-50 scroll-mt-20" id="logo">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Drei Bögen und ein Dach</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">Unser Logo</h2>
+
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Im Logo der Paul-Klee-Schule stehen drei Brückenbögen: einer gelb,
+          einer orange, einer rot. Jeder hat zwei Beine, und sie stehen nicht
+          ordentlich nebeneinander, sondern treten versetzt aus der Reihe —
+          als würden sie auf den Betrachter zugehen. Darüber spannen sich
+          zwei Linien in Blau und Grün wie ein Dach.
+        </p>
+
+        <div class="mt-9 grid sm:grid-cols-3 gap-3">
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow">
+            <div class="font-display font-semibold">Gelb</div>
+            <div class="mt-1 text-sm text-navy-900/70">Der hinterste Bogen, am kleinsten.</div>
+          </div>
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-orange">
+            <div class="font-display font-semibold">Orange</div>
+            <div class="mt-1 text-sm text-navy-900/70">Der zweite, nach hinten versetzt.</div>
+          </div>
+          <div class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-red">
+            <div class="font-display font-semibold">Rot</div>
+            <div class="mt-1 text-sm text-navy-900/70">Der größte, ganz vorn, mitten im Schritt.</div>
+          </div>
+        </div>
+
+        <h3 class="mt-12 text-xl font-display font-bold">
+          Das Bild dahinter: „Revolution des Viadukts“
+        </h3>
+        <p class="mt-5 text-lg leading-relaxed text-navy-900/80">
+          Das Motiv stammt aus einem Gemälde, das Klee 1937 malte. Ein Viadukt
+          ist eine Brücke aus lauter gleichen Bögen. Jeder einzelne hat nur
+          eine Aufgabe: still stehen, die Last tragen, ein Glied in der Kette
+          sein. Keiner darf anders sein als die anderen, sonst trägt die
+          Brücke nicht.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-navy-900/80">
+          Bei Klee tun die Bögen genau das nicht mehr. Sie lösen sich aus der
+          Reihe, drehen sich zum Betrachter und gehen los. Jeder ist anders
+          groß, jeder hat eine andere Farbe. Die Brücke, die sie bilden
+          sollten, hört damit auf zu existieren — und genau das ist der Punkt.
+        </p>
+        <p class="mt-4 text-lg leading-relaxed text-navy-900/80">
+          Klee malte das Bild 1937. Im selben Jahr zeigten die
+          Nationalsozialisten die Ausstellung „Entartete Kunst“, in der auch
+          seine Werke hingen. Vier Jahre zuvor hatten sie ihn aus Düsseldorf
+          geworfen. Das Bild gilt seither als sein Widerspruch gegen eine
+          Ordnung, in der alle gleich zu sein haben. Das Original hängt in
+          der Hamburger Kunsthalle, Öl, 60 × 50 Zentimeter.
+        </p>
+
+        <div
+          class="mt-10 bg-white border border-navy-900/10 border-l-4 p-6"
+          style="border-left-color:#3a78b8"
+        >
+          <div class="text-xs font-semibold uppercase tracking-wider" style="color:#3a78b8">
+            Warum das zu einer Grundschule passt
+          </div>
+          <p class="mt-3 leading-relaxed text-navy-900/80">
+            An unserer Schule lernen rund 220 Kinder aus mehr als 30
+            Herkunftsländern. Kein Bogen gleicht dem anderen, jeder trägt sein
+            eigenes Gewicht, und zusammen halten sie trotzdem etwas. Das Dach
+            darüber ist die Schule, die sie dabei schützt. So lesen wir das
+            Logo.
+          </p>
+          <p class="mt-3 text-sm leading-relaxed text-navy-900/60">
+            Eine amtliche Deutung gibt es nicht: Die Schule hat nie
+            veröffentlicht, wie ihr Logo entstanden ist. Dass das Motiv aus
+            Klees Viadukt-Bild stammt, ist nicht zu übersehen — die Lesart
+            darüber ist unsere.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* K20 */}
+  <section class="bg-cream-50 scroll-mt-20" id="k20">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <div class="eyebrow mb-3">Die Sammlung in unserer Stadt</div>
+        <h2 class="text-2xl md:text-3xl font-display font-bold">Paul Klee im K20</h2>
+
+        <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+          Düsseldorf besitzt eine der bedeutendsten Klee-Sammlungen der Welt —
+          und sie steht am Anfang des ganzen Museums. Ohne Paul Klee gäbe es
+          die Kunstsammlung Nordrhein-Westfalen nicht.
+        </p>
+
+        <ol class="mt-10 divide-y divide-navy-900/10 border-y border-navy-900/10">
+          {K20.map((e) => (
+            <li class="py-6 grid sm:grid-cols-[8rem_1fr] gap-2 sm:gap-8">
+              <div class="text-sm font-display font-bold sm:pt-0.5" style="color:#c89010">
+                {e.jahr}
+              </div>
+              <div>
+                <div class="font-display font-bold text-lg">{e.titel}</div>
+                <p class="mt-2 leading-relaxed text-navy-900/80">{e.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div class="mt-10 bg-white border border-navy-900/10 border-l-4 p-6" style="border-left-color:#7fb83e">
+          <div class="text-xs font-semibold uppercase tracking-wider" style="color:#5f9129">
+            Für einen Besuch
+          </div>
+          <dl class="mt-4 space-y-3 text-navy-900/80">
+            <div class="grid sm:grid-cols-[9rem_1fr] gap-1 sm:gap-4">
+              <dt class="text-xs uppercase tracking-wider font-semibold text-navy-900/60 sm:pt-1">Adresse</dt>
+              <dd>K20 am Grabbeplatz, Grabbeplatz 5, 40213 Düsseldorf</dd>
+            </div>
+            <div class="grid sm:grid-cols-[9rem_1fr] gap-1 sm:gap-4">
+              <dt class="text-xs uppercase tracking-wider font-semibold text-navy-900/60 sm:pt-1">Anfahrt</dt>
+              <dd>U-Bahn bis Heinrich-Heine-Allee, von dort wenige Minuten zu Fuß</dd>
+            </div>
+            <div class="grid sm:grid-cols-[9rem_1fr] gap-1 sm:gap-4">
+              <dt class="text-xs uppercase tracking-wider font-semibold text-navy-900/60 sm:pt-1">Geöffnet</dt>
+              <dd>Dienstag bis Sonntag und an Feiertagen 11 bis 18 Uhr, montags geschlossen. Jeden ersten Mittwoch im Monat bis 22 Uhr.</dd>
+            </div>
+            <div class="grid sm:grid-cols-[9rem_1fr] gap-1 sm:gap-4">
+              <dt class="text-xs uppercase tracking-wider font-semibold text-navy-900/60 sm:pt-1">Eintritt</dt>
+              <dd>
+                <strong>Für Kinder und Jugendliche unter 18 Jahren frei.</strong>
+                Die Preise für Erwachsene ändern sich; sie stehen aktuell beim Museum.
+              </dd>
+            </div>
+          </dl>
+          <a
+            href="https://www.kunstsammlung.de/de/visit"
+            target="_blank"
+            rel="noopener"
+            class="mt-6 inline-flex btn-ghost !py-2.5 !px-4 text-xs"
+          >
+            Zur Kunstsammlung NRW
+          </a>
+        </div>
+
+        <p class="mt-10 text-lg leading-relaxed text-navy-900/80">
+          Für Kinder ist Klee ein dankbarer erster Museumsbesuch: Seine Bilder
+          sind klein, farbig und voller Zeichen, die man erkennen kann —
+          Pfeile, Fische, Monde, Gesichter. Man muss nichts über Kunst wissen,
+          um etwas zu sehen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ABSCHLUSS */}
+  <section class="bg-cream-50">
+    <div class="container-c border-t border-navy-900/10 py-14">
+      <div class="max-w-3xl">
+        <p class="text-lg leading-relaxed text-navy-900/80">
+          Eine Schule, die den Namen eines Künstlers trägt, den man aus dieser
+          Stadt vertrieben hat, trägt auch dessen Geschichte. Die drei Bögen
+          im Logo erinnern daran, dass es gut ausgehen kann, wenn nicht alle
+          gleich sind.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/schule/" class="btn-ghost !py-2.5 !px-4 text-xs">Die Schule, die wir unterstützen</a>
+          <a href="/foerderverein/" class="btn-ghost !py-2.5 !px-4 text-xs">Was der Förderverein tut</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</Base>
