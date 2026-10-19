@@ -27,10 +27,14 @@ export const ZAHLWEISE: Record<string, string> = {
 // Spalten nach Vorgabe; "Empfaenger" ist angehängt, damit sich der Export mit
 // der bestehenden Serienbriefliste zusammenführen lässt — die kennt keine
 // getrennten Vor-/Nachnamen, sondern nur ein Feld "Empfaenger".
+//
+// "Email" steht bewusst ganz hinten: Neue Spalten werden angehängt, nie
+// eingeschoben, sonst verrutschen bestehende Serienbriefe. Gebraucht wird sie
+// für Einladungen zur Mitgliederversammlung.
 const KOPF_LISTE = [
   'Herkunft', 'Vorname', 'Nachname', 'Strasse', 'PLZ', 'Ort', 'Kind', 'Klasse', 'Beitrag',
   'Zahlweise', 'Mandatsreferenz', 'Einwilligung_Speicherung',
-  'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger', 'Ausgetreten_am',
+  'Einwilligung_Ansprache', 'Erfasst_am', 'Empfaenger', 'Ausgetreten_am', 'Email',
 ];
 
 export async function mitgliederCsv(): Promise<string> {
@@ -53,6 +57,7 @@ export async function mitgliederCsv(): Promise<string> {
     deDatum(r.erstellt_am),
     `${r.vorname} ${r.nachname}`,
     r.ausgetreten_am ? deDatum(r.ausgetreten_am) : '',
+    r.email ?? '',
   ]);
   return csvDokument(KOPF_LISTE, zeilen);
 }
