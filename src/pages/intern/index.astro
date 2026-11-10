@@ -2,16 +2,8 @@
 // Einstieg in die geschützten Bereiche. Die Seite selbst ist öffentlich und
 // verrät nichts; die Passwortprüfung findet jeweils hinter den Links statt.
 import Base from '../../layouts/Base.astro';
-import { VERSAMMLUNG } from '../../data/mv2026.ts';
 
 const bereiche = [
-  {
-    fuer: 'Für Mitglieder',
-    titel: VERSAMMLUNG.titel,
-    text: 'Einladung, Tagesordnung, Vollmacht und alle Unterlagen zur Versammlung. Das Passwort steht in Ihrer Einladung.',
-    href: '/mv2026/',
-    knopf: 'Zu den Unterlagen',
-  },
   {
     fuer: 'Für den Vorstand',
     titel: 'Vorstandsbereich',
