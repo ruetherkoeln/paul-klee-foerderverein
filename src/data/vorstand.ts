@@ -1,6 +1,6 @@
 // Der Vorstand — gemeinsame Quelle für Impressum und Kontaktseite.
 //
-// Beide Seiten nennen dieselben vier Personen. Getrennt gepflegt würden sie
+// Beide Seiten nennen dieselben Personen. Getrennt gepflegt würden sie
 // nach einer Neuwahl auseinanderlaufen, und ein Impressum mit einem
 // ausgeschiedenen Vorstand ist nicht nur unschön, sondern fehlerhaft.
 //
@@ -16,6 +16,7 @@ export const VORSTAND: Vorstandsmitglied[] = [
   { name: 'S. Buchwald', funktion: '2. Vorsitzende' },
   { name: 'P. Müller',   funktion: 'Kassenwartin' },
   { name: 'H. Bassit',   funktion: 'Beisitzerin' },
+  { name: 'M. Dambeck',  funktion: 'Schriftführerin' },
 ];
 
 /** Sitzung, in der dieser Vorstand gewählt wurde. */

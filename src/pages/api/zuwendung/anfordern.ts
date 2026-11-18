@@ -4,7 +4,7 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 import { STEUER } from '../../../data/verein-steuer.ts';
-import { getEnv, baseUrl, signSpende, formatEuro, type Spende } from '../../../lib/zuwendung.ts';
+import { esc, getEnv, baseUrl, signSpende, formatEuro, type Spende } from '../../../lib/zuwendung.ts';
 
 export const prerender = false;
 
@@ -82,11 +82,11 @@ export const POST: APIRoute = async ({ request }) => {
       des Zahlungseingangs freigeben — mit dem Klick wird die Bescheinigung erzeugt und an den
       Spender (Kopie an den Verein) gesendet.</p>
       <table style="border-collapse:collapse;margin:16px 0">
-        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Spender</td><td><strong>${spende.vorname} ${spende.name}</strong></td></tr>
-        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Anschrift</td><td>${spende.strasse} ${spende.hausnummer}, ${spende.plz} ${spende.ort}</td></tr>
-        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">E-Mail</td><td>${spende.email}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Spender</td><td><strong>${esc(spende.vorname)} ${esc(spende.name)}</strong></td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Anschrift</td><td>${esc(spende.strasse)} ${esc(spende.hausnummer)}, ${esc(spende.plz)} ${esc(spende.ort)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">E-Mail</td><td>${esc(spende.email)}</td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Betrag</td><td><strong>${formatEuro(betragCent)}</strong></td></tr>
-        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Tag der Zuwendung</td><td>${spende.datum}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Tag der Zuwendung</td><td>${esc(spende.datum)}</td></tr>
         <tr><td style="padding:4px 12px 4px 0;color:#5a6b7b">Verzicht auf Aufwendungsersatz</td><td>${spende.verzicht ? 'Ja' : 'Nein'}</td></tr>
       </table>
       <p style="margin:24px 0">

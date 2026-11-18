@@ -4,15 +4,16 @@
 // ⚠️  WICHTIG: Diese Werte stehen wörtlich auf einem rechtsverbindlichen
 //     Steuerdokument. Vor Live-Schaltung von der Steuerberatung prüfen lassen.
 //
-//  AUSSTELLUNG_AKTIV bleibt FALSE, bis der gültige Freistellungsbescheid
-//  vorliegt und die Gemeinnützigkeit wiederhergestellt ist. Solange false:
-//  Das Formular zeigt einen Hinweis, der API-Endpoint stellt nichts aus.
+//  Seit dem Freistellungsbescheid vom 17.11.2026 (FA Düsseldorf-Mitte, VZ 2025)
+//  ist die Gemeinnützigkeit wieder anerkannt — AUSSTELLUNG_AKTIV steht auf true.
+//  Auf false gesetzt zeigt das Formular einen Hinweis, die API stellt nichts aus.
+//  Der Bescheid gilt für Bestätigungen 5 Jahre ab seinem Datum (bis 17.11.2031),
+//  danach den neuen Bescheid hier eintragen.
 // ───────────────────────────────────────────────────────────────────────────
 
 export const STEUER = {
-  // Master-Schalter. Erst auf true setzen, wenn der gültige Freistellungs-
-  // bescheid vorliegt UND die Angaben unten geprüft sind.
-  AUSSTELLUNG_AKTIV: false,
+  // Master-Schalter für die Online-Ausstellung.
+  AUSSTELLUNG_AKTIV: true,
 
   // Aussteller (Verein)
   verein: {
@@ -34,17 +35,14 @@ export const STEUER = {
   //   'feststellung' → vorläufige Feststellung nach § 60a AO (Neugründung)
   bescheid: {
     art: 'freistellung' as 'freistellung' | 'feststellung',
-    // ⚠️ PLATZHALTER — aus dem GÜLTIGEN Freistellungsbescheid übernehmen:
-    datum: 'TT.MM.JJJJ', // Datum des Freistellungsbescheids
-    // Bei Freistellungsbescheid: für welche Jahre / welcher Veranlagungszeitraum
-    veranlagungszeitraum: 'JJJJ',
+    datum: '17.11.2026', // Datum des Freistellungsbescheids
+    veranlagungszeitraum: '2025', // letzter Veranlagungszeitraum laut Bescheid
   },
 
   // Begünstigte Zwecke laut Bescheid. WICHTIG: als Genitiv-Phrase, die direkt
   // auf das Wort „Förderung" folgt (das Muster setzt „Förderung" davor).
-  // Also z. B. "der Erziehung, Volks- und Berufsbildung" — NICHT mit
-  // „Förderung" beginnen.  ⚠️ PLATZHALTER — exakt aus dem Bescheid übernehmen.
-  zwecke: 'der Erziehung, Volks- und Berufsbildung',
+  // Wortlaut laut Bescheid vom 17.11.2026 (§ 52 Abs. 2 Satz 1 Nr. 7 AO).
+  zwecke: 'der Volks- und Berufsbildung einschließlich der Studentenhilfe',
 
   // Sind Mitgliedsbeiträge bei diesem Verein steuerlich abziehbar?
   // (Bei Förderung von Bildung i.d.R. ja → false. Bei Sport/Kultur/Brauchtum
@@ -53,8 +51,8 @@ export const STEUER = {
 
   // Unterschriftsberechtigte Person (für die maschinelle Zeichnung im PDF)
   unterschrift: {
-    name: 'PLATZHALTER Vorstand', // ⚠️ Name eintragen
-    funktion: '1. Vorsitzende/r',
+    name: 'A. Ruether',
+    funktion: '1. Vorsitzender',
     // Optional: Pfad zu einer Unterschrifts-Grafik (PNG, transparent) in /public.
     // Leer lassen für rein maschinelle Ausstellung (zulässig, wenn elektronisch
     // erstellt und versendet).
@@ -80,5 +78,6 @@ export const STEUER = {
     'S. Buchwald (2. Vorsitzende)',
     'P. Müller (Kassenwartin)',
     'H. Bassit (Beisitzerin)',
+    'M. Dambeck (Schriftführerin)',
   ],
 } as const;

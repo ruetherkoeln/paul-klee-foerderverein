@@ -5,7 +5,7 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
 import { STEUER } from '../../../data/verein-steuer.ts';
-import { getEnv, verifySpende, formatEuro } from '../../../lib/zuwendung.ts';
+import { esc, getEnv, verifySpende, formatEuro } from '../../../lib/zuwendung.ts';
 import { buildZuwendungsPdf } from '../../../lib/zuwendung-pdf.ts';
 
 export const prerender = false;
@@ -42,15 +42,15 @@ export const GET: APIRoute = async ({ url }) => {
     <h1>Bescheinigung freigeben?</h1>
     <p class="muted">Bitte vor dem Senden prüfen, dass dieser Betrag tatsächlich auf dem Vereinskonto eingegangen ist.</p>
     <table>
-      <tr><td class="k">Spender</td><td><strong>${s.vorname} ${s.name}</strong></td></tr>
-      <tr><td class="k">Anschrift</td><td>${s.strasse} ${s.hausnummer}, ${s.plz} ${s.ort}</td></tr>
-      <tr><td class="k">E-Mail</td><td>${s.email}</td></tr>
+      <tr><td class="k">Spender</td><td><strong>${esc(s.vorname)} ${esc(s.name)}</strong></td></tr>
+      <tr><td class="k">Anschrift</td><td>${esc(s.strasse)} ${esc(s.hausnummer)}, ${esc(s.plz)} ${esc(s.ort)}</td></tr>
+      <tr><td class="k">E-Mail</td><td>${esc(s.email)}</td></tr>
       <tr><td class="k">Betrag</td><td><strong>${formatEuro(s.betragCent)}</strong></td></tr>
-      <tr><td class="k">Tag der Zuwendung</td><td>${s.datum}</td></tr>
+      <tr><td class="k">Tag der Zuwendung</td><td>${esc(s.datum)}</td></tr>
       <tr><td class="k">Verzicht auf Aufwendungsersatz</td><td>${s.verzicht ? 'Ja' : 'Nein'}</td></tr>
     </table>
     <form method="post">
-      <input type="hidden" name="token" value="${token}">
+      <input type="hidden" name="token" value="${esc(token)}">
       <button class="btn" type="submit">Jetzt erzeugen &amp; an Spender senden</button>
     </form>
     <p class="muted" style="margin-top:18px">Erst mit diesem Klick wird die Bescheinigung erstellt und versendet.</p>
@@ -81,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
   const dateiname = `Zuwendungsbescheinigung_${s.name}_${s.datum}.pdf`.replace(/\s+/g, '_');
   const spenderHtml = `
     <div style="font-family:Arial,sans-serif;color:#0d1726;line-height:1.6">
-      <p>Guten Tag ${s.vorname} ${s.name},</p>
+      <p>Guten Tag ${esc(s.vorname)} ${esc(s.name)},</p>
       <p>vielen Dank für Ihre Unterstützung des Fördervereins Paul-Klee-Schule.
       Im Anhang finden Sie Ihre Zuwendungsbescheinigung über <strong>${formatEuro(s.betragCent)}</strong>
       zur Vorlage beim Finanzamt.</p>
@@ -107,6 +107,6 @@ export const POST: APIRoute = async ({ request }) => {
   return html(`
     <h1 class="ok">✓ Bescheinigung versendet</h1>
     <p class="muted">Die Zuwendungsbescheinigung über <strong>${formatEuro(s.betragCent)}</strong>
-    wurde an ${s.email} gesendet${kopie ? ' (Kopie an den Verein)' : ''}.</p>
+    wurde an ${esc(s.email)} gesendet${kopie ? ' (Kopie an den Verein)' : ''}.</p>
   `);
 };

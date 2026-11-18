@@ -74,6 +74,14 @@ export function verifySpende(token: string, maxAgeMs = 1000 * 60 * 60 * 24 * 30)
   }
 }
 
+// HTML-Escaping für Spenderangaben in Mails und Freigabeseite —
+// die Felder kommen ungeprüft aus dem öffentlichen Formular.
+export function esc(v: unknown): string {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 // ── Formatierung ─────────────────────────────────────────────────────────────
 export function formatEuro(cent: number): string {
   return (cent / 100).toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' €';
