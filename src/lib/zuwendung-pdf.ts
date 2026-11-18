@@ -132,7 +132,7 @@ export async function buildZuwendungsPdf(spende: Spende): Promise<Uint8Array> {
   const stnr = getEnv('VEREIN_STEUERNUMMER') || 'PLATZHALTER StNr.';
   if (STEUER.bescheid.art === 'freistellung') {
     wrapped(
-      `Wir sind wegen Förderung ${STEUER.zwecke} durch Freistellungsbescheid des ${faGenitiv}, ` +
+      `Wir sind wegen Förderung ${STEUER.zwecke} durch Bescheid des ${faGenitiv}, ` +
         `StNr. ${stnr}, vom ${STEUER.bescheid.datum} für den letzten Veranlagungszeitraum ` +
         `${STEUER.bescheid.veranlagungszeitraum} nach § 5 Abs. 1 Nr. 9 des Körperschaftsteuergesetzes ` +
         `von der Körperschaftsteuer und nach § 3 Nr. 6 des Gewerbesteuergesetzes von der Gewerbesteuer befreit.`,
@@ -177,7 +177,7 @@ export async function buildZuwendungsPdf(spende: Spende): Promise<Uint8Array> {
   rule(10);
   const hinweisDatumSatz =
     STEUER.bescheid.art === 'freistellung'
-      ? 'wenn das Datum des Freistellungsbescheides länger als 5 Jahre seit Ausstellung der Bestätigung zurückliegt'
+      ? 'wenn das Datum des Bescheides länger als 5 Jahre seit Ausstellung der Bestätigung zurückliegt'
       : 'wenn das Datum der Feststellung der Einhaltung der satzungsmäßigen Voraussetzungen nach § 60a Abs. 1 AO länger als 3 Jahre seit Ausstellung der Bestätigung zurückliegt';
   wrapped(
     'Hinweis: Wer vorsätzlich oder grob fahrlässig eine unrichtige Zuwendungsbestätigung erstellt oder ' +
