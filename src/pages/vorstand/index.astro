@@ -215,6 +215,13 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
             {konto?.letzterFehler && (
               <p class="mt-4 text-xs leading-relaxed text-navy-900/60 break-words">Letzte Meldung der Bank: {konto.letzterFehler}</p>
             )}
+            {konto?.letzterFehler?.includes('9955') && (
+              <p class="mt-2 text-xs leading-relaxed text-navy-900/60">
+                Die Bank kennt das Gerät für die Freigabe nicht. In Vercel muss
+                <code>FINTS_TAN_MEDIUM</code> genau die Gerätebezeichnung aus der S-pushTAN-App
+                enthalten (bzw. aus dem Online-Banking unter den pushTAN-Verbindungen).
+              </p>
+            )}
 
             {konto?.eingerichtet && (
               <form method="POST" action="/vorstand/kontostand" class="mt-6 flex flex-wrap items-center gap-4">

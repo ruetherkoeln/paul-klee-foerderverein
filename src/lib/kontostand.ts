@@ -79,8 +79,12 @@ function zugang() {
   const benutzer = getEnv('FINTS_BENUTZER');
   const pin = getEnv('FINTS_PIN');
   const iban = (getEnv('FINTS_IBAN') ?? '').replace(/\s+/g, '').toUpperCase();
+  // Bezeichnung des pushTAN-Geräts, so wie die Sparkasse sie kennt. Ohne sie
+  // schickt lib-fints „default“, und die Sparkasse antwortet mit 9955
+  // „Die Gerätebezeichnung ist unbekannt“.
+  const tanMedium = getEnv('FINTS_TAN_MEDIUM')?.trim() || undefined;
   if (!produktId || !url || !benutzer || !pin || !iban) return null;
-  return { produktId, url, benutzer, pin, iban };
+  return { produktId, url, benutzer, pin, iban, tanMedium };
 }
 
 export async function uebersicht(): Promise<Uebersicht> {
@@ -176,6 +180,15 @@ function verfahrenWaehlen(config: FinTSConfig): number | null {
   return push?.id ?? null;
 }
 
+/**
+ * Gerätebezeichnung direkt setzen. selectTanMedia() prüft gegen die Geräteliste
+ * der Bank, die lib-fints nur in einem erfolgreichen Dialog abholt — genau der
+ * scheitert aber ohne Bezeichnung. Daher am Prüfschritt vorbei.
+ */
+function geraetSetzen(config: FinTSConfig, name: string | undefined): void {
+  if (name) (config as { tanMediaName?: string }).tanMediaName = name;
+}
+
 // ── Abruf ───────────────────────────────────────────────────────────────────
 export type Ergebnis =
   | { status: 'ok'; stand: Stand }
@@ -204,6 +217,7 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
       config = FinTSConfig.fromBankingInformation(
         z.produktId, BANK.produktVersion, info, z.benutzer, z.pin, tanMethode,
       );
+      geraetSetzen(config, z.tanMedium);
     } else {
       // Erstes Mal: zweimal synchronisieren (siehe oben).
       config = FinTSConfig.forFirstTimeUse(z.produktId, BANK.produktVersion, z.url, BANK.blz, z.benutzer, z.pin);
@@ -213,6 +227,7 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
       tanMethode = verfahrenWaehlen(config);
       if (!tanMethode) return await scheitern('Die Bank bietet kein Freigabeverfahren per App (pushTAN) an.');
       c0.selectTanMethod(tanMethode);
+      geraetSetzen(config, z.tanMedium);
       let s2 = await c0.synchronize();
       if (s2.requiresTan) {
         if (!warteAufFreigabeMs) return await freigabeFehlt();

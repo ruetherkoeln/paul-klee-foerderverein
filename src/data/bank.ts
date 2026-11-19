@@ -9,6 +9,8 @@
 //   FINTS_BENUTZER    Anmeldename / Legitimations-ID des Online-Bankings
 //   FINTS_PIN         PIN des Online-Bankings
 //   FINTS_IBAN        das Vereinskonto, dessen Stand gezeigt wird
+//   FINTS_TAN_MEDIUM  Bezeichnung des pushTAN-Geräts (S-pushTAN-App bzw.
+//                     Online-Banking → pushTAN-Verbindungen), sonst Fehler 9955
 //   CRON_SECRET       schützt den täglichen Abruf (Vercel Cron schickt ihn mit)
 export const BANK = {
   name: 'Stadtsparkasse Düsseldorf',
