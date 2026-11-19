@@ -223,7 +223,7 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
       config = FinTSConfig.forFirstTimeUse(z.produktId, BANK.produktVersion, z.url, BANK.blz, z.benutzer, z.pin);
       const c0 = new FinTSClient(config);
       const s1 = await c0.synchronize();
-      if (!s1.success) return await scheitern(meldung(s1));
+      if (!s1.success) return await scheitern(meldung(s1), z, warteAufFreigabeMs);
       tanMethode = verfahrenWaehlen(config);
       if (!tanMethode) return await scheitern('Die Bank bietet kein Freigabeverfahren per App (pushTAN) an.');
       c0.selectTanMethod(tanMethode);
@@ -234,7 +234,7 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
         s2 = await freigabeAbwarten(c0, s2, (ref) => c0.synchronizeWithTan(ref), warteAufFreigabeMs);
         if (s2.requiresTan) return await freigabeFehlt();
       }
-      if (!s2.success) return await scheitern(meldung(s2));
+      if (!s2.success) return await scheitern(meldung(s2), z, warteAufFreigabeMs);
       await zustandSpeichern(config.bankingInformation, tanMethode);
     }
 
@@ -250,7 +250,7 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
       if (r.requiresTan) return await freigabeFehlt();
     }
     if (r.bankingInformationUpdated) await zustandSpeichern(config.bankingInformation, tanMethode);
-    if (!r.success || !r.balance) return await scheitern(meldung(r));
+    if (!r.success || !r.balance) return await scheitern(meldung(r), z, warteAufFreigabeMs);
 
     const b = r.balance;
     const verfuegbar = b.availableAmount ?? null;
@@ -267,12 +267,56 @@ export async function abrufen(warteAufFreigabeMs: number): Promise<Ergebnis> {
   }
 }
 
+/**
+ * Fragt bei der Bank die registrierten pushTAN-Geräte ab (HKTAB). Dafür wird
+ * ein eigener Dialog geführt, in dem die Gerätebezeichnung als „optional“ gilt
+ * und daher nicht mitgeschickt wird — sonst scheitert schon der Dialogstart an
+ * 9955. Löst ggf. eine Push-Nachricht aus; nur nach einem Klick verwenden.
+ */
+async function geraeteErmitteln(
+  z: NonNullable<ReturnType<typeof zugang>>,
+  warteMs: number,
+): Promise<{ geraete: string[] } | { fehler: string }> {
+  try {
+    const config = FinTSConfig.forFirstTimeUse(z.produktId, BANK.produktVersion, z.url, BANK.blz, z.benutzer, z.pin);
+    const c = new FinTSClient(config);
+    const s1 = await c.synchronize();
+    if (!s1.success) return { fehler: meldung(s1) };
+    const tm = verfahrenWaehlen(config);
+    if (!tm) return { fehler: 'kein pushTAN-Verfahren' };
+    const methode = c.selectTanMethod(tm) as { tanMediaRequirement?: number; activeTanMedia?: string[] };
+    if ((methode.tanMediaRequirement ?? 0) > 1) methode.tanMediaRequirement = 1;
+    let s2 = await c.synchronize();
+    if (s2.requiresTan && warteMs > 0) {
+      s2 = await freigabeAbwarten(c, s2, (ref) => c.synchronizeWithTan(ref), warteMs);
+    }
+    const geraete = config.selectedTanMethod?.activeTanMedia ?? [];
+    if (geraete.length) return { geraete };
+    return { fehler: s2.success ? 'Die Bank hat keine Geräte genannt.' : meldung(s2) };
+  } catch (e) {
+    return { fehler: (e as Error).message };
+  }
+}
+
 async function freigabeFehlt(): Promise<Ergebnis> {
   await vermerken(true, null);
   return { status: 'freigabe-noetig' };
 }
 
-async function scheitern(text: string): Promise<Ergebnis> {
+async function scheitern(
+  text: string,
+  z?: NonNullable<ReturnType<typeof zugang>>,
+  warteMs = 0,
+): Promise<Ergebnis> {
+  // Gerätebezeichnung unbekannt: nach einem Klick die Geräteliste der Bank
+  // holen und mit ausgeben, damit FINTS_TAN_MEDIUM richtig gesetzt werden kann.
+  if (z && warteMs > 0 && text.includes('9955')) {
+    const g = await geraeteErmitteln(z, Math.min(warteMs, 35_000)); // Laufzeitgrenze 60 s
+    text += 'geraete' in g
+      ? ` — Bei der Bank registrierte Geräte: ${g.geraete.map((n) => `„${n}“`).join(', ')}`
+        + ` (eingestellt: „${z.tanMedium ?? '—'}“)`
+      : ` — Geräteliste nicht abrufbar: ${g.fehler}`;
+  }
   console.error('Kontostand: Abruf fehlgeschlagen —', text);
   try { await vermerken(false, text); } catch { /* Datenbank selbst gestört */ }
   return { status: 'fehler', text };
