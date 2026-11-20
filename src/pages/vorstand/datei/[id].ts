@@ -2,11 +2,11 @@
 import type { APIRoute } from 'astro';
 import { VORSTAND, zurAnmeldung } from '../../../lib/vorstand.ts';
 import { dokumentLaden } from '../../../lib/vorstand-db.ts';
-import { GESCHUETZT_KOPFZEILEN } from '../../../lib/sicherheit.ts';
+import { dateiAntwort } from '../../../lib/mitglieder-bereich.ts';
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params, cookies }) => {
+export const GET: APIRoute = async ({ params, cookies, url }) => {
   if (!VORSTAND.angemeldet(cookies)) return zurAnmeldung();
 
   const id = Number(params.id);
@@ -21,19 +21,5 @@ export const GET: APIRoute = async ({ params, cookies }) => {
   }
   if (!dok) return new Response('Nicht gefunden', { status: 404 });
 
-  // PDF und Bilder darf der Browser direkt anzeigen, alles andere wird
-  // heruntergeladen. Der Dateiname ist beim Hochladen schon von
-  // Anführungszeichen und Zeilenumbrüchen befreit; der Name in UTF-8 steht
-  // zusätzlich in filename*, damit Umlaute erhalten bleiben.
-  const anzeigen = dok.typ === 'application/pdf' || dok.typ.startsWith('image/');
-  const ascii = dok.dateiname.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '');
-  return new Response(dok.inhalt, {
-    headers: {
-      'content-type': dok.typ,
-      'content-length': String(dok.inhalt.length),
-      'content-disposition': `${anzeigen ? 'inline' : 'attachment'}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(dok.dateiname)}`,
-      'x-content-type-options': 'nosniff',
-      ...GESCHUETZT_KOPFZEILEN,
-    },
-  });
+  return dateiAntwort(dok, url.searchParams.has('download'));
 };

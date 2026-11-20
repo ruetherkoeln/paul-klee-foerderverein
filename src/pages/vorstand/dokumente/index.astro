@@ -8,7 +8,7 @@ import { geschuetzt } from '../../../lib/zugang.ts';
 import { dokumente } from '../../../lib/vorstand-db.ts';
 import type { Dokument } from '../../../lib/vorstand-db.ts';
 import { deDatum } from '../../../lib/csv.ts';
-import { DOKUMENT_TYPEN, MAX_BYTES } from '../../../data/vorstand-bereich.ts';
+import { DOKUMENT_TYPEN, MAX_BYTES, MITGLIEDER_RUBRIKEN } from '../../../data/vorstand-bereich.ts';
 
 export const prerender = false;
 
@@ -18,6 +18,8 @@ if (!VORSTAND.angemeldet(Astro.cookies)) return Astro.redirect(START, 303);
 const HINWEISE: Record<string, { text: string; gut?: boolean }> = {
   hochgeladen: { text: 'Das Dokument ist hochgeladen.', gut: true },
   geloescht: { text: 'Das Dokument ist gelöscht.', gut: true },
+  freigegeben: { text: 'Das Dokument ist jetzt im Mitgliederbereich sichtbar.', gut: true },
+  zurueckgezogen: { text: 'Das Dokument ist jetzt nur noch für den Vorstand sichtbar.', gut: true },
   'nicht-bestaetigt': { text: 'Zum Löschen bitte zuerst das Häkchen „Ja, löschen“ setzen.' },
   'keine-datei': { text: 'Bitte wählen Sie eine Datei aus.' },
   'zu-gross': { text: `Die Datei ist zu groß. Erlaubt sind höchstens ${MAX_BYTES / 1024 / 1024} MB.` },
@@ -35,6 +37,13 @@ try {
   datenFehler = true;
 }
 
+// Auswahl „Sichtbar für“ — beim Hochladen und je Dokument.
+const freigaben = [
+  { wert: 'vorstand', text: 'Nur Vorstand' },
+  ...Object.entries(MITGLIEDER_RUBRIKEN).map(([k, t]) => ({ wert: `mitglieder:${k}`, text: `Mitglieder · ${t}` })),
+];
+const freigabeVon = (d: Dokument) => (d.sichtbar === 'mitglieder' && d.rubrik ? `mitglieder:${d.rubrik}` : 'vorstand');
+
 const annehmen = Object.keys(DOKUMENT_TYPEN).map((e) => `.${e}`).join(',');
 const feld = 'w-full border border-navy-900/20 px-4 py-3 focus:outline-none focus:border-navy-900';
 const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-900/70 mb-1';
@@ -45,7 +54,10 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
       <div class="eyebrow mb-4">Nur für den Vorstand</div>
       <h1 class="text-3xl md:text-4xl font-display font-bold">Dokumente</h1>
       <VorstandNav aktiv="dokumente" />
-      <p class="mt-6 text-sm text-navy-900/60">Protokolle, Bescheide, Verträge. Nur für den Vorstand sichtbar.</p>
+      <p class="mt-6 text-sm text-navy-900/60">
+        Protokolle, Bescheide, Verträge. Sichtbar nur für den Vorstand — außer Sie geben ein
+        Dokument für den <a href="/mitglieder/" class="underline hover:text-navy-900">Mitgliederbereich</a> frei.
+      </p>
 
       {hinweis && (
         <div role="status" class={`mt-8 bg-white border border-navy-900/10 border-l-4 p-5 ${hinweis.gut ? 'border-l-pk-yellow' : 'border-l-pk-red'}`}>
@@ -70,7 +82,21 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
                 <span class="block mt-1 text-xs uppercase tracking-wider text-navy-900/50">
                   {d.dateiname.split('.').pop()?.toUpperCase()} · {groesse(d.groesse)} · hochgeladen {deDatum(d.hochgeladen_am)}
                 </span>
+                {d.sichtbar === 'mitglieder' && (
+                  <span class="inline-block mt-2 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider bg-pk-yellow/30 text-navy-900">
+                    Für Mitglieder sichtbar
+                  </span>
+                )}
               </a>
+              <form method="POST" action="/vorstand/dokumente/aktion" class="flex items-center gap-2 text-sm">
+                <input type="hidden" name="aktion" value="freigabe" />
+                <input type="hidden" name="id" value={d.id} />
+                <label class="sr-only" for={`freigabe-${d.id}`}>Sichtbar für</label>
+                <select id={`freigabe-${d.id}`} name="freigabe" class="border border-navy-900/20 px-2 py-1 text-sm max-w-[16rem]">
+                  {freigaben.map((f) => <option value={f.wert} selected={f.wert === freigabeVon(d)}>{f.text}</option>)}
+                </select>
+                <button type="submit" class="underline text-navy-900/60 hover:text-navy-900">Ändern</button>
+              </form>
               <form method="POST" action="/vorstand/dokumente/aktion" class="flex items-center gap-3 text-sm">
                 <input type="hidden" name="aktion" value="loeschen" />
                 <input type="hidden" name="id" value={d.id} />
@@ -90,7 +116,16 @@ const label = 'block text-xs font-semibold uppercase tracking-wider text-navy-90
         <div>
           <label for="titel" class={label}>Titel (optional)</label>
           <input id="titel" name="titel" maxlength="160" class={feld}
-            placeholder="z. B. Protokoll Vorstandssitzung 14.10.2026" />
+            placeholder="z. B. Protokoll Mitgliederversammlung 09.11.2026" />
+        </div>
+        <div>
+          <label for="freigabe" class={label}>Sichtbar für</label>
+          <select id="freigabe" name="freigabe" class={feld}>
+            {freigaben.map((f) => <option value={f.wert}>{f.text}</option>)}
+          </select>
+          <p class="mt-2 text-xs text-navy-900/60">
+            Mit „Mitglieder · …“ erscheint das Dokument im Mitgliederbereich unter dieser Rubrik.
+          </p>
         </div>
         <div>
           <label for="datei" class={label}>Datei *</label>

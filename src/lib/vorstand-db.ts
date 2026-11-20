@@ -122,6 +122,11 @@ async function dokumenteSchema(): Promise<void> {
       groesse         INTEGER     NOT NULL,
       inhalt_b64      TEXT        NOT NULL
     )`;
+  // Seit 2026-11: Dokumente können für den Mitgliederbereich (/mitglieder/)
+  // freigegeben werden. sichtbar = 'vorstand' bleibt nur im Vorstandsbereich,
+  // 'mitglieder' sehen Mitglieder und Vorstand. rubrik ordnet die Liste dort.
+  await sql()`ALTER TABLE vorstand_dokumente ADD COLUMN IF NOT EXISTS sichtbar TEXT NOT NULL DEFAULT 'vorstand'`;
+  await sql()`ALTER TABLE vorstand_dokumente ADD COLUMN IF NOT EXISTS rubrik TEXT`;
   dokumenteGeprueft = true;
 }
 
@@ -132,21 +137,39 @@ export interface Dokument {
   dateiname: string;
   typ: string;
   groesse: number;
+  sichtbar: 'vorstand' | 'mitglieder';
+  rubrik: string | null;
 }
 
 export async function dokumente(): Promise<Dokument[]> {
   await dokumenteSchema();
   return (await sql()`
-    SELECT id, hochgeladen_am, titel, dateiname, typ, groesse
+    SELECT id, hochgeladen_am, titel, dateiname, typ, groesse, sichtbar, rubrik
       FROM vorstand_dokumente
      ORDER BY hochgeladen_am DESC, id DESC`) as Dokument[];
 }
 
-export async function dokumentLaden(id: number): Promise<(Dokument & { inhalt: Buffer }) | null> {
+/** Nur die für Mitglieder freigegebenen Dokumente. */
+export async function mitgliederDokumente(): Promise<Dokument[]> {
+  await dokumenteSchema();
+  return (await sql()`
+    SELECT id, hochgeladen_am, titel, dateiname, typ, groesse, sichtbar, rubrik
+      FROM vorstand_dokumente
+     WHERE sichtbar = 'mitglieder'
+     ORDER BY hochgeladen_am DESC, id DESC`) as Dokument[];
+}
+
+/** Lädt ein Dokument samt Inhalt. Mit nurMitglieder kommt ein reines
+ *  Vorstandsdokument gar nicht erst aus der Datenbank. */
+export async function dokumentLaden(
+  id: number, nurMitglieder = false,
+): Promise<(Dokument & { inhalt: Buffer }) | null> {
   await dokumenteSchema();
   const rows = (await sql()`
-    SELECT id, hochgeladen_am, titel, dateiname, typ, groesse, inhalt_b64
-      FROM vorstand_dokumente WHERE id = ${id}`) as (Dokument & { inhalt_b64: string })[];
+    SELECT id, hochgeladen_am, titel, dateiname, typ, groesse, sichtbar, rubrik, inhalt_b64
+      FROM vorstand_dokumente
+     WHERE id = ${id}
+       AND (${!nurMitglieder} OR sichtbar = 'mitglieder')`) as (Dokument & { inhalt_b64: string })[];
   const r = rows[0];
   if (!r) return null;
   const { inhalt_b64, ...rest } = r;
@@ -155,11 +178,20 @@ export async function dokumentLaden(id: number): Promise<(Dokument & { inhalt: B
 
 export async function dokumentSpeichern(
   titel: string, dateiname: string, typ: string, inhalt: Buffer,
+  sichtbar: 'vorstand' | 'mitglieder' = 'vorstand', rubrik: string | null = null,
 ): Promise<void> {
   await dokumenteSchema();
   await sql()`
-    INSERT INTO vorstand_dokumente (titel, dateiname, typ, groesse, inhalt_b64)
-    VALUES (${titel}, ${dateiname}, ${typ}, ${inhalt.length}, ${inhalt.toString('base64')})`;
+    INSERT INTO vorstand_dokumente (titel, dateiname, typ, groesse, inhalt_b64, sichtbar, rubrik)
+    VALUES (${titel}, ${dateiname}, ${typ}, ${inhalt.length}, ${inhalt.toString('base64')}, ${sichtbar}, ${rubrik})`;
+}
+
+/** Freigabe für Mitglieder nachträglich ändern. */
+export async function dokumentFreigabe(
+  id: number, sichtbar: 'vorstand' | 'mitglieder', rubrik: string | null,
+): Promise<void> {
+  await dokumenteSchema();
+  await sql()`UPDATE vorstand_dokumente SET sichtbar = ${sichtbar}, rubrik = ${rubrik} WHERE id = ${id}`;
 }
 
 export async function dokumentLoeschen(id: number): Promise<void> {

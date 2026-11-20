@@ -1,0 +1,168 @@
+---
+// Mitgliederbereich — Anmeldung und Dokumente für Mitglieder.
+//
+// Hinter einem gemeinsamen Passwort (MITGLIEDER_PASSWORT). Gezeigt werden nur
+// Dokumente, die der Vorstand unter /vorstand/dokumente/ für Mitglieder
+// freigegeben hat, geordnet nach Rubriken. Satzung und Beitragsordnung sind
+// ohnehin öffentlich und stehen hier zusätzlich fest in ihrer Rubrik.
+import Base from '../../layouts/Base.astro';
+import { MITGLIEDER, START } from '../../lib/mitglieder-bereich.ts';
+import { KONTAKT, groesse } from '../../lib/vorstand.ts';
+import { anmeldungVerarbeiten, geschuetzt } from '../../lib/zugang.ts';
+import { mitgliederDokumente } from '../../lib/vorstand-db.ts';
+import type { Dokument } from '../../lib/vorstand-db.ts';
+import { deDatum } from '../../lib/csv.ts';
+import { MITGLIEDER_RUBRIKEN } from '../../data/vorstand-bereich.ts';
+
+export const prerender = false;
+
+geschuetzt(Astro.response.headers);
+
+const anmeldung = await anmeldungVerarbeiten(
+  Astro.request, Astro.cookies, MITGLIEDER, 'mitglieder', START, KONTAKT,
+);
+if (anmeldung.antwort) return anmeldung.antwort;
+const { fehler, abgemeldet } = anmeldung;
+
+const offen = !abgemeldet && MITGLIEDER.angemeldet(Astro.cookies);
+
+let ablage: Dokument[] = [];
+let datenFehler = false;
+if (offen) {
+  try {
+    ablage = await mitgliederDokumente();
+  } catch (e) {
+    console.error('Mitglieder: Dokumente nicht ladbar —', (e as Error).message);
+    datenFehler = true;
+  }
+}
+
+interface Eintrag { titel: string; info: string; ansehen: string; laden: string }
+
+const FEST: Record<string, Eintrag[]> = {
+  satzung: [
+    {
+      titel: 'Satzung (Neufassung vom 09.11.2026)',
+      info: 'PDF',
+      ansehen: '/dokumente/foerderverein-satzung.pdf',
+      laden: '/dokumente/foerderverein-satzung.pdf',
+    },
+    {
+      titel: 'Beitragsordnung',
+      info: 'PDF',
+      ansehen: '/dokumente/foerderverein-beitragsordnung.pdf',
+      laden: '/dokumente/foerderverein-beitragsordnung.pdf',
+    },
+  ],
+};
+
+const rubriken = Object.entries(MITGLIEDER_RUBRIKEN).map(([schluessel, titel]) => ({
+  schluessel,
+  titel,
+  eintraege: [
+    ...ablage
+      .filter((d) => d.rubrik === schluessel)
+      .map((d): Eintrag => ({
+        titel: d.titel,
+        info: `${d.dateiname.split('.').pop()?.toUpperCase()} · ${groesse(d.groesse)} · eingestellt ${deDatum(d.hochgeladen_am)}`,
+        ansehen: `/mitglieder/datei/${d.id}`,
+        laden: `/mitglieder/datei/${d.id}?download=1`,
+      })),
+    ...(FEST[schluessel] ?? []),
+  ],
+}));
+
+const feld = 'w-full border border-navy-900/20 px-4 py-3 focus:outline-none focus:border-navy-900';
+---
+<Base title="Mitglieder" robots="noindex, nofollow" description="Interner Bereich für die Mitglieder des Fördervereins.">
+
+  <section class="bg-cream-50 pt-16 pb-10">
+    <div class="container-c max-w-4xl">
+      <div class="eyebrow mb-4">Für Mitglieder</div>
+      <h1 class="text-4xl md:text-5xl font-display font-bold leading-tight">Mitgliederbereich</h1>
+      <p class="mt-6 text-lg leading-relaxed text-navy-900/80">
+        Protokolle der Mitgliederversammlung, Jahresabschlüsse, Satzung, Beitragsordnung und
+        weitere Informationen für unsere Mitglieder — zum Ansehen und zum Herunterladen.
+        {!offen && ' Bitte melden Sie sich mit dem Mitgliederpasswort an.'}
+      </p>
+    </div>
+  </section>
+
+  {!offen && (
+    <section class="bg-cream-50 pb-20">
+      <div class="container-c border-t border-navy-900/10 py-12 max-w-4xl">
+        {abgemeldet && (
+          <div class="mb-8 bg-white border border-navy-900/10 border-l-4 border-l-pk-yellow p-5 max-w-md">
+            <p class="text-sm leading-relaxed">Sie sind abgemeldet.</p>
+          </div>
+        )}
+        <form method="POST" class="bg-white border border-navy-900/10 p-6 md:p-8 max-w-md">
+          <label for="passwort" class="block text-sm font-semibold uppercase tracking-wider text-navy-900/70">
+            Mitgliederpasswort
+          </label>
+          <input
+            id="passwort" name="passwort" type="password" required
+            autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"
+            aria-describedby={fehler ? 'passwort-fehler' : undefined}
+            aria-invalid={fehler ? 'true' : undefined}
+            class={`mt-2 text-lg ${feld}`}
+          />
+          {fehler && (
+            <p id="passwort-fehler" role="alert" class="mt-3 text-sm font-semibold" style="color:#c2185b">{fehler}</p>
+          )}
+          <button type="submit" class="btn-dark mt-6 w-full">Anmelden</button>
+        </form>
+        <p class="mt-8 text-sm text-navy-900/60">
+          Passwort vergessen? Schreiben Sie an
+          <a href={`mailto:${KONTAKT}`} class="underline hover:text-navy-900">{KONTAKT}</a>.
+        </p>
+      </div>
+    </section>
+  )}
+
+  {offen && (
+    <section class="bg-cream-50 pb-20">
+      <div class="container-c border-t border-navy-900/10 py-12 max-w-4xl space-y-12">
+        {datenFehler && (
+          <div role="alert" class="bg-white border-2 border-pk-red p-5 text-sm">
+            Die Dokumente konnten gerade nicht geladen werden. Bitte die Seite in einer Minute neu laden.
+          </div>
+        )}
+
+        {rubriken.map((r) => (
+          <div>
+            <h2 class="text-2xl font-display font-bold">{r.titel}</h2>
+            {r.eintraege.length === 0 ? (
+              <p class="mt-4 text-sm text-navy-900/60">Hier ist noch nichts eingestellt.</p>
+            ) : (
+              <ul class="mt-5 space-y-3">
+                {r.eintraege.map((e) => (
+                  <li class="bg-white p-5 border border-navy-900/10 border-l-4 border-l-pk-yellow flex flex-wrap items-center gap-4">
+                    <div class="flex-1 min-w-[12rem]">
+                      <a href={e.ansehen} target="_blank" rel="noopener" class="font-semibold hover:text-gold-600 transition-colors">{e.titel}</a>
+                      <div class="mt-1 text-xs uppercase tracking-wider text-navy-900/50">{e.info}</div>
+                    </div>
+                    <div class="flex gap-4 text-sm">
+                      <a href={e.ansehen} target="_blank" rel="noopener" class="underline text-navy-900/70 hover:text-navy-900">Ansehen</a>
+                      <a href={e.laden} download class="underline text-navy-900/70 hover:text-navy-900">Herunterladen</a>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+
+        <div class="flex flex-wrap items-center gap-6 border-t border-navy-900/10 pt-8">
+          <form method="POST">
+            <input type="hidden" name="abmelden" value="1" />
+            <button type="submit" class="text-sm underline text-navy-900/60 hover:text-navy-900">Abmelden</button>
+          </form>
+          <span class="text-sm text-navy-900/50">
+            Die Unterlagen sind nur für Mitglieder bestimmt. Bitte nicht weitergeben.
+          </span>
+        </div>
+      </div>
+    </section>
+  )}
+</Base>
