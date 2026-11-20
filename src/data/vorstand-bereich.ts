@@ -23,3 +23,12 @@ export const DOKUMENT_TYPEN: Record<string, string> = {
   jpeg: 'image/jpeg',
   png: 'image/png',
 };
+
+// Rubriken im Mitgliederbereich (/mitglieder/) — Schlüssel → Überschrift.
+// Reihenfolge = Reihenfolge auf der Seite.
+export const MITGLIEDER_RUBRIKEN: Record<string, string> = {
+  protokolle: 'Protokolle der Mitgliederversammlung',
+  jahresabschluesse: 'Jahresabschlüsse',
+  satzung: 'Satzung und Ordnungen',
+  informationen: 'Informationen für Mitglieder',
+};
